@@ -1,0 +1,11 @@
+*.iml
+.gradle
+local.properties
+*/build
+.idea/compiler.xml
+.idea/copyright
+.idea/libraries
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+build

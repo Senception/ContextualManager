@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PerSense Light</string>
+    <string name="background">A correr em background...</string>
+    <string name="getInfo">A Obter Informação, Por Favor Aguarde...</string>
+    <string name="stopservice">Parar o Serviço</string>
+    <string name="wifiOff">Wifi Desligado</string>
+    <string name="wifiOn">Wifi Ligado</string>
+    <string name="wifiDown">Falha na conexão Wifi</string>
+    <string name="wifiUp">Conexão Wifi Estabelecida</string>
+    <string name="bestAp">Connectado ao melhor PA </string>
+    <string name="noAp">BD vazia</string>
+    <string name="handover">Handover to AP </string>
+    <string name="expected">is expected to occur in about</string>
+    <string name="expectedd">was expected to occur about</string>
+    <string name="fused">Serviço de Localização</string>
+    <string name="fusedd">Vefique se o Serviço de Localizaçao esta Activo</string>
+    <string name="weekended">A Semana Terminou!!!</string>
+    <string name="mainback">Carrega mais uma vez no botão Back para fechar a aplicação.</string>
+    <string name="sendreport">Enviar Relatório</string>
+    <string name="emailnotsent">Não foi possível enviar o email: </string>
+    <string name="nointernet">Relatório não enviado, sem acesso a internet!</string>
+    <string name="report_time">Escolher Hora de Gerar Relatórios</string>
+    
+  
+</resources>

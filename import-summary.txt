@@ -1,0 +1,235 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Manifest Merging:
+-----------------
+Your project uses libraries that provide manifests, and your Eclipse
+project did not explicitly turn on manifest merging. In Android Gradle
+projects, manifests are always merged (meaning that contents from your
+libraries' manifests will be merged into the app manifest. If you had
+manually copied contents from library manifests into your app manifest
+you may need to remove these for the app to build correctly.
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+* .pydevproject
+* doc/
+* doc/allclasses-frame.html
+* doc/allclasses-noframe.html
+* doc/com/
+* doc/com/example/
+* doc/com/example/tkiddo/
+* doc/com/example/tkiddo/BuildConfig.html
+* doc/com/example/tkiddo/R.attr.html
+* doc/com/example/tkiddo/R.color.html
+* doc/com/example/tkiddo/R.dimen.html
+* doc/com/example/tkiddo/R.drawable.html
+* doc/com/example/tkiddo/R.html
+* doc/com/example/tkiddo/R.id.html
+* doc/com/example/tkiddo/R.integer.html
+* doc/com/example/tkiddo/R.layout.html
+* doc/com/example/tkiddo/R.menu.html
+* doc/com/example/tkiddo/R.raw.html
+* doc/com/example/tkiddo/R.string.html
+* doc/com/example/tkiddo/R.style.html
+* doc/com/example/tkiddo/R.styleable.html
+* doc/com/example/tkiddo/TKiddoAP.html
+* doc/com/example/tkiddo/TKiddoCAP.html
+* doc/com/example/tkiddo/TKiddoCAPDetail.html
+* doc/com/example/tkiddo/TKiddoCustomAdapter.html
+* doc/com/example/tkiddo/TKiddoCustomAdapterH.html
+* doc/com/example/tkiddo/TKiddoCustomAdapterL.html
+* doc/com/example/tkiddo/TKiddoDado.html
+* doc/com/example/tkiddo/TKiddoDataBaseChangeListener.html
+* doc/com/example/tkiddo/TKiddoDataSource.html
+* doc/com/example/tkiddo/TKiddoFusedLocation.html
+* doc/com/example/tkiddo/TKiddoLocate.Connect.html
+* doc/com/example/tkiddo/TKiddoLocate.MyClientTask.html
+* doc/com/example/tkiddo/TKiddoLocate.html
+* doc/com/example/tkiddo/TKiddoMainActivity.html
+* doc/com/example/tkiddo/TKiddoMapA.html
+* doc/com/example/tkiddo/TKiddoMapC.html
+* doc/com/example/tkiddo/TKiddoMapH.html
+* doc/com/example/tkiddo/TKiddoMapL.html
+* doc/com/example/tkiddo/TKiddoPerSense.html
+* doc/com/example/tkiddo/TKiddoSQLiteHelper.html
+* doc/com/example/tkiddo/TKiddoService.AlarmReceiver.html
+* doc/com/example/tkiddo/TKiddoService.LocalBinder.html
+* doc/com/example/tkiddo/TKiddoService.html
+* doc/com/example/tkiddo/TKiddoSmsReceiver.html
+* doc/com/example/tkiddo/TKiddoSmsSender.html
+* doc/com/example/tkiddo/TKiddoVisit.html
+* doc/com/example/tkiddo/TKiddoWifiChangeListener.html
+* doc/com/example/tkiddo/TKiddoWifiManager.html
+* doc/com/example/tkiddo/TKiddoWifiP2P.html
+* doc/com/example/tkiddo/class-use/
+* doc/com/example/tkiddo/class-use/BuildConfig.html
+* doc/com/example/tkiddo/class-use/R.attr.html
+* doc/com/example/tkiddo/class-use/R.color.html
+* doc/com/example/tkiddo/class-use/R.dimen.html
+* doc/com/example/tkiddo/class-use/R.drawable.html
+* doc/com/example/tkiddo/class-use/R.html
+* doc/com/example/tkiddo/class-use/R.id.html
+* doc/com/example/tkiddo/class-use/R.integer.html
+* doc/com/example/tkiddo/class-use/R.layout.html
+* doc/com/example/tkiddo/class-use/R.menu.html
+* doc/com/example/tkiddo/class-use/R.raw.html
+* doc/com/example/tkiddo/class-use/R.string.html
+* doc/com/example/tkiddo/class-use/R.style.html
+* doc/com/example/tkiddo/class-use/R.styleable.html
+* doc/com/example/tkiddo/class-use/TKiddoAP.html
+* doc/com/example/tkiddo/class-use/TKiddoCAP.html
+* doc/com/example/tkiddo/class-use/TKiddoCAPDetail.html
+* doc/com/example/tkiddo/class-use/TKiddoCustomAdapter.html
+* doc/com/example/tkiddo/class-use/TKiddoCustomAdapterH.html
+* doc/com/example/tkiddo/class-use/TKiddoCustomAdapterL.html
+* doc/com/example/tkiddo/class-use/TKiddoDado.html
+* doc/com/example/tkiddo/class-use/TKiddoDataBaseChangeListener.html
+* doc/com/example/tkiddo/class-use/TKiddoDataSource.html
+* doc/com/example/tkiddo/class-use/TKiddoFusedLocation.html
+* doc/com/example/tkiddo/class-use/TKiddoLocate.Connect.html
+* doc/com/example/tkiddo/class-use/TKiddoLocate.MyClientTask.html
+* doc/com/example/tkiddo/class-use/TKiddoLocate.html
+* doc/com/example/tkiddo/class-use/TKiddoMainActivity.html
+* doc/com/example/tkiddo/class-use/TKiddoMapA.html
+* doc/com/example/tkiddo/class-use/TKiddoMapC.html
+* doc/com/example/tkiddo/class-use/TKiddoMapH.html
+* doc/com/example/tkiddo/class-use/TKiddoMapL.html
+* doc/com/example/tkiddo/class-use/TKiddoPerSense.html
+* doc/com/example/tkiddo/class-use/TKiddoSQLiteHelper.html
+* doc/com/example/tkiddo/class-use/TKiddoService.AlarmReceiver.html
+* doc/com/example/tkiddo/class-use/TKiddoService.LocalBinder.html
+* doc/com/example/tkiddo/class-use/TKiddoService.html
+* doc/com/example/tkiddo/class-use/TKiddoSmsReceiver.html
+* doc/com/example/tkiddo/class-use/TKiddoSmsSender.html
+* doc/com/example/tkiddo/class-use/TKiddoVisit.html
+* doc/com/example/tkiddo/class-use/TKiddoWifiChangeListener.html
+* doc/com/example/tkiddo/class-use/TKiddoWifiManager.html
+* doc/com/example/tkiddo/class-use/TKiddoWifiP2P.html
+* doc/com/example/tkiddo/package-frame.html
+* doc/com/example/tkiddo/package-summary.html
+* doc/com/example/tkiddo/package-tree.html
+* doc/com/example/tkiddo/package-use.html
+* doc/com/google/
+* doc/com/google/android/
+* doc/com/google/android/gms/
+* doc/com/google/android/gms/R.attr.html
+* doc/com/google/android/gms/R.color.html
+* doc/com/google/android/gms/R.drawable.html
+* doc/com/google/android/gms/R.html
+* doc/com/google/android/gms/R.id.html
+* doc/com/google/android/gms/R.integer.html
+* doc/com/google/android/gms/R.raw.html
+* doc/com/google/android/gms/R.string.html
+* doc/com/google/android/gms/R.style.html
+* doc/com/google/android/gms/R.styleable.html
+* doc/com/google/android/gms/class-use/
+* doc/com/google/android/gms/class-use/R.attr.html
+* doc/com/google/android/gms/class-use/R.color.html
+* doc/com/google/android/gms/class-use/R.drawable.html
+* doc/com/google/android/gms/class-use/R.html
+* doc/com/google/android/gms/class-use/R.id.html
+* doc/com/google/android/gms/class-use/R.integer.html
+* doc/com/google/android/gms/class-use/R.raw.html
+* doc/com/google/android/gms/class-use/R.string.html
+* doc/com/google/android/gms/class-use/R.style.html
+* doc/com/google/android/gms/class-use/R.styleable.html
+* doc/com/google/android/gms/package-frame.html
+* doc/com/google/android/gms/package-summary.html
+* doc/com/google/android/gms/package-tree.html
+* doc/com/google/android/gms/package-use.html
+* doc/constant-values.html
+* doc/deprecated-list.html
+* doc/help-doc.html
+* doc/index-files/
+* doc/index-files/index-1.html
+* doc/index-files/index-10.html
+* doc/index-files/index-11.html
+* doc/index-files/index-12.html
+* doc/index-files/index-13.html
+* doc/index-files/index-14.html
+* doc/index-files/index-15.html
+* doc/index-files/index-16.html
+* doc/index-files/index-17.html
+* doc/index-files/index-18.html
+* doc/index-files/index-19.html
+* doc/index-files/index-2.html
+* doc/index-files/index-20.html
+* doc/index-files/index-21.html
+* doc/index-files/index-3.html
+* doc/index-files/index-4.html
+* doc/index-files/index-5.html
+* doc/index-files/index-6.html
+* doc/index-files/index-7.html
+* doc/index-files/index-8.html
+* doc/index-files/index-9.html
+* doc/index.html
+* doc/overview-frame.html
+* doc/overview-summary.html
+* doc/overview-tree.html
+* doc/package-list
+* doc/script.js
+* doc/stylesheet.css
+* ic_launcher-web.png
+* proguard-project.txt
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:22.2.1
+
+Replaced Libraries with Dependencies:
+-------------------------------------
+The importer recognized the following library projects as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the source files in your project were of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the library replacement in the import wizard and try
+again:
+
+appcompat-v7 => [com.android.support:appcompat-v7:22.2.1]
+google-play-services_lib => [com.google.android.gms:play-services:+]
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+In showcaselib:
+* AndroidManifest.xml => showcaselib/src/main/AndroidManifest.xml
+* assets/ => showcaselib/src/main/assets
+* res/ => showcaselib/src/main/res/
+* src/ => showcaselib/src/main/java/
+In PerSense_Light:
+* AndroidManifest.xml => perSense_Light/src/main/AndroidManifest.xml
+* assets/ => perSense_Light/src/main/assets
+* res/ => perSense_Light/src/main/res/
+* src/ => perSense_Light/src/main/java/
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.senception.cmumobile.CMUmobileMainActivity" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:showAsAction="always"
+        android:icon="@drawable/menu_icon"
+        android:title="@string/stopservice">
+        <menu>
+            <item
+                android:id="@+id/sendreport"
+                android:orderInCategory="1"
+                android:showAsAction="always"
+                android:icon="@drawable/sendreport"
+                android:title="@string/sendreport">
+
+            </item>
+
+            <item
+                android:id="@+id/stopservice"
+                android:orderInCategory="2"
+                android:showAsAction="always"
+                android:icon="@drawable/stop"
+                android:title="@string/stopservice">
+            </item>
+
+        </menu>
+    </item>
+
+</menu>

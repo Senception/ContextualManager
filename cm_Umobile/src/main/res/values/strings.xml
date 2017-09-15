@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">PerSense Light</string>
+    <string name="background">Running in background...</string> 
+    <string name="getInfo">Getting Info, Please Wait...</string>
+    <string name="stopservice">Stop Service</string>
+    <string name="wifiOff">Wifi turned OFF</string>
+    <string name="wifiOn">Wifi turned ON</string>
+    <string name="wifiDown">Wifi connection DOWN</string>
+    <string name="wifiUp">Wifi connection UP</string>
+    <string name="bestAp">Connected to the best AP </string>
+    <string name="noAp">No AP in DB</string>
+    <string name="handover">Handover to AP </string>
+    <string name="expected">is expected to occur in about</string>
+    <string name="expectedd">was expected to occur about</string>
+    <string name="fused">Location Services</string>
+    <string name="fusedd">Verify Location Services is Enabled</string>
+    <string name="weekended">The Week As Ended</string>  
+    <string name="mainback">Press the back button once again to close the application.</string>
+    <string name="sendreport">Send Report</string>
+    <string name="emailnotsent">Could not send email: </string>
+    <string name="nointernet">Report not sent, No internet access</string>
+    <string name="report_time">Set Generating Report Time</string>
+  
+</resources>
