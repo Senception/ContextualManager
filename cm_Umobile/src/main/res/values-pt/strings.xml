@@ -22,6 +22,10 @@
     <string name="emailnotsent">Não foi possível enviar o email: </string>
     <string name="nointernet">Relatório não enviado, sem acesso a internet!</string>
     <string name="report_time">Escolher Hora de Gerar Relatórios</string>
-    
+    <string name="usage_stats">Estatísticas de uso</string>
+    <string name="usage_stats_message">Verifique se as permissões para estatisticas de uso estão activas.</string>
+    <string name="usage_stats_gps"> Dados estatisticos ou Localização desligado. </string>
+    <string name="permission_request_msg">Verifique se os dados estatisticos e serviços de localização estão activos.</string>
+    <string name="page_1"> Check usage stats permission </string>
   
 </resources>

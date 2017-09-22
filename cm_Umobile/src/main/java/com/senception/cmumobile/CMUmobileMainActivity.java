@@ -81,7 +81,13 @@ public class CMUmobileMainActivity extends Activity {
 		setContentView(R.layout.cmumobile_ma_layout);
 
 		//Log.d(TAG, "MAIN ACTIVITY");
+		//Asks user for permission to get usage stats
 
+		if(!Permissions.usageStatsPermission(getApplicationContext())){
+			Intent intent = new Intent(this, LaunchDialog.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivityForResult(intent, 1);
+		}
 		startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
 		doBindService();
 
@@ -89,7 +95,6 @@ public class CMUmobileMainActivity extends Activity {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		if(mIsServiceBound && mConnection == null){
 			doBindService();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="app_name">PerSense Light</string>
+    <string name="app_name">Contextual Manager</string>
     <string name="background">Running in background...</string> 
     <string name="getInfo">Getting Info, Please Wait...</string>
     <string name="stopservice">Stop Service</string>
@@ -15,12 +15,19 @@
     <string name="expected">is expected to occur in about</string>
     <string name="expectedd">was expected to occur about</string>
     <string name="fused">Location Services</string>
-    <string name="fusedd">Verify Location Services is Enabled</string>
-    <string name="weekended">The Week As Ended</string>  
+    <string name="weekended">The Week As Ended</string>
     <string name="mainback">Press the back button once again to close the application.</string>
     <string name="sendreport">Send Report</string>
     <string name="emailnotsent">Could not send email: </string>
     <string name="nointernet">Report not sent, No internet access</string>
     <string name="report_time">Set Generating Report Time</string>
-  
+    <string name="usage_stats">Usage stats</string>
+    <string name="fusedd">Verify Location Services is Enabled</string>
+    <string name="usage_stats_message">Verify if permission to access usage stats is enabled.</string>
+    <string name="usage_stats_gps"> Usage stats and Location turned off.</string>
+    <string name="permission_request"> Please check if usage stats and location services are enabled. </string>
+    <string name="location"> Location </string>
+    <string name="page_1"> Check usage stats permission </string>
+
+
 </resources>

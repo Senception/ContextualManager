@@ -1,9 +1,18 @@
 package com.senception.cmumobile.ResourceUsage;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AppOpsManager;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Process;
+import android.provider.Settings;
 
 import java.util.ArrayList;
+
+import static android.app.AppOpsManager.MODE_ALLOWED;
+import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -20,11 +29,14 @@ import java.util.ArrayList;
  */
 public class ResourceUsageHandler {
 
-    public static void start() {
+    public static void start(Context context) {
+
+        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+
+
 
         //Check battery usage
         checkEnergyUsage();
-
     }
 
     private static void checkEnergyUsage() {
@@ -36,9 +48,4 @@ public class ResourceUsageHandler {
 
     }
 
-    private boolean checkForPermission(Context context){
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
-        return mode == MODE_ALLOWED;
-    }
 }

@@ -52,7 +52,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
-import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
@@ -112,16 +111,17 @@ public class CMUmobileService extends Service{
 	public void onCreate(){
 		super.onCreate();
 
-		ResourceUsageHandler.start();
+		AlertDialog.Builder alertBox = new AlertDialog.Builder(getApplicationContext());
+
+		ResourceUsageHandler.start(this);
 
 		//Log.d(TAG, " SERVICE ");
+		//Asks user for permission to get location
 		if(!isLocationEnabled(getApplicationContext())){
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-
-			builder.setTitle(getString(R.string.fused));
-			builder.setMessage(getString(R.string.fusedd));
-			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			alertBox.setTitle(getString(R.string.fused));
+			alertBox.setMessage(getString(R.string.fusedd));
+			alertBox.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -131,7 +131,7 @@ public class CMUmobileService extends Service{
 					startActivity(intent);
 				}
 			});
-			Dialog alertDialog = builder.create();
+			Dialog alertDialog = alertBox.create();
 			alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
 			alertDialog.setCanceledOnTouchOutside(false);
 			alertDialog.show();
