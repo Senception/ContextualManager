@@ -30,19 +30,21 @@ import java.util.Date;
 import java.util.List;
 
 import com.opencsv.CSVWriter;
-import com.senception.cmumobile.ResourceUsage.ResourceUsageHandler;
+import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
+import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
+import com.senception.cmumobile.interfaces.CMUmobileWifiChangeListener;
+import com.senception.cmumobile.interfaces.CMUmobileWifiP2PChangeListener;
+import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.pipelines.CMUmobileWifiP2P;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -58,8 +60,6 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.IBinder;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 //import android.util.Log;
@@ -111,13 +111,12 @@ public class CMUmobileService extends Service{
 	public void onCreate(){
 		super.onCreate();
 
-		AlertDialog.Builder alertBox = new AlertDialog.Builder(getApplicationContext());
-
-		ResourceUsageHandler.start(this);
+		//ResourceUsageHandler.start(this);
 
 		//Log.d(TAG, " SERVICE ");
 		//Asks user for permission to get location
-		if(!isLocationEnabled(getApplicationContext())){
+		/*if(!Permissions.isLocationEnabled(getApplicationContext())){
+			AlertDialog.Builder alertBox = new AlertDialog.Builder(getApplicationContext());
 
 			alertBox.setTitle(getString(R.string.fused));
 			alertBox.setMessage(getString(R.string.fusedd));
@@ -135,7 +134,7 @@ public class CMUmobileService extends Service{
 			alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
 			alertDialog.setCanceledOnTouchOutside(false);
 			alertDialog.show();
-		}
+		}*/
 
 		fusedLocation = new CMUmobileFusedLocation(CMUmobileService.this);
 		dataSource = new CMUmobileDataSource(this);
@@ -203,32 +202,7 @@ public class CMUmobileService extends Service{
 	public void stopForeGround(){
 		stopForeground(true);
 	}
-	/**
-	 * Function isLocationEnabled
-	 * Check if location service is Enabled
-	 * @param context application context
-	 * @return true if location service is enabled and false if location service is disabled
-	 */
-	@SuppressWarnings("deprecation")
-	public static boolean isLocationEnabled(Context context) {
-		int locationMode = 0;
-		String locationProviders;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-			try {
-				locationMode = Settings.Secure.getInt(context.getContentResolver(), Settings.Secure.LOCATION_MODE);
-
-			} catch (SettingNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			return locationMode != Settings.Secure.LOCATION_MODE_OFF;
-
-		}else{
-			locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-			return !TextUtils.isEmpty(locationProviders);
-		}
-	}
 	/**
 	 * Function discoveredPeers
 	 * Register or Update discovered wifi p2p devices
@@ -886,7 +860,7 @@ public class CMUmobileService extends Service{
 		}
 	}
 
-	class PerSenseServiceWifiListener implements CMUmobileWifiChangeListener{
+	class PerSenseServiceWifiListener implements CMUmobileWifiChangeListener {
 		public void onWifiStateDisabled(boolean valid, String bssid, String ssid, long visitId, long connectionStart, long connectionEnd){
 			notifyPredictedMoveChange(getString(R.string.wifiOff));
 			if(valid){

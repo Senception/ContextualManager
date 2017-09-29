@@ -24,6 +24,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 
+import com.senception.cmumobile.interfaces.CMUmobileWifiChangeListener;
+
 /**
  * This class provides some methods to provide extended
  * functionality to the android WifiManager.
@@ -39,7 +41,7 @@ public class CMUmobileWifiManager {
 	
 	WifiInfo wifiCurrentAP;
 	private long wifiCurrentVisitId;
-	protected long wifiCurrentAPStart;
+	public long wifiCurrentAPStart;
 	
 	private WifiStateChange wifiStateReceiver;
 	private WifiConnectionChange wifiConnReceiver;
@@ -77,7 +79,7 @@ public class CMUmobileWifiManager {
 		
 	};
 	
-	CMUmobileWifiManager (Context c) {
+	public CMUmobileWifiManager (Context c) {
 		androidWifiManager = (WifiManager)c.getSystemService(Context.WIFI_SERVICE);
 		wifiStateReceiver = new WifiStateChange();
     	wifiConnReceiver = new WifiConnectionChange();

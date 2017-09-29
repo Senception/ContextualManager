@@ -27,6 +27,10 @@ import android.content.Context;
 import android.database.*;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
+import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.modals.CMUmobileVisit;
+
 /**
  * This class provides methods to insert, update and
  * query the application database. It also provide
@@ -36,7 +40,7 @@ import android.database.sqlite.SQLiteDatabase;
  */
 public class CMUmobileDataSource {
 	
-	SQLiteDatabase db;
+	public SQLiteDatabase db;
 	private CMUmobileSQLiteHelper dbHelper;
 	private boolean isDbOpen;
 	private GregorianCalendar cal;

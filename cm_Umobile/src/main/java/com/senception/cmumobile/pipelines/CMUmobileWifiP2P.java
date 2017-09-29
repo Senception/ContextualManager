@@ -22,6 +22,8 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+
+import com.senception.cmumobile.modals.CMUmobileAP;
 //import android.util.Log;
 
 @SuppressLint("NewApi")

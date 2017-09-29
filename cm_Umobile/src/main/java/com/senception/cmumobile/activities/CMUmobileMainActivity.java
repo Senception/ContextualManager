@@ -38,10 +38,16 @@ import android.view.MenuItem;
 
 import android.widget.Toast;
 
+import com.senception.cmumobile.dialogs.LaunchDialog;
+import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
+import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.services.CMUmobileService;
+
 @SuppressLint("Recycle")
 public class CMUmobileMainActivity extends Activity {
 
 	private static final String TAG ="MAIN ACTIVITY--->";
+	static final int PERMISSION_REQUEST = 1;  // The request code
 	int backButtonCount = 0;
 	private CMUmobileService mBoundService;
 	private boolean mIsServiceBound = false;
@@ -84,13 +90,38 @@ public class CMUmobileMainActivity extends Activity {
 		//Asks user for permission to get usage stats
 
 		if(!Permissions.usageStatsPermission(getApplicationContext())){
-			Intent intent = new Intent(this, LaunchDialog.class);
+			Intent usage_request = new Intent(this, LaunchDialog.class);
+			//usage_request.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			//startActivityForResult(usage_request, PERMISSION_REQUEST);
+			startActivity(usage_request);
+		}
+
+
+		/*if(!Permissions.isLocationEnabled(getApplicationContext())){
+			Intent intent = new Intent(this, GPSDialog.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivityForResult(intent, 1);
-		}
+		}*/
+
 		startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
 		doBindService();
 
+	}
+
+	// Call Back method  to get the Message form other Activity
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		super.onActivityResult(requestCode, resultCode, data);
+		// check if the request code is same as what is passed  here it is 2
+		if(requestCode==1)
+		{
+			String message = data.getStringExtra("Permission");
+			if(message == "True"){
+				Toast.makeText(this, "It came out true", Toast.LENGTH_SHORT).show();
+			}
+			//textView1.setText(message);
+		}
 	}
 
 	@Override

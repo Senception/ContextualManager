@@ -19,6 +19,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.senception.cmumobile.services.CMUmobileService;
 
 import android.content.Context;
 import android.location.Location;
@@ -32,7 +33,7 @@ public class CMUmobileFusedLocation implements LocationListener, GoogleApiClient
 	private static final long FASTEST_INTERVAL = 500 * 10;
 	LocationRequest mLocationRequest;
 	GoogleApiClient mGoogleApiClient;
-	Location mCurrentLocation;
+	public Location mCurrentLocation;
 	private final Context mContext;
 	CMUmobileService service;
 
@@ -80,7 +81,7 @@ public class CMUmobileFusedLocation implements LocationListener, GoogleApiClient
 	           LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,  mLocationRequest, this);	
 		}
 	}
-	protected void stopLocationUpdates(){
+	public void stopLocationUpdates(){
 		LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
 	}
 
