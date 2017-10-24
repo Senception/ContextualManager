@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">PerSense Light</string>
+    <string name="app_name">Contextual Manager</string>
     <string name="background">A correr em background...</string>
     <string name="getInfo">A Obter Informação, Por Favor Aguarde...</string>
     <string name="stopservice">Parar o Serviço</string>
@@ -14,8 +14,6 @@
     <string name="handover">Handover to AP </string>
     <string name="expected">is expected to occur in about</string>
     <string name="expectedd">was expected to occur about</string>
-    <string name="fused">Serviço de Localização</string>
-    <string name="fusedd">Vefique se o Serviço de Localizaçao esta Activo</string>
     <string name="weekended">A Semana Terminou!!!</string>
     <string name="mainback">Carrega mais uma vez no botão Back para fechar a aplicação.</string>
     <string name="sendreport">Enviar Relatório</string>
@@ -23,9 +21,9 @@
     <string name="nointernet">Relatório não enviado, sem acesso a internet!</string>
     <string name="report_time">Escolher Hora de Gerar Relatórios</string>
     <string name="usage_stats">Estatísticas de uso</string>
-    <string name="usage_stats_message">Verifique se as permissões para estatisticas de uso estão activas.</string>
-    <string name="usage_stats_gps"> Dados estatisticos ou Localização desligado. </string>
-    <string name="permission_request_msg">Verifique se os dados estatisticos e serviços de localização estão activos.</string>
-    <string name="page_1"> Check usage stats permission </string>
+    <string name="usage_stats_msg">Verifique se as permissões para estatisticas de uso estão activas.</string>
+    <string name="location">Serviço de Localização</string>
+    <string name="location_msg">Vefique se o Serviço de Localizaçao esta Activo</string>
+
   
 </resources>

@@ -12,7 +12,7 @@
  * the day of the week, and the hour of the day
  */ 
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.modals;
 
 import android.annotation.SuppressLint;
 import java.text.SimpleDateFormat;

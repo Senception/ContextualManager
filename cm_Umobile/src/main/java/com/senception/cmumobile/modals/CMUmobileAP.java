@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.modals;
 
 public class CMUmobileAP {
 

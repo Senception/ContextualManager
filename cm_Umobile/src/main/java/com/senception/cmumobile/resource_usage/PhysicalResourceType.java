@@ -1,6 +1,4 @@
-package com.senception.cmumobile.ResourceUsage;
-
-import java.util.ArrayList;
+package com.senception.cmumobile.resource_usage;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -19,6 +17,6 @@ import java.util.ArrayList;
 public enum PhysicalResourceType {
     ENERGY,
     STORAGE,
-    CPU,;
-
+    CPU,
+    MEMORY,
 }

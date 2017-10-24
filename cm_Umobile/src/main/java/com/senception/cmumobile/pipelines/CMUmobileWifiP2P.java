@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.pipelines;
 
 import java.util.ArrayList;
 import android.annotation.SuppressLint;
@@ -23,6 +23,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
+import com.senception.cmumobile.services.CMUmobileService;
 import com.senception.cmumobile.modals.CMUmobileAP;
 //import android.util.Log;
 

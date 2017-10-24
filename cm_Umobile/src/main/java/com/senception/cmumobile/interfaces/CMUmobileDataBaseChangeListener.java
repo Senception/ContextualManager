@@ -11,7 +11,9 @@
  *
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.interfaces;
+
+import com.senception.cmumobile.modals.CMUmobileAP;
 
 import java.util.List;
 

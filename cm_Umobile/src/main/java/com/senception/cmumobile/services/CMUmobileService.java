@@ -13,7 +13,7 @@
  *
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.services;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -30,12 +30,18 @@ import java.util.Date;
 import java.util.List;
 
 import com.opencsv.CSVWriter;
+import com.senception.cmumobile.databases.CMUmobileDataSource;
+import com.senception.cmumobile.pipelines.CMUmobileFusedLocation;
+import com.senception.cmumobile.activities.CMUmobileMainActivity;
+import com.senception.cmumobile.pipelines.CMUmobileWifiManager;
+import com.senception.cmumobile.R;
 import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
 import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
 import com.senception.cmumobile.interfaces.CMUmobileWifiChangeListener;
 import com.senception.cmumobile.interfaces.CMUmobileWifiP2PChangeListener;
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.pipelines.CMUmobileWifiP2P;
+import com.senception.cmumobile.resource_usage.ResourceUsageHandler;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -43,6 +49,7 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TimePickerDialog;
+import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -102,7 +109,7 @@ public class CMUmobileService extends Service{
 	private final IBinder mBinder = new LocalBinder();
 
 	public class LocalBinder extends Binder{
-		CMUmobileService getService(){
+		public CMUmobileService getService(){
 			return CMUmobileService.this;
 		}
 	}
@@ -114,27 +121,8 @@ public class CMUmobileService extends Service{
 		//ResourceUsageHandler.start(this);
 
 		//Log.d(TAG, " SERVICE ");
-		//Asks user for permission to get location
-		/*if(!Permissions.isLocationEnabled(getApplicationContext())){
-			AlertDialog.Builder alertBox = new AlertDialog.Builder(getApplicationContext());
 
-			alertBox.setTitle(getString(R.string.fused));
-			alertBox.setMessage(getString(R.string.fusedd));
-			alertBox.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					// TODO Auto-generated method stub
-					Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-					startActivity(intent);
-				}
-			});
-			Dialog alertDialog = alertBox.create();
-			alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-			alertDialog.setCanceledOnTouchOutside(false);
-			alertDialog.show();
-		}*/
+        //ResourceUsageHandler.start(getApplicationContext());
 
 		fusedLocation = new CMUmobileFusedLocation(CMUmobileService.this);
 		dataSource = new CMUmobileDataSource(this);
@@ -192,7 +180,7 @@ public class CMUmobileService extends Service{
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.cmumobilelight)
-				.setContentText("PerSence Light")
+				.setContentText(getString(R.string.app_name))
 				.setContentIntent(pendingIntent).build();
 
 		startForeground(NOTIFICATION_ID, notification);

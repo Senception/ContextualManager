@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.pipelines;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;

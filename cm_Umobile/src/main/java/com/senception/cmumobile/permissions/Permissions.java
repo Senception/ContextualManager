@@ -1,11 +1,9 @@
-package com.senception.cmumobile;
+package com.senception.cmumobile.permissions;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
 import android.text.TextUtils;

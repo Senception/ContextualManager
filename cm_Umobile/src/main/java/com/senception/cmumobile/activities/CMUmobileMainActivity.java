@@ -12,15 +12,21 @@
  *
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.activities;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import android.app.AlarmManager;
+import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,9 +44,13 @@ import android.view.MenuItem;
 
 import android.widget.Toast;
 
-import com.senception.cmumobile.dialogs.LaunchDialog;
+import com.senception.cmumobile.fragments.LocationDialogFragment;
+import com.senception.cmumobile.fragments.UsageStatsDialogFragment;
+import com.senception.cmumobile.permissions.Permissions;
+import com.senception.cmumobile.R;
 import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
 import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.resource_usage.ResourceUsageHandler;
 import com.senception.cmumobile.services.CMUmobileService;
 
 @SuppressLint("Recycle")
@@ -86,42 +96,46 @@ public class CMUmobileMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
+		FragmentManager manager = getFragmentManager();
+
 		//Log.d(TAG, "MAIN ACTIVITY");
 		//Asks user for permission to get usage stats
 
 		if(!Permissions.usageStatsPermission(getApplicationContext())){
-			Intent usage_request = new Intent(this, LaunchDialog.class);
-			//usage_request.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			//startActivityForResult(usage_request, PERMISSION_REQUEST);
-			startActivity(usage_request);
+			UsageStatsDialogFragment usageDialog = UsageStatsDialogFragment.newInstance(getString(R.string.usage_stats), getString(R.string.usage_stats_msg));
+			usageDialog.show(manager, "Dialog");
 		}
 
+		if(!Permissions.isLocationEnabled(getApplicationContext())){
+			LocationDialogFragment locationDialog = LocationDialogFragment.newInstance(getString(R.string.location), getString(R.string.location_msg));
+			locationDialog.show(manager, "Dialog");
+		}
 
-		/*if(!Permissions.isLocationEnabled(getApplicationContext())){
-			Intent intent = new Intent(this, GPSDialog.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivityForResult(intent, 1);
-		}*/
+		Log.d(TAG, "ENTROU NO ONCREATE");
 
 		startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
 		doBindService();
 
+		setHourlyAlarm();
+
 	}
 
-	// Call Back method  to get the Message form other Activity
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data)
-	{
-		super.onActivityResult(requestCode, resultCode, data);
-		// check if the request code is same as what is passed  here it is 2
-		if(requestCode==1)
-		{
-			String message = data.getStringExtra("Permission");
-			if(message == "True"){
-				Toast.makeText(this, "It came out true", Toast.LENGTH_SHORT).show();
-			}
-			//textView1.setText(message);
-		}
+	public void setHourlyAlarm(){
+
+		//To start the alarm 5min after the current time.
+		Long timeStart = new GregorianCalendar().getTimeInMillis();
+		//Toast.makeText(this, "Alarm Scheduled for 2 seconds", Toast.LENGTH_LONG).show();
+
+		//Set the class that will execute when alarm triggers
+		Intent intentAlarm = new Intent(this, ResourceUsageHandler.class);
+		PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 1, intentAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
+
+		//Create the object
+		AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+		//Set the alarm to trigger hourly
+		alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStart, 60*1000 /**AlarmManager.INTERVAL_HOUR*/, pendingIntent);
+
 	}
 
 	@Override

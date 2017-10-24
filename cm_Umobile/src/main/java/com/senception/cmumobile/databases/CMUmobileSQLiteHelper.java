@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.databases;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

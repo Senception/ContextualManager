@@ -1,18 +1,24 @@
-package com.senception.cmumobile.ResourceUsage;
+package com.senception.cmumobile.resource_usage;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.AppOpsManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Process;
-import android.provider.Settings;
+import android.util.Log;
+import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-import static android.app.AppOpsManager.MODE_ALLOWED;
-import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -27,25 +33,116 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
  * resources getting its usage.
  *
  */
-public class ResourceUsageHandler {
+public class ResourceUsageHandler extends BroadcastReceiver{
 
-    public static void start(Context context) {
+    private static final String TAG = "RESOURCE USAGE HANDLER";
 
-        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
-
-
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        //Map<String, UsageStats> statsMap = usm.queryAndAggregateUsageStats(start, end);
 
         //Check battery usage
-        checkEnergyUsage();
+        checkEnergyUsage(context);
+        //Check cpu usage
+        //checkCPUUsage(context);
+        //Check device storage
+        //checkStorage(context);
+        //Check device memory
+        //checkMemory(context);
+        //Check apps usage
+        //checkAppsUsage(context);
     }
 
-    private static void checkEnergyUsage() {
-        ArrayList usagePerHour = new ArrayList();
+    private static void checkEnergyUsage(Context context) {
 
-        PhysicalResourceUsage energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY, usagePerHour);
+        //Log.d(TAG, "ENTROU NO CHECK ENERGY");
 
-        //Next Step: Check every hour for the battery usage and save it in the array
+        PhysicalResourceUsage energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY);
+
+        //1) Capture usage once
+        energy.CaptureUsage(context);
+
+        /** USANDO ARRAYLIST*/
+        ArrayList<Integer> array = energy.getUsagePerHour();
+
+        /** USANDO HASHMAP*/
+        //HashMap<Integer, Integer> array = energy.getUsagePerHour();
+
+        Log.d(TAG, "Array at" + new GregorianCalendar().getTime() + ":" + array.toString());
+
+        //2) Save on the database
+        energy.addToDataBase();
+    }
+
+    private static void checkCPUUsage(Context context) {
+        PhysicalResourceUsage cpu = new PhysicalResourceUsage(PhysicalResourceType.CPU);
+
+        //1) Capture usage once
+        cpu.CaptureUsage(context);
+
+
+
+        //2) Save on the database
+        cpu.addToDataBase();
+    }
+
+    private static void checkStorage(Context context) {
+        PhysicalResourceUsage storage = new PhysicalResourceUsage(PhysicalResourceType.STORAGE);
+
+        //1) Capture usage
+        storage.CaptureUsage(context);
+        //2) Get the array
+        storage.getUsagePerHour();
+        //3) Put it on the database
+        storage.addToDataBase();
+    }
+
+    private static void checkMemory(Context context) {
+        PhysicalResourceUsage memory = new PhysicalResourceUsage(PhysicalResourceType.MEMORY);
+
+        //1) Capture usage
+        memory.CaptureUsage(context);
+        //2) Get the array
+        memory.getUsagePerHour();
+        //3) Put it on the database
+        memory.addToDataBase();
 
     }
+
+    @SuppressLint("NewApi")
+    private static void checkAppsUsage(Context context) {
+        UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
+
+        //begin date
+        Calendar startDate = Calendar.getInstance();
+        startDate.add(Calendar.DAY_OF_MONTH, -8);
+        printCalendar(startDate);
+        long start = startDate.getTimeInMillis();
+
+        //end date
+        Calendar endDate = Calendar.getInstance();
+        printCalendar(endDate);
+        long end = endDate.getTimeInMillis();
+
+        List<UsageStats> stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
+
+
+        //so far it only prints the apps that ran on beetween the given date
+        for (UsageStats stat: stats) {
+            if(!usm.isAppInactive(stat.getPackageName())){
+                DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                Date netDate = (new Date(stat.getFirstTimeStamp()));
+                //Log.d(TAG, "" + sdf.format(netDate));
+            }
+        }
+    }
+
+
+    public static void printCalendar(Calendar calendar){
+        SimpleDateFormat format = new SimpleDateFormat("EEEE, d'/'MM'/'yyyy 'at' h:mm a");
+        String currentDate = format.format(calendar.getTime());
+        Log.d("CALENDAR", currentDate);
+    }
+
 
 }

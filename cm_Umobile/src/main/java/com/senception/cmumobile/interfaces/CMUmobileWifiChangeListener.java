@@ -11,7 +11,7 @@
  *
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.interfaces;
 
 import java.util.List;
 import android.net.wifi.ScanResult;

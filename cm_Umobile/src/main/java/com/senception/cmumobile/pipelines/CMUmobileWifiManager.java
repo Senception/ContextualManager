@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.pipelines;
 
 import java.util.List;
 import android.content.BroadcastReceiver;

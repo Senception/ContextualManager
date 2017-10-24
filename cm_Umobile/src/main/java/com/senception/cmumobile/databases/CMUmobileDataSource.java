@@ -11,7 +11,7 @@
  * 
  */
 
-package com.senception.cmumobile;
+package com.senception.cmumobile.databases;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

@@ -1,4 +1,4 @@
-package com.senception.cmumobile.ResourceUsage;
+package com.senception.cmumobile.resource_usage;
 
 /**
  * Copyright (C) 2016 Senception Lda
