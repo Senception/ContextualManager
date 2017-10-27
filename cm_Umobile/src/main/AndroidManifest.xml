@@ -39,7 +39,12 @@
 
         <service
             android:name="com.senception.cmumobile.services.CMUmobileService"
-            android:label="@string/app_name" >
+            android:label="Contextual Manager Report" >
+        </service>
+
+        <service
+            android:name="com.senception.cmumobile.resource_usage.ResourceUsageService"
+            android:label="Contextual Manager Resource">
         </service>
 
         <activity
@@ -51,8 +56,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <receiver android:name=".resource_usage.ResourceUsageHandler"/>
     </application>
 
 </manifest>

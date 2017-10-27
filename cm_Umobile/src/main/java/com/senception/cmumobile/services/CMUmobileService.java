@@ -41,7 +41,6 @@ import com.senception.cmumobile.interfaces.CMUmobileWifiChangeListener;
 import com.senception.cmumobile.interfaces.CMUmobileWifiP2PChangeListener;
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.pipelines.CMUmobileWifiP2P;
-import com.senception.cmumobile.resource_usage.ResourceUsageHandler;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -49,7 +48,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TimePickerDialog;
-import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -118,11 +116,11 @@ public class CMUmobileService extends Service{
 	public void onCreate(){
 		super.onCreate();
 
-		//ResourceUsageHandler.start(this);
+		//ResourceUsageService.start(this);
 
 		//Log.d(TAG, " SERVICE ");
 
-        //ResourceUsageHandler.start(getApplicationContext());
+        //ResourceUsageService.start(getApplicationContext());
 
 		fusedLocation = new CMUmobileFusedLocation(CMUmobileService.this);
 		dataSource = new CMUmobileDataSource(this);
@@ -140,7 +138,7 @@ public class CMUmobileService extends Service{
 		intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
 		registerReceiver(receiver, intentFilter);
-		registerReceiver(mReceiver, new IntentFilter("com.example.persense"));
+		registerReceiver(mReceiver, new IntentFilter("com.example.report"));
 
 		wifiListener = new PerSenseServiceWifiListener();
 		wifiManager.setOnWifiChangeListener(wifiListener);
@@ -571,7 +569,7 @@ public class CMUmobileService extends Service{
 	 */
 	private void setWeekAlarm(Calendar calendar){
 		pendingIntent = PendingIntent.getBroadcast(this,
-				0, new Intent("com.example.persense"), 0);
+				0, new Intent("com.example.report"), 0);
 		/*Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, 23);
 		calendar.set(Calendar.MINUTE, 50);
@@ -587,6 +585,7 @@ public class CMUmobileService extends Service{
 	 * Save DB to to server and Clean it after
 	 */
 	public void saveCleanDay(){
+		Log.d(TAG, "NO SAVECLEANDARY");
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE");
 		Date date = new Date();
 		final String dw = sdf.format(date);
@@ -959,6 +958,7 @@ public class CMUmobileService extends Service{
 			}
 		}
 	}
+
 	/*Alarm BroadcastReceiver*/
 	public class AlarmReceiver extends BroadcastReceiver{
 

@@ -1,4 +1,4 @@
-package com.senception.cmumobile.resource_usage;
+package com.senception.cmumobile.resource_usage.physical;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -9,11 +9,9 @@ package com.senception.cmumobile.resource_usage;
  * @author José Soares
  * @version 0.1
  *
- * @file Contains PhysicalResourceType. This class provides an enumerated with
- * each possible physical resource type
- *
+ * @file This class provides an enumerated with each possible
+ * physical resource type
  */
-
 public enum PhysicalResourceType {
     ENERGY,
     STORAGE,
