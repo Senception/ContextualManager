@@ -24,9 +24,14 @@ public class MemoryUsage {
         ActivityManager.MemoryInfo mi = new ActivityManager.MemoryInfo();
         ActivityManager activityManager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         activityManager.getMemoryInfo(mi);
-        double availableMegs = mi.availMem / 0x100000L;
+
+        //1024 bytes = 1Kbyte , 1024 Kbytes = 1 Mbyte -> 1024*1024 = 1048576 = 0x100000 Mbytes
+        //double availableMegs = mi.availMem / 0x100000L;
 
         //16Log.d("RESOURCE", "PERCENTAGEM " + mi.availMem / (double)mi.totalMem * 100.0);
+
+        Log.d("RESOURCE", String.valueOf(mi.availMem/ 0x100000L) + "mb");
+        Log.d("RESOURCE", String.valueOf(mi.totalMem/ 0x100000L) + "mb");
 
         //Percentage can be calculated for API 16+
         int percentAvail = (int) ((mi.availMem / (double)mi.totalMem * 100.0) + 0.5);

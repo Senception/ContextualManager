@@ -21,6 +21,7 @@ import com.senception.cmumobile.resource_usage.physical.CPUUsage;
 import com.senception.cmumobile.resource_usage.physical.MemoryUsage;
 import com.senception.cmumobile.resource_usage.physical.PhysicalResourceType;
 import com.senception.cmumobile.resource_usage.physical.PhysicalResourceUsage;
+import com.senception.cmumobile.resource_usage.physical.StorageUsage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,7 +64,7 @@ public class ResourceUsageService extends Service{
         energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY);
         cpu = new PhysicalResourceUsage(PhysicalResourceType.CPU);
         memory = new PhysicalResourceUsage(PhysicalResourceType.MEMORY);
-        //storage = new PhysicalResourceUsage(PhysicalResourceType.STORAGE);
+        storage = new PhysicalResourceUsage(PhysicalResourceType.STORAGE);
 
         alarmReceiver = new AlarmReceiver();
         registerReceiver(alarmReceiver, new IntentFilter("com.example.resource_usage"));
@@ -103,10 +104,10 @@ public class ResourceUsageService extends Service{
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            //CaptureUsage(energy);
-            //CaptureUsage(cpu);
+            CaptureUsage(energy);
+            CaptureUsage(cpu);
             CaptureUsage(memory);
-            //CaptureUsage(storage);
+            CaptureUsage(storage);
         }
     }
 
@@ -131,21 +132,26 @@ public class ResourceUsageService extends Service{
             case CPU:
                 Log.d(TAG, "CPU: ");
                 int cpuUsage = CPUUsage.getCpuUsageStatistic();
-                Log.d(TAG, String.valueOf(cpuUsage));
+                //Log.d(TAG, String.valueOf(cpuUsage));
                 pru.getUsagePerHour().set(currentSecond, cpuUsage);
                 Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             case MEMORY:
                 Log.d(TAG, "MEMORY: ");
-                int memory = MemoryUsage.getCurrentRam(this);
-                Log.d(TAG, String.valueOf(memory));
-                pru.getUsagePerHour().set(currentSecond, memory);
+                int mem = MemoryUsage.getCurrentRam(this);
+                //Log.d(TAG, String.valueOf(mem));
+                pru.getUsagePerHour().set(currentSecond, mem);
                 Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             case STORAGE:
                 Log.d(TAG, "STORAGE: ");
+                int storageUsg = StorageUsage.getCurrentStorage(this);
+                //Log.d(TAG, String.valueOf(storageUsg) + "%");
+                pru.getUsagePerHour().set(currentSecond, storageUsg);
+                Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             default:
+                Log.d(TAG, "THAT RESOURCE ISN'T RECOGNIZED.");
                 break;
         }
     }

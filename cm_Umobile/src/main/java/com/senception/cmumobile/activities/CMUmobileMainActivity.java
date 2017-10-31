@@ -108,19 +108,16 @@ public class CMUmobileMainActivity extends Activity {
 
 		FragmentManager manager = getFragmentManager();
 
-		//Log.d(TAG, "MAIN ACTIVITY");
 		//Asks user for permission to get usage stats
-
-		if(!Permissions.usageStatsPermission(getApplicationContext())){
+		if(!Permissions.usageStatsPermission(getApplicationContext())) {
 			UsageStatsDialogFragment usageDialog = UsageStatsDialogFragment.newInstance(getString(R.string.usage_stats), getString(R.string.usage_stats_msg));
 			usageDialog.show(manager, "Dialog");
 		}
 
-		Log.d(TAG, "NO ON CREATE");
-
 		startService(new Intent(CMUmobileMainActivity.this, ResourceUsageService.class));
 		doBindResourceService();
 
+		//Asks user for permission to get device location
 		if(!Permissions.isLocationEnabled(getApplicationContext())){
 			LocationDialogFragment locationDialog = LocationDialogFragment.newInstance(getString(R.string.location), getString(R.string.location_msg));
 			locationDialog.show(manager, "Dialog");
@@ -155,14 +152,14 @@ public class CMUmobileMainActivity extends Activity {
 		switch (item.getItemId()) {
 			case R.id.stopservice:
 				reportBoundService.stopForeGround();
-				doUnbindResourceService();
+				doUnbindReportService();
 				stopService(new Intent(CMUmobileMainActivity.this, CMUmobileService.class));
 				this.finish();
 
 				return true;
 			case R.id.sendreport:
 
-				File report_dir = new File(Environment.getExternalStorageDirectory(), "PerSense_mobile_light_Report");
+				File report_dir = new File(Environment.getExternalStorageDirectory(), "Contextual_Manager_Report");
 
 				if (!report_dir.exists()) {
 					report_dir.mkdirs();

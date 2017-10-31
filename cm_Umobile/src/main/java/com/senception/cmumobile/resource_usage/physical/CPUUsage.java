@@ -23,7 +23,7 @@ public class CPUUsage {
     /**
      *
      * @return integer Array with 4 elements: user, system, idle and other cpu
-     *         usage in percentage.
+     * usage in percentage.
      */
     public static int getCpuUsageStatistic() {
 
@@ -49,7 +49,7 @@ public class CPUUsage {
         double averageUsageDouble = 0;
         int averageUsage = 0;
         for (int i : cpuUsageAsInt){
-            Log.d("RESOURCE", "CPU USAGE" + i);
+            Log.d("RESOURCE", "CPU CORE" + i);
             averageUsageDouble += Double.valueOf(i);
         }
 
