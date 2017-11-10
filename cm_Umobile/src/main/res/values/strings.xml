@@ -24,5 +24,9 @@
     <string name="usage_stats_msg">Verify if permission to access usage stats is enabled.</string>
     <string name="location">Location Services</string>
     <string name="location_msg">Verify Location Services is Enabled</string>
+    <string name="project_name_report">Contextual_Manager_Report</string>
+    <string name="projname_report">cm_report-</string>
+
+
 
 </resources>

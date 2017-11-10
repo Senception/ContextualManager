@@ -1,6 +1,12 @@
 package com.senception.cmumobile.resource_usage.physical;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -20,9 +26,10 @@ public class PhysicalResourceUsage {
     private final int HOURLY = 23;
     private final int SECONDLY = 59;
 
+    private int id;
     private PhysicalResourceType resourceType;
-
     private ArrayList<Integer> usagePerHour;
+    private int dayOfTheWeek;
 
     private final String TAG = "PHYSICAL RESOURCE";
 
@@ -34,6 +41,11 @@ public class PhysicalResourceUsage {
         for (int i = 0; i <= SECONDLY; i++){
             usagePerHour.add(i, -1);
         }
+
+        Calendar day = Calendar.getInstance();
+        dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
+        Log.d("DIA DE HOJE" , String.valueOf(dayOfTheWeek));
+
     }
 
     public PhysicalResourceType getResourceType() {
@@ -44,4 +56,7 @@ public class PhysicalResourceUsage {
         return usagePerHour;
     }
 
+    public int getDayOfTheWeek(){return dayOfTheWeek;}
+
+    public void setDayOfTheWeek(int day){dayOfTheWeek = day;}
 }

@@ -24,6 +24,7 @@
     <string name="usage_stats_msg">Verifique se as permissões para estatisticas de uso estão activas.</string>
     <string name="location">Serviço de Localização</string>
     <string name="location_msg">Vefique se o Serviço de Localizaçao esta Activo</string>
-
+    <string name="project_name_report">Contextual_Manager_Relatorio</string>
+    <string name="projname_report">cm_relatorio-</string>
   
 </resources>

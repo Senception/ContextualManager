@@ -16,15 +16,17 @@ package com.senception.cmumobile.databases;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * This class extends the SQLiteOpenHelper android class.
  */
 public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 
-	private static final String DATABASE_NAME = "CMUmobileight.db";
+	private static final String DATABASE_NAME = "cmumobile.db";
 	private static final int DATABASE_VERSION = 1;
 
+    //TABLES
 	public static final String TABLE_VISITS = "visits";
 	public static final String TABLE_MONDAY = "monday";
 	public static final String TABLE_TUESDAY = "tuesday";
@@ -40,12 +42,14 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 	public static final String TABLE_FRIDAY_PEERS = "fridaypeers";
 	public static final String TABLE_SATURDAY_PEERS = "saturdaypeers";
 	public static final String TABLE_SUNDAY_PEERS = "sundaypeers";
+    public static final String TABLE_RESOURCE_USAGE = "resourceusage";
 
 	// IDENTIFICATION
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_SSID = "uuid";
 	public static final String COLUMN_BSSID = "mac";
 	public static final String COLUMN_GROUPID = "groupid";
+    public static final String COLUMN_DAYOFTHEWEEK = "dayoftheweek";
 	
 	// ACCESS POINTS
 	public static final String COLUMN_ATTRACTIVENESS = "attractiveness";
@@ -56,8 +60,12 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 	// VISITS
 	public static final String COLUMN_TIMEON = "timeon";
 	public static final String COLUMN_TIMEOUT = "timeout";
-	public static final String COLUMN_DAYOFTHEWEEK = "dayoftheweek";
 	public static final String COLUMN_HOUR = "hour";
+
+    //RESOURCE USAGE
+    public static final String COLUMN_TYPE_OF_RESOURCE = "typeofresource";
+    public static final String COLUMN_AVERAGE_USAGE_HOUR = "averageusagehour";
+
 
 	private static final String CREATE_MONDAY_TABLE = "create table "
 			+ TABLE_MONDAY + "("
@@ -223,6 +231,14 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_DAYOFTHEWEEK + " integer, "
 			+ COLUMN_HOUR + " integer"
 			+ ");";
+
+    private static final String CREATE_RESOURCE_USAGE_TABLE = "create table "
+            + TABLE_RESOURCE_USAGE + "("
+            + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_TYPE_OF_RESOURCE + " text not null, "
+            + COLUMN_AVERAGE_USAGE_HOUR + " text not null, "
+            + COLUMN_DAYOFTHEWEEK + " integer "
+            + ");";
 	
 	public CMUmobileSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -245,6 +261,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL(CREATE_FRIDAY_PEERS_TABLE);
 		dataBase.execSQL(CREATE_SATURDAY_PEERS_TABLE);
 		dataBase.execSQL(CREATE_SUNDAY_PEERS_TABLE);
+        dataBase.execSQL(CREATE_RESOURCE_USAGE_TABLE);
 	}
 
 	@Override
@@ -264,7 +281,13 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_FRIDAY_PEERS);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_SATURDAY_PEERS);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_SUNDAY_PEERS);
+        dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_RESOURCE_USAGE);
 		onCreate(dataBase);
 	}
 
+	@Override
+	public void onOpen(SQLiteDatabase database){
+		//I use this to "clear" the resource usage table
+		//onUpgrade(database, 1, 1);
+	}
 }

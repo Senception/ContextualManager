@@ -15,15 +15,14 @@ package com.senception.cmumobile.modals;
 
 public class CMUmobileAP {
 
-	private String SSID;
+	private int id;
 	private String BSSID;
+	private String SSID;
 	private double attractiveness;
 	private  String dateTime;
+	private String DayOfWeek;
 	private double latitude;
 	private double longitude;
-	private String DayOfWeek;
-	private int id;
-
 	/**
 	 *Get the id of this AP
 	 *@return the id

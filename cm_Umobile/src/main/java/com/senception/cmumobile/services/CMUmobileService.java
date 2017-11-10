@@ -116,15 +116,10 @@ public class CMUmobileService extends Service{
 	public void onCreate(){
 		super.onCreate();
 
-		//ResourceUsageService.start(this);
-
-		//Log.d(TAG, " SERVICE ");
-
-        //ResourceUsageService.start(getApplicationContext());
-
 		fusedLocation = new CMUmobileFusedLocation(CMUmobileService.this);
 		dataSource = new CMUmobileDataSource(this);
 		dataSource.openDB(true);
+
 		wifiManager = new CMUmobileWifiManager(this);
 
 		manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -973,7 +968,7 @@ public class CMUmobileService extends Service{
 
 		protected Boolean doInBackground(final String... args) {
 			String file_name = fileDate()+"-"+args[1]+"-"+macAddress()+"-pml.csv";
-			File exportDir = new File(Environment.getExternalStorageDirectory(), "PerSense_mobile_light");
+			File exportDir = new File(Environment.getExternalStorageDirectory(), "cm_umobile");
 
 			if (!exportDir.exists()) {
 				exportDir.mkdirs();

@@ -30,8 +30,8 @@ public class MemoryUsage {
 
         //16Log.d("RESOURCE", "PERCENTAGEM " + mi.availMem / (double)mi.totalMem * 100.0);
 
-        Log.d("RESOURCE", String.valueOf(mi.availMem/ 0x100000L) + "mb");
-        Log.d("RESOURCE", String.valueOf(mi.totalMem/ 0x100000L) + "mb");
+        //Log.d("RESOURCE", String.valueOf(mi.availMem/ 0x100000L) + "mb");
+        //Log.d("RESOURCE", String.valueOf(mi.totalMem/ 0x100000L) + "mb");
 
         //Percentage can be calculated for API 16+
         int percentAvail = (int) ((mi.availMem / (double)mi.totalMem * 100.0) + 0.5);

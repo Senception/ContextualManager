@@ -43,7 +43,7 @@
         </service>
 
         <service
-            android:name="com.senception.cmumobile.resource_usage.ResourceUsageService"
+            android:name="com.senception.cmumobile.services.ResourceUsageService"
             android:label="Contextual Manager Resource">
         </service>
 

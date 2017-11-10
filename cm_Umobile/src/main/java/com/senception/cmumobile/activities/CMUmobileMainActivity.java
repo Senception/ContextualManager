@@ -29,7 +29,7 @@ import com.senception.cmumobile.permissions.Permissions;
 import com.senception.cmumobile.R;
 import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
 import com.senception.cmumobile.modals.CMUmobileAP;
-import com.senception.cmumobile.resource_usage.ResourceUsageService;
+import com.senception.cmumobile.services.ResourceUsageService;
 import com.senception.cmumobile.services.CMUmobileService;
 
 /**
@@ -159,7 +159,7 @@ public class CMUmobileMainActivity extends Activity {
 				return true;
 			case R.id.sendreport:
 
-				File report_dir = new File(Environment.getExternalStorageDirectory(), "Contextual_Manager_Report");
+				File report_dir = new File(Environment.getExternalStorageDirectory(), getString(R.string.project_name_report));
 
 				if (!report_dir.exists()) {
 					report_dir.mkdirs();
@@ -177,7 +177,7 @@ public class CMUmobileMainActivity extends Activity {
 		}
 	}
 	/**
-	 * Bind the service in case it is not already binded.
+	 * Bind the report service in case it is not already binded.
 	 */
 	void doBindReportService() {
 		if(!mIsServiceBound){
@@ -185,6 +185,9 @@ public class CMUmobileMainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Bind the resource service in case it is not already binded.
+	 */
 	void doBindResourceService() {
 		if(!resUsgServIsBound){
 			bindService(new Intent (CMUmobileMainActivity.this, ResourceUsageService.class), resourceConnection, Context.BIND_AUTO_CREATE);
@@ -192,7 +195,7 @@ public class CMUmobileMainActivity extends Activity {
 	}
 
 	/**
-	 * Un-bind the service in case it is binded.
+	 * Un-bind the report service in case it is binded.
 	 */
 	void doUnbindReportService() {
 		if (mIsServiceBound && reportConnection != null) {
@@ -200,11 +203,15 @@ public class CMUmobileMainActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Un-bind the resource service in case it is binded.
+	 */
 	void doUnbindResourceService() {
 		if (resUsgServIsBound && resourceConnection != null) {
 			unbindService(resourceConnection);
 		}
 	}
+
 	@Override
 	public void onBackPressed(){
 		if(backButtonCount >= 1)
@@ -223,7 +230,7 @@ public class CMUmobileMainActivity extends Activity {
 	}
 
 	public String zipFolder(String inputFolderPath) {
-		String output = Environment.getExternalStorageDirectory().getAbsolutePath()+"/PerSense_mobile_light_Report/"+"pml_report-"+reportBoundService.fileDate()+".zip";
+		String output = Environment.getExternalStorageDirectory().getAbsolutePath()+"/" + getString(R.string.project_name_report) + "/" + getString(R.string.projname_report) +reportBoundService.fileDate()+".zip";
 
 		try {
 			FileOutputStream fos = new FileOutputStream(output);
@@ -259,8 +266,8 @@ public class CMUmobileMainActivity extends Activity {
 	public class Send_report extends AsyncTask<String, Void, String> {
 
 		protected String doInBackground(final String... args){
-			String input = Environment.getExternalStorageDirectory().getAbsolutePath()+"/PerSense_mobile_light";
-			String output = Environment.getExternalStorageDirectory().getAbsolutePath()+"/PerSense_mobile_light_Report/"+"pml_report-"+reportBoundService.fileDate()+".zip";
+			String input = Environment.getExternalStorageDirectory().getAbsolutePath()+"/" + getString(R.string.app_name);
+			String output = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+getString(R.string.project_name_report)+"/"+getString(R.string.projname_report)+reportBoundService.fileDate()+".zip";
 
 			try {
 				FileOutputStream fos = new FileOutputStream(output);
@@ -293,8 +300,8 @@ public class CMUmobileMainActivity extends Activity {
 					Intent emailIntent = new Intent(Intent.ACTION_SEND);
 					emailIntent.setType("text/plain");
 					emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {""});
-					emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hi, Here is your PML Report!");
-					emailIntent.putExtra(Intent.EXTRA_TEXT, "In Attach is the PerSense Mobile Light Report for the: "+reportBoundService.fileDate());
+					emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Hi, Here is your " + getString(R.string.app_name) + "Report!");
+					emailIntent.putExtra(Intent.EXTRA_TEXT, "In Attach is the " + getString(R.string.project_name_report) + " for the: " + reportBoundService.fileDate());
 					Uri uri = Uri.fromFile(root);
 					emailIntent.putExtra(Intent.EXTRA_STREAM, uri);
 					startActivity(Intent.createChooser(emailIntent, "Pick an Email provider"));

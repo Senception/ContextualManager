@@ -26,10 +26,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.*;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
-import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.modals.CMUmobileVisit;
+import com.senception.cmumobile.resource_usage.physical.PhysicalResourceType;
+import com.senception.cmumobile.resource_usage.physical.PhysicalResourceUsage;
 
 /**
  * This class provides methods to insert, update and
@@ -60,9 +62,11 @@ public class CMUmobileDataSource {
 	 * @throws SQLException
 	 */
 	public void openDB(boolean writable) throws SQLException {
+
 		if (!isDbOpen) {
-			if (writable)
+			if (writable) {
 				db = dbHelper.getWritableDatabase();
+			}
 			else
 				db = dbHelper.getReadableDatabase();
 		}
@@ -87,6 +91,7 @@ public class CMUmobileDataSource {
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_FRIDAY_PEERS);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_SATURDAY_PEERS);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_SUNDAY_PEERS);
+		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
 	}
 	
 	/**
@@ -120,6 +125,26 @@ public class CMUmobileDataSource {
 			CMUmobileSQLiteHelper.COLUMN_LATITUDE,
 			CMUmobileSQLiteHelper.COLUMN_LONGITUDE
 	};
+
+	/**
+	 * List of all columns on the VISIT table.
+	 */
+	private String[] allColumnsVisit = {
+			CMUmobileSQLiteHelper.COLUMN_SSID,
+			CMUmobileSQLiteHelper.COLUMN_BSSID,
+			CMUmobileSQLiteHelper.COLUMN_TIMEON,
+			CMUmobileSQLiteHelper.COLUMN_TIMEOUT,
+			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
+			CMUmobileSQLiteHelper.COLUMN_HOUR
+	};
+
+	private String[] allColumnsResourceUsage = {
+			CMUmobileSQLiteHelper.COLUMN_ID,
+			CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE,
+			CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR,
+			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
+	};
+
 	/**
 	 * Function cursorAP
 	 * Converts a cursor pointing to a record in the AP table to a TKiddoAP object.
@@ -191,6 +216,31 @@ public class CMUmobileDataSource {
 	    
 	    return db.insert(tableName, null, values);
 	}
+
+	/**
+	 * Function registerNewResourceUsage
+	 * Register a new Resource Usage in the application. It creates a new record on the ResourceUsage table, with the information passed as CMUmobileAP.
+	 * @param resUsg resource usage
+	 * @param tableName name of the table on the database
+	 * @return the row ID of the newly inserted row, or -1 if an error occurred.
+	 */
+	public long registerNewResourceUsage (PhysicalResourceUsage resUsg, String tableName) {
+		ContentValues values = new ContentValues();
+		values.put(CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE, resUsg.getResourceType().toString());
+        StringBuilder arrayToDatabase = new StringBuilder();
+        for(int i = 0; i < resUsg.getUsagePerHour().size(); i++){
+			arrayToDatabase.append(resUsg.getUsagePerHour().get(i));
+			if( i < resUsg.getUsagePerHour().size() - 1 ){
+				arrayToDatabase.append(".");
+			}
+		}
+        //Log.d("ARRAY TO DATA BASE", arrayToDatabase.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(resUsg.getDayOfTheWeek()));
+
+		return db.insert(tableName, null, values);
+	}
+
 	/**
 	 * Function updateAP
 	 * Update an AP already registered by the application. This modifies the corresponding record to the AP in the AP table.
@@ -233,6 +283,47 @@ public class CMUmobileDataSource {
 		
 	    return ((rows != 0)? true : false);
 	}
+
+	/**
+	 * Function updateResourceUsage
+	 * Update a resource usage already registered by the application.
+	 * This modifies the corresponding averageUsage and day of the week in the resource usage table.
+	 * @param pru physical resource usage.
+	 * @param tableName name of the table on the database
+	 * @return true, if successful.
+	 */
+	public boolean updateResourceUsage(PhysicalResourceUsage pru, String tableName){
+
+		ContentValues values = new ContentValues();
+		StringBuilder arrayToDatabase = new StringBuilder();
+		for(int i = 0; i < pru.getUsagePerHour().size(); i++){
+			arrayToDatabase.append(pru.getUsagePerHour().get(i));
+			if( i < pru.getUsagePerHour().size() - 1 ){
+				arrayToDatabase.append(".");
+			}
+		}
+
+       	values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(pru.getDayOfTheWeek()));
+
+		int rows = 0;
+
+		if(pru.getResourceType().equals(PhysicalResourceType.ENERGY)) {
+			rows = db.update(tableName, values, "_id = 1", null);
+		}
+		else if(pru.getResourceType().equals(PhysicalResourceType.CPU)) {
+			rows = db.update(tableName, values, "_id = 2", null);
+		}
+		else if(pru.getResourceType().equals(PhysicalResourceType.MEMORY)) {
+			rows = db.update(tableName, values, "_id = 3", null);
+		}
+		else if(pru.getResourceType().equals(PhysicalResourceType.STORAGE)) {
+            rows = db.update(tableName, values, "_id = 4", null);
+		}
+
+		return rows != 0 ? true : false;
+	}
+
 	/**
 	 * Function getAP
 	 * Gets an AP already registered by the application. 
@@ -361,6 +452,7 @@ public class CMUmobileDataSource {
 	public boolean hasPeer(String bssid, String tableName) {
         return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + CMUmobileSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+ " COLLATE NOCASE ", null) == 0)? false : true;
 	}
+
 	/**
 	 * Function getBestAP
 	 * Checks all the AP registered by the application and return the one with the highest Rank.
@@ -410,17 +502,7 @@ public class CMUmobileDataSource {
 			return null;
 		}
 	}
-	/**
-	 * List of all columns on the VISIT table.
-	 */
-	private String[] allColumnsVisit = { 
-			CMUmobileSQLiteHelper.COLUMN_SSID,
-			CMUmobileSQLiteHelper.COLUMN_BSSID,
-			CMUmobileSQLiteHelper.COLUMN_TIMEON,
-			CMUmobileSQLiteHelper.COLUMN_TIMEOUT,
-			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
-			CMUmobileSQLiteHelper.COLUMN_HOUR
-	};
+
 	/**
 	 * Function cursorToVisit
 	 * Converts a cursor pointing to a record in the Visit table to a TKiddoAP object.
@@ -632,6 +714,7 @@ public class CMUmobileDataSource {
 		
 	    return ((rows != 0)? true : false);
 	}
+
 	/**
      * Function getAllVisits
      * Get a List with all the visit objects stored in the database.
@@ -656,7 +739,7 @@ public class CMUmobileDataSource {
 	/**
      * Function getAllVisitsString
 	 * Gets the all the visit recorded by the application on the visit table.
-	 * @param tableName name of the table on the database
+	 * @param ap (table name) name of the table on the database
 	 * @return A map with the AP objects, and the bssid as key.
 	 */ 
 	public List<String> getAllVisitsString(CMUmobileAP ap) {
@@ -681,5 +764,16 @@ public class CMUmobileDataSource {
      */
 	public long getNumVisits(){
 		return DatabaseUtils.queryNumEntries(db, CMUmobileSQLiteHelper.TABLE_VISITS);
+	}
+
+	public boolean rowExists(String TableName, String fieldValue) {
+		String Query = "Select * from " + TableName + " where " + dbHelper.COLUMN_TYPE_OF_RESOURCE + " = +'" + fieldValue + "'";
+		Cursor cursor = db.rawQuery(Query, null);
+		if(cursor.getCount() <= 0){
+			cursor.close();
+			return false;
+		}
+		cursor.close();
+		return true;
 	}
 }

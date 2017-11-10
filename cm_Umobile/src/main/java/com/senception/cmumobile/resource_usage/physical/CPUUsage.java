@@ -47,15 +47,13 @@ public class CPUUsage {
         }
 
         double averageUsageDouble = 0;
-        int averageUsage = 0;
+        int totalUsage = 0;
         for (int i : cpuUsageAsInt){
-            Log.d("RESOURCE", "CPU CORE" + i);
-            averageUsageDouble += Double.valueOf(i);
+            //Log.d("RESOURCE", ""+i);
+            totalUsage += Double.valueOf(i);
         }
 
-        averageUsage = (int) ((averageUsageDouble/cpuUsageAsInt.length) + 0.5);
-
-        return averageUsage;
+        return totalUsage;
     }
 
     private static String executeTop() {
@@ -80,6 +78,7 @@ public class CPUUsage {
                 e.printStackTrace();
             }
         }
+        //Log.d("RESOURCE", returnString);
         return returnString;
     }
 }
