@@ -1,4 +1,4 @@
-package com.senception.cmumobile.resource_usage.physical;
+package com.senception.cmumobile.resource_usage.physical_usage;
 
 import android.util.Log;
 

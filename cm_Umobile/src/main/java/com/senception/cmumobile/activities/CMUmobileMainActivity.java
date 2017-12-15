@@ -123,8 +123,8 @@ public class CMUmobileMainActivity extends Activity {
 			locationDialog.show(manager, "Dialog");
 		}
 
-		startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
-		doBindReportService();
+		//startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
+		//doBindReportService();
 
 	}
 

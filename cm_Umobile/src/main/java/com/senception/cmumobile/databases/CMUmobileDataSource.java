@@ -30,8 +30,9 @@ import android.util.Log;
 
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.modals.CMUmobileVisit;
-import com.senception.cmumobile.resource_usage.physical.PhysicalResourceType;
-import com.senception.cmumobile.resource_usage.physical.PhysicalResourceUsage;
+import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceType;
+import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceUsage;
 
 /**
  * This class provides methods to insert, update and
@@ -92,6 +93,7 @@ public class CMUmobileDataSource {
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_SATURDAY_PEERS);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_SUNDAY_PEERS);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
 	}
 	
 	/**
@@ -141,6 +143,14 @@ public class CMUmobileDataSource {
 	private String[] allColumnsResourceUsage = {
 			CMUmobileSQLiteHelper.COLUMN_ID,
 			CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE,
+			CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR,
+			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
+	};
+
+	private String[] allColumnsAppsUsage = {
+			CMUmobileSQLiteHelper.COLUMN_ID,
+			CMUmobileSQLiteHelper.COLUMN_APP_NAME,
+			CMUmobileSQLiteHelper.COLUMN_APP_CATEGORY,
 			CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR,
 			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
 	};
@@ -219,12 +229,12 @@ public class CMUmobileDataSource {
 
 	/**
 	 * Function registerNewResourceUsage
-	 * Register a new Resource Usage in the application. It creates a new record on the ResourceUsage table, with the information passed as CMUmobileAP.
+	 * Register a new Resource Usage in the application. It creates a new record on the ResourceUsage table, with the information passed as PhysicalResourceUSage.
 	 * @param resUsg resource usage
 	 * @param tableName name of the table on the database
 	 * @return the row ID of the newly inserted row, or -1 if an error occurred.
 	 */
-	public long registerNewResourceUsage (PhysicalResourceUsage resUsg, String tableName) {
+	public long registerNewResourceUsage(PhysicalResourceUsage resUsg, String tableName) {
 		ContentValues values = new ContentValues();
 		values.put(CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE, resUsg.getResourceType().toString());
         StringBuilder arrayToDatabase = new StringBuilder();
@@ -234,11 +244,50 @@ public class CMUmobileDataSource {
 				arrayToDatabase.append(".");
 			}
 		}
-        //Log.d("ARRAY TO DATA BASE", arrayToDatabase.toString());
+        Log.d("RESOURCES", "AQUI " + arrayToDatabase.toString().getBytes().length);
 		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(resUsg.getDayOfTheWeek()));
 
 		return db.insert(tableName, null, values);
+	}
+
+	/**
+	 * Function registerNewAppsUsage
+	 * Register a new Apps Usage in the application. It creates a new record on the AppsUsage table, with the information passed as AppResourceUsage.
+	 * @param appUsg resource usage
+	 * @param tableName name of the table on the database
+	 * @return the row ID of the newly inserted row, or -1 if an error occurred.
+	 */
+	public long registerNewAppUsage(AppResourceUsage appUsg, String tableName){
+		ContentValues values = new ContentValues();
+        Log.d("RESOURCE", CMUmobileSQLiteHelper.COLUMN_APP_NAME);
+        Log.d("RESOURCE", appUsg.getAppName());
+		values.put(CMUmobileSQLiteHelper.COLUMN_APP_NAME, appUsg.getAppName());
+        // O valor que entra aqui é "Cat"
+        Log.d("RESOURCE", appUsg.getAppCategory());
+		values.put(CMUmobileSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
+		StringBuilder arrayToDatabase = new StringBuilder();
+        Log.d("RESOURCE", appUsg.getUsagePerHour().toString());
+        Log.d("RESOURCE", String.valueOf(appUsg.getUsagePerHour().size()));
+        Log.d("RESOURCE", String.valueOf(appUsg.getUsagePerHour().get(0)));
+		for(int i = 0; i < appUsg.getUsagePerHour().size(); i++){
+			arrayToDatabase.append(appUsg.getUsagePerHour().get(i));
+			if( i < appUsg.getUsagePerHour().size() - 1 ){
+				arrayToDatabase.append(".");
+			}
+		}
+		Log.d("RESOURCE", arrayToDatabase.toString());
+        Log.d("RESOURCE", CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR);
+		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
+		//values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, "-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1");
+
+        Log.d("RESOURCE", String.valueOf(appUsg.getDayOfTheWeek()));
+        values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, appUsg.getDayOfTheWeek());
+		Log.d("RESOURCE", values.toString());
+        long result = db.insertOrThrow(tableName, null, values);
+		//long result = -1;
+        Log.d("RESOURCE", "Resul: " + String.valueOf(result));
+		return result; //db.insertOrThrow(tableName, null, values);
 	}
 
 	/**
@@ -323,6 +372,52 @@ public class CMUmobileDataSource {
 
 		return rows != 0 ? true : false;
 	}
+
+    /**
+     * Function updateAppsUsage
+     * Update an app usage already registered by the application.
+     * @param appUsg resource usage.
+     * @param tableName name of the table on the database
+     * @return true, if successful.
+     */
+    public boolean updateAppUsage(AppResourceUsage appUsg, String tableName){
+
+        ContentValues values = new ContentValues();
+        StringBuilder arrayToDatabase = new StringBuilder();
+        for(int i = 0; i < appUsg.getUsagePerHour().size(); i++){
+            arrayToDatabase.append(appUsg.getUsagePerHour().get(i));
+            if( i < appUsg.getUsagePerHour().size() - 1 ){
+                arrayToDatabase.append(".");
+            }
+        }
+
+        values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
+        //values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(pru.getDayOfTheWeek()));
+
+        int rows = 0;
+
+
+        //if the app exist on the database update it
+        /*if(rowExists(tableName, ))
+        //else insert into the database the new app
+
+        if(pru.getResourceType().equals(PhysicalResourceType.ENERGY)) {
+            rows = db.update(tableName, values, "_id = 1", null);
+        }
+        else if(pru.getResourceType().equals(PhysicalResourceType.CPU)) {
+            rows = db.update(tableName, values, "_id = 2", null);
+        }
+        else if(pru.getResourceType().equals(PhysicalResourceType.MEMORY)) {
+            rows = db.update(tableName, values, "_id = 3", null);
+        }
+        else if(pru.getResourceType().equals(PhysicalResourceType.STORAGE)) {
+            rows = db.update(tableName, values, "_id = 4", null);
+        }*/
+
+        return rows != 0 ? true : false;
+    }
+
+
 
 	/**
 	 * Function getAP
@@ -766,13 +861,24 @@ public class CMUmobileDataSource {
 		return DatabaseUtils.queryNumEntries(db, CMUmobileSQLiteHelper.TABLE_VISITS);
 	}
 
-	public boolean rowExists(String TableName, String fieldValue) {
-		String Query = "Select * from " + TableName + " where " + dbHelper.COLUMN_TYPE_OF_RESOURCE + " = +'" + fieldValue + "'";
-		Cursor cursor = db.rawQuery(Query, null);
+	public boolean rowExists(String tableName, String fieldValue, String columnName) {
+		String query = "Select * from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
+		//String query = "Select " + columnName + " from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
+        Log.d("RESOURCE", query);
+        Cursor cursor = db.rawQuery(query, null);
+		//Log.d("RESOURCE", "" + cursor.getCount());
+
 		if(cursor.getCount() <= 0){
+            Log.d("RESOURCE", "A QUERY NAO ENCONTROU APPS INICIALIZADAS");
 			cursor.close();
 			return false;
 		}
+		else{
+            Log.d("RESOURCE", "A QUERY ENCONTROU APPS INICIALIZADAS:");
+            for (String s : cursor.getColumnNames()) {
+                Log.d("RESOURCE", s);
+            }
+        }
 		cursor.close();
 		return true;
 	}

@@ -1,8 +1,7 @@
-package com.senception.cmumobile.resource_usage.physical;
+package com.senception.cmumobile.resource_usage.physical_usage;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.util.Log;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 

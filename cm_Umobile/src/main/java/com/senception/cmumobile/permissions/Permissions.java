@@ -1,12 +1,14 @@
 package com.senception.cmumobile.permissions;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AppOpsManager;
 import android.content.Context;
 import android.os.Build;
 import android.os.Process;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import static android.app.AppOpsManager.MODE_ALLOWED;
 import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
@@ -18,10 +20,15 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
 public class Permissions {
 
     //@TargetApi(19)
-    @SuppressLint("NewApi")
+    //@SuppressLint("NewApi")
     public static boolean usageStatsPermission(Context context){
         AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        int mode = 0;
+        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.KITKAT) {
+            mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
+        }
+        else
+            Toast.makeText(context, "This android sistem doesn't allow to get usage stats.", Toast.LENGTH_SHORT).show();
         return mode == MODE_ALLOWED;
     }
 

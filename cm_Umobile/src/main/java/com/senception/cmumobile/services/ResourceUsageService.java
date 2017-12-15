@@ -9,7 +9,8 @@ import android.app.usage.UsageStatsManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -18,23 +19,34 @@ import android.util.Log;
 
 import com.senception.cmumobile.databases.CMUmobileDataSource;
 import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
-import com.senception.cmumobile.resource_usage.physical.BatteryUsage;
-import com.senception.cmumobile.resource_usage.physical.CPUUsage;
-import com.senception.cmumobile.resource_usage.physical.MemoryUsage;
-import com.senception.cmumobile.resource_usage.physical.PhysicalResourceType;
-import com.senception.cmumobile.resource_usage.physical.PhysicalResourceUsage;
-import com.senception.cmumobile.resource_usage.physical.StorageUsage;
+import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.BatteryUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.CPUUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.MemoryUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceType;
+import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceUsage;
+import com.senception.cmumobile.resource_usage.physical_usage.StorageUsage;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -56,11 +68,11 @@ public class ResourceUsageService extends Service{
     private static PhysicalResourceUsage cpu;
     private static PhysicalResourceUsage memory;
     private static PhysicalResourceUsage storage;
+    private static List<UsageStats> apps;
     private final IBinder mBinder = new LocalBinder();
     private static AlarmManager alarmManager;
     private static PendingIntent pendingIntentHourly;
     private static PendingIntent pendingIntentDaily;
-    private final String TABLE_RESOURCE_USAGE = CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE;
     AlarmReceiver alarmReceiverHourly;
     AlarmReceiver alarmReceiverDaily;
     CMUmobileDataSource dataSource;
@@ -68,35 +80,68 @@ public class ResourceUsageService extends Service{
     @Override
     public void onCreate() {
         super.onCreate();
-
         dataSource = new CMUmobileDataSource(this);
         dataSource.openDB(true);
 
+        /*
+        * Initializes the physical resource usage table in the DB
+        * */
         energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY);
-        initializeResourceTable(energy);
+        //initializeResourceTable(energy);
         cpu = new PhysicalResourceUsage(PhysicalResourceType.CPU);
-        initializeResourceTable(cpu);
+        //initializeResourceTable(cpu);
         memory = new PhysicalResourceUsage(PhysicalResourceType.MEMORY);
-        initializeResourceTable(memory);
+        //initializeResourceTable(memory);
         storage = new PhysicalResourceUsage(PhysicalResourceType.STORAGE);
-        initializeResourceTable(storage);
+        //initializeResourceTable(storage);
 
+        /**
+         * Initializes the apps resource usage table in the DB with all the apps in the device
+         */
+        apps = getDeviceAppsList(this);
+        int count = 0;
+        for (UsageStats app : apps) {
+            Log.d(TAG, app.toString());
+            if (count < 1) {
+                count++;
+                initializeAppsTable(app);
+            }
+        }
+
+
+        backupDB();
+        Log.d(TAG, "FEZ BACKUP");
+/*
         //Schedules the alarm to trigger every hour (from this exact moment)
         alarmReceiverHourly = new AlarmReceiver();
         registerReceiver(alarmReceiverHourly, new IntentFilter("com.example.resource_usage_hourly"));
         //Schedules the alarm to trigger every day (from midnight on)
         alarmReceiverDaily = new AlarmReceiver();
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
-        setAlarm();
+        //setAlarm();
+*/
+    }
 
+    @SuppressLint("NewApi")
+    private void initializeAppsTable(UsageStats app) {
+        Log.d(TAG, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
+        Log.d(TAG, app.getPackageName());
+        Log.d(TAG, CMUmobileSQLiteHelper.COLUMN_APP_NAME);
+        if (!dataSource.rowExists(CMUmobileSQLiteHelper.TABLE_APPS_USAGE, app.getPackageName(), CMUmobileSQLiteHelper.COLUMN_APP_NAME)) {
+            Log.d(TAG, "INICIALIZOU APPS");
+            AppResourceUsage appUsg = new AppResourceUsage(app.getPackageName(), "Category");
+            Log.d(TAG, appUsg.toString());
+            dataSource.registerNewAppUsage(appUsg, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
+        }
     }
 
     /**
      * Checks if the 4 types of resource are already in the resource usage table, if not, then adds them.
      */
     private void initializeResourceTable(PhysicalResourceUsage pru) {
-        if (!dataSource.rowExists(TABLE_RESOURCE_USAGE, pru.getResourceType().toString())) {
-            dataSource.registerNewResourceUsage(pru, TABLE_RESOURCE_USAGE);
+        if (!dataSource.rowExists(CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE, pru.getResourceType().toString(), CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE)) {
+            Log.d(TAG, "INICIALIZOU RESOURCE_USAGE");
+            dataSource.registerNewResourceUsage(pru, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
         }
     }
 
@@ -121,6 +166,9 @@ public class ResourceUsageService extends Service{
         //super.onDestroy();
     }
 
+    /**
+     * Sets the alarm to trigger hourly and to trigger daily, each with diferent intents
+     */
     public void setAlarm(){
         //To start at the current time.
         Long timeStartHourly = new GregorianCalendar().getTimeInMillis();
@@ -146,35 +194,62 @@ public class ResourceUsageService extends Service{
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStartDaily, 2*60*1000/*AlarmManager.INTERVAL_DAY*/, pendingIntentDaily);
     }
 
-    /*Alarm BroadcastReceiver*/
+    /**
+     * Alarm BroadcastReceiver
+     * On receiving the broadcast if the broadcast came from and hourly intent
+     * then it captures the usage, else it saves them into the database.
+     * */
     public class AlarmReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
+            //Captures the usage
             if(intent.getAction().equals("com.example.resource_usage_hourly")) {
-                Log.d(TAG, "A CADA minuto ELE ENTRA AQUI"); //mudar para de hora em hora
-                CaptureUsage(energy);
-                CaptureUsage(cpu);
-                CaptureUsage(memory);
-                CaptureUsage(storage);
+                //get current time
+                Calendar currentTime = Calendar.getInstance();
+                printCalendar(currentTime);
+                Log.d(TAG, "A CADA MINUTO ELE ENTRA AQUI"); //mudar para de hora em hora
+
+                /* Captures the 4 physical resource usage */
+                //capturePhysicalUsage(energy);
+                //capturePhysicalUsage(cpu);
+                //capturePhysicalUsage(memory);
+                //capturePhysicalUsage(storage);
+
+                /* Captures the apps usage */
+                //captureAppsUsage(context);
             }
+            //Saves the usage percentage into the database
             else{
-                Log.d(TAG, "A CADA 2 minutos ELE ENTRA AQUI"); //mudar para diariamente à meia noite
+
                 Calendar day = Calendar.getInstance();
                 int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
+                printCalendar(day);
+                Log.d(TAG, "A CADA 2 MINUTOS ELE ENTRA AQUI"); //mudar para diariamente à meia noite
+
+                //Saves the 4 physical resource usage into the database
                 energy.setDayOfTheWeek(newDayOfTheWeek);
-                addToDataBase(energy);
+                //Log.d(TAG, energy.getUsagePerHour().toString());
+                //addToDataBase(energy);
                 cpu.setDayOfTheWeek(newDayOfTheWeek);
-                addToDataBase(cpu);
+                //Log.d(TAG, cpu.getUsagePerHour().toString());
+                //addToDataBase(cpu);
                 memory.setDayOfTheWeek(newDayOfTheWeek);
-                addToDataBase(memory);
+                //Log.d(TAG, memory.getUsagePerHour().toString());
+                //addToDataBase(memory);
                 storage.setDayOfTheWeek(newDayOfTheWeek);
-                addToDataBase(storage);
+                //Log.d(TAG, storage.getUsagePerHour().toString());
+                //addToDataBase(storage);
+
             }
         }
     }
 
-    public void CaptureUsage(PhysicalResourceUsage pru) {
+    /**
+     * Given a physical resource usage, this method will capture its usage
+     * @param pru the physical resource usage
+     */
+    public void capturePhysicalUsage(PhysicalResourceUsage pru) {
 
         //get current time
         Calendar currentTime = Calendar.getInstance();
@@ -183,32 +258,32 @@ public class ResourceUsageService extends Service{
         //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
         int currentSecond = currentTime.get(Calendar.SECOND);
 
-        printCalendar(currentTime);
+        //printCalendar(currentTime);
 
         switch(pru.getResourceType()){
             case ENERGY:
                 int level = BatteryUsage.getEnergyLevel(this);
                 //Log.d(TAG, "BATTERY: " + String.valueOf(level) + "%");
                 pru.getUsagePerHour().set(currentSecond, level);
-                //Log.d(TAG, pru.getUsagePerHour().toString());
+                Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             case CPU:
                 int cpuUsage = CPUUsage.getCpuUsageStatistic();
                 //Log.d(TAG, "CPU: " + String.valueOf(cpuUsage) + "%");
                 pru.getUsagePerHour().set(currentSecond, cpuUsage);
-                //Log.d(TAG, pru.getUsagePerHour().toString());
+                Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             case MEMORY:
                 int mem = MemoryUsage.getCurrentRam(this);
                 //Log.d(TAG, "MEMORY: " + String.valueOf(mem) + "%");
                 pru.getUsagePerHour().set(currentSecond, mem);
-                //Log.d(TAG, pru.getUsagePerHour().toString());
+                Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             case STORAGE:
                 int storageUsg = StorageUsage.getCurrentStorage(this);
                 //Log.d(TAG, "STORAGE: " + String.valueOf(storageUsg) + "%");
                 pru.getUsagePerHour().set(currentSecond, storageUsg);
-                //Log.d(TAG, pru.getUsagePerHour().toString());
+                Log.d(TAG, pru.getUsagePerHour().toString());
                 break;
             default:
                 Log.d(TAG, "THAT RESOURCE ISN'T RECOGNIZED.");
@@ -216,50 +291,146 @@ public class ResourceUsageService extends Service{
         }
     }
 
+    /**
+     * captures the usage of the five more used apps on the device
+     * @param context the context
+     */
+    @SuppressLint("NewApi")
+    private static void captureAppsUsage(Context context) {
+
+        List<UsageStats> stats = getDeviceAppsList(context);
+
+        //list of the five more used usageStats in the current time
+        ArrayList<UsageStats> mostUsed = getMostUsedApps(stats);
+
+        //list of the top five appResourceUsages
+        ArrayList<AppResourceUsage> topFiveApps = new ArrayList<AppResourceUsage>(4);
+
+        int id = 0;
+        for (UsageStats stat : mostUsed){
+            //Log.d(TAG, id+1 + stat.getTotalTimeInForeground()/1000/60 + " minutes of usage:");
+            id++;
+
+            AppResourceUsage app = new AppResourceUsage(stat.getPackageName(), "category(To-Do)");
+            //Log.d(TAG, app.toString());
+            topFiveApps.add(app);
+        }
+
+        //Log.d(TAG, topFiveApps.toString());
+
+    }
+
+    /**
+     * Updates the given physical resource usage in the resource usage table in the database to
+     * @param pru the physical resource usage to update
+     */
     public void addToDataBase(PhysicalResourceUsage pru) {
-        //get current time
-        Calendar currentTime = Calendar.getInstance();
-        printCalendar(currentTime);
 
-        Log.d(TAG, pru.getUsagePerHour().toString());
-
-        dataSource.updateResourceUsage(pru, TABLE_RESOURCE_USAGE);
+        dataSource.updateResourceUsage(pru, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
 
         backupDB();
     }
 
+    /**
+     * The next 2 methods are just something we're trying out
+     * to get the category of an app, they're not used yet
+     *
+     * Get the category of the app with the package name given
+     * @param packageName the package name of the app
+     * @return the category of the app
+     */
+    private String getCategory(String packageName) {
+
+        String GOOGLE_URL = "https://play.google.com/store/apps/details?id=";
+        String ERROR = "Failed to get app category";
+
+        packageName = GOOGLE_URL + packageName;
+
+        boolean network = isNetworkAvailable();
+        if (!network) {
+            //manage connectivity lost
+            return ERROR;
+        } else {
+            try {
+                Document doc = Jsoup.connect(packageName).get();
+                Element link = doc.select("span[itemprop=genre]").first();
+                return link.text();
+            } catch (Exception e) {
+                return ERROR;
+            }
+        }
+    }
+
+    // Check all connectivities whether available or not
+    public boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        // if no network is available networkInfo will be null
+        // otherwise check if we are connected
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks for the 5 more used apps in the given list of apps, in the current time
+     * @param stats list of UsageStats
+     * @return mostUsed ArrayList with 5 elements that are the most used apps from the given list
+     */
+    @SuppressLint("NewApi")
+    public static ArrayList<UsageStats> getMostUsedApps(List<UsageStats> stats){
+        ArrayList<UsageStats> mostUsed = new ArrayList<>(4); //gets the 5 more used from the given list
+        Map<UsageStats, Long> usageAppsMap = new HashMap<UsageStats, Long>();
+
+        for (UsageStats stat: stats) {
+            long totalTimeInForeground = stat.getTotalTimeInForeground()/1000/60; //time in minutes
+            usageAppsMap.put(stat, totalTimeInForeground);
+        }
+
+        Map<UsageStats, Long> sortedMap = sortByValue(usageAppsMap);
+
+        int id = 0;
+        for (UsageStats usageStat: sortedMap.keySet()){
+
+            if(id < 5){
+                mostUsed.add(usageStat);
+            }
+            String key =usageStat.getPackageName();
+            String value = usageAppsMap.get(usageStat).toString();
+            //Log.d(TAG, id + " - " + key + " " + value);
+            id++;
+        }
+        return mostUsed;
+    }
 
     @SuppressLint("NewApi")
-    private static void checkAppsUsage(Context context) {
-
-        //Map<String, UsageStats> statsMap = usm.queryAndAggregateUsageStats(start, end);
+    public static List<UsageStats> getDeviceAppsList(Context context){
 
         UsageStatsManager usm = (UsageStatsManager) context.getSystemService(Context.USAGE_STATS_SERVICE);
 
         //begin date
         Calendar startDate = Calendar.getInstance();
-        startDate.add(Calendar.DAY_OF_MONTH, -8);
-        printCalendar(startDate);
+        startDate.set(Calendar.HOUR_OF_DAY, 0);
+        startDate.set(Calendar.MINUTE, 0);
+        startDate.set(Calendar.SECOND, 0);
+        //printCalendar(startDate);
         long start = startDate.getTimeInMillis();
 
         //end date
         Calendar endDate = Calendar.getInstance();
-        printCalendar(endDate);
+        //printCalendar(endDate);
         long end = endDate.getTimeInMillis();
 
-        List<UsageStats> stats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
-
-
-        //so far it only prints the apps that ran on beetween the given date
-        for (UsageStats stat: stats) {
-            if(!usm.isAppInactive(stat.getPackageName())){
-                DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                Date netDate = (new Date(stat.getFirstTimeStamp()));
-                //Log.d(TAG, "" + sdf.format(netDate));
-            }
-        }
+        return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
     }
 
+    /**
+     * Since the database on the device is only visible through root, to check the
+     * database tables this method creates a backup in a place that the database is visible.
+     * (main folder of the android device)
+     */
     private void backupDB() {
 
         try {
@@ -286,10 +457,55 @@ public class ResourceUsageService extends Service{
         }
     }
 
+    /**
+     * Logs the calender in a specific format
+     * @param calendar the calendar to log
+     */
     public static void printCalendar(Calendar calendar){
         SimpleDateFormat format = new SimpleDateFormat("EEEE, d'/'MM'/'yyyy 'at' h:mm:s a");
         String currentDate = format.format(calendar.getTime());
         Log.d(TAG, currentDate);
     }
 
+    /**
+     * Return date in specified format.
+     * @param milliSeconds Date in milliseconds
+     * @param dateFormat Date format
+     * @return String representing date in specified format
+     */
+    public static String getDate(long milliSeconds, String dateFormat)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+
+    /**
+     * Sorts the given map by its values in a descendent way
+     * @param map map to sort
+     * @param <K> data type of the keys
+     * @param <V> data type of the values
+     * @return result map with the entrys sorted by its values
+     */
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+        Collections.sort( list, new Comparator<Map.Entry<K, V>>() {
+            @Override
+            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+
+        Collections.reverse(list);
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
 }
