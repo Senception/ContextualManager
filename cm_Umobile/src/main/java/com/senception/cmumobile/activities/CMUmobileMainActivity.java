@@ -154,6 +154,11 @@ public class CMUmobileMainActivity extends Activity {
 				reportBoundService.stopForeGround();
 				doUnbindReportService();
 				stopService(new Intent(CMUmobileMainActivity.this, CMUmobileService.class));
+
+				resUsgBoundService.stopForeGround();
+				doUnbindResourceService();
+				stopService(new Intent(CMUmobileMainActivity.this, ResourceUsageService.class));
+
 				this.finish();
 
 				return true;
@@ -259,7 +264,6 @@ public class CMUmobileMainActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		doUnbindResourceService();
 		super.onDestroy();
 	}
 

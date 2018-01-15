@@ -2,6 +2,7 @@ package com.senception.cmumobile.services;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.usage.UsageStats;
@@ -15,8 +16,11 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.senception.cmumobile.R;
+import com.senception.cmumobile.activities.CMUmobileMainActivity;
 import com.senception.cmumobile.databases.CMUmobileDataSource;
 import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
 import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
@@ -63,11 +67,13 @@ import java.util.Map;
  */
 public class ResourceUsageService extends Service{
 
+    private int NOTIFICATION_ID = 1338;
     private static final String TAG = "RESOURCE USAGE SERVICE";
     private static PhysicalResourceUsage energy;
     private static PhysicalResourceUsage cpu;
     private static PhysicalResourceUsage memory;
     private static PhysicalResourceUsage storage;
+
     private static List<UsageStats> apps;
     private final IBinder mBinder = new LocalBinder();
     private static AlarmManager alarmManager;
@@ -87,13 +93,13 @@ public class ResourceUsageService extends Service{
         * Initializes the physical resource usage table in the DB
         * */
         energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY);
-        //initializeResourceTable(energy);
+        initializeResourceTable(energy);
         cpu = new PhysicalResourceUsage(PhysicalResourceType.CPU);
-        //initializeResourceTable(cpu);
+        initializeResourceTable(cpu);
         memory = new PhysicalResourceUsage(PhysicalResourceType.MEMORY);
-        //initializeResourceTable(memory);
+        initializeResourceTable(memory);
         storage = new PhysicalResourceUsage(PhysicalResourceType.STORAGE);
-        //initializeResourceTable(storage);
+        initializeResourceTable(storage);
 
         /**
          * Initializes the apps resource usage table in the DB with all the apps in the device
@@ -101,16 +107,11 @@ public class ResourceUsageService extends Service{
         apps = getDeviceAppsList(this);
         int count = 0;
         for (UsageStats app : apps) {
-            Log.d(TAG, app.toString());
-            if (count < 1) {
-                count++;
-                initializeAppsTable(app);
-            }
+            count++;
+            initializeAppsTable(app);
         }
 
-
         backupDB();
-        Log.d(TAG, "FEZ BACKUP");
 /*
         //Schedules the alarm to trigger every hour (from this exact moment)
         alarmReceiverHourly = new AlarmReceiver();
@@ -122,6 +123,29 @@ public class ResourceUsageService extends Service{
 */
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId){
+        runAsForeground();
+        return START_STICKY;
+    }
+
+    public void runAsForeground(){
+        Intent notificationIntent = new Intent(this, CMUmobileMainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0 );
+        Notification notification = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.drawable.cmumobilelight)
+                .setContentText(getString(R.string.app_name))
+                .setContentIntent(pendingIntent).build();
+
+        startForeground(NOTIFICATION_ID, notification);
+
+    }
+
+    public void stopForeGround(){
+        stopForeground(true);
+    }
+
     @SuppressLint("NewApi")
     private void initializeAppsTable(UsageStats app) {
         Log.d(TAG, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
@@ -130,7 +154,6 @@ public class ResourceUsageService extends Service{
         if (!dataSource.rowExists(CMUmobileSQLiteHelper.TABLE_APPS_USAGE, app.getPackageName(), CMUmobileSQLiteHelper.COLUMN_APP_NAME)) {
             Log.d(TAG, "INICIALIZOU APPS");
             AppResourceUsage appUsg = new AppResourceUsage(app.getPackageName(), "Category");
-            Log.d(TAG, appUsg.toString());
             dataSource.registerNewAppUsage(appUsg, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
         }
     }
@@ -161,6 +184,7 @@ public class ResourceUsageService extends Service{
     public void onDestroy() {
         alarmManager.cancel(pendingIntentHourly);
         alarmManager.cancel(pendingIntentDaily);
+        dataSource.closeDB();
         unregisterReceiver(alarmReceiverHourly);
         unregisterReceiver(alarmReceiverDaily);
         //super.onDestroy();
@@ -415,12 +439,10 @@ public class ResourceUsageService extends Service{
         startDate.set(Calendar.HOUR_OF_DAY, 0);
         startDate.set(Calendar.MINUTE, 0);
         startDate.set(Calendar.SECOND, 0);
-        //printCalendar(startDate);
         long start = startDate.getTimeInMillis();
 
         //end date
         Calendar endDate = Calendar.getInstance();
-        //printCalendar(endDate);
         long end = endDate.getTimeInMillis();
 
         return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
@@ -450,6 +472,7 @@ public class ResourceUsageService extends Service{
                     //Log.d(TAG, "Backup Done");
                     src.close();
                     dst.close();
+                    Log.d(TAG, "FEZ BACKUP");
                 }
             }
         } catch (IOException e) {

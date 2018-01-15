@@ -47,7 +47,8 @@ public class CMUmobileDataSource {
 	private CMUmobileSQLiteHelper dbHelper;
 	private boolean isDbOpen;
 	private GregorianCalendar cal;
-	
+	private int count = 0;
+
 	/**
 	 * Constructor that takes Android Context as input.
 	 * @param context class context
@@ -244,10 +245,9 @@ public class CMUmobileDataSource {
 				arrayToDatabase.append(".");
 			}
 		}
-        Log.d("RESOURCES", "AQUI " + arrayToDatabase.toString().getBytes().length);
 		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(resUsg.getDayOfTheWeek()));
-
+		count++;
 		return db.insert(tableName, null, values);
 	}
 
@@ -260,34 +260,18 @@ public class CMUmobileDataSource {
 	 */
 	public long registerNewAppUsage(AppResourceUsage appUsg, String tableName){
 		ContentValues values = new ContentValues();
-        Log.d("RESOURCE", CMUmobileSQLiteHelper.COLUMN_APP_NAME);
-        Log.d("RESOURCE", appUsg.getAppName());
 		values.put(CMUmobileSQLiteHelper.COLUMN_APP_NAME, appUsg.getAppName());
-        // O valor que entra aqui é "Cat"
-        Log.d("RESOURCE", appUsg.getAppCategory());
 		values.put(CMUmobileSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
 		StringBuilder arrayToDatabase = new StringBuilder();
-        Log.d("RESOURCE", appUsg.getUsagePerHour().toString());
-        Log.d("RESOURCE", String.valueOf(appUsg.getUsagePerHour().size()));
-        Log.d("RESOURCE", String.valueOf(appUsg.getUsagePerHour().get(0)));
 		for(int i = 0; i < appUsg.getUsagePerHour().size(); i++){
 			arrayToDatabase.append(appUsg.getUsagePerHour().get(i));
 			if( i < appUsg.getUsagePerHour().size() - 1 ){
 				arrayToDatabase.append(".");
 			}
 		}
-		Log.d("RESOURCE", arrayToDatabase.toString());
-        Log.d("RESOURCE", CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR);
 		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
-		//values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, "-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1.-1");
-
-        Log.d("RESOURCE", String.valueOf(appUsg.getDayOfTheWeek()));
         values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, appUsg.getDayOfTheWeek());
-		Log.d("RESOURCE", values.toString());
-        long result = db.insertOrThrow(tableName, null, values);
-		//long result = -1;
-        Log.d("RESOURCE", "Resul: " + String.valueOf(result));
-		return result; //db.insertOrThrow(tableName, null, values);
+		return db.insertOrThrow(tableName, null, values);
 	}
 
 	/**
@@ -863,22 +847,14 @@ public class CMUmobileDataSource {
 
 	public boolean rowExists(String tableName, String fieldValue, String columnName) {
 		String query = "Select * from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
-		//String query = "Select " + columnName + " from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
-        Log.d("RESOURCE", query);
+
         Cursor cursor = db.rawQuery(query, null);
 		//Log.d("RESOURCE", "" + cursor.getCount());
 
 		if(cursor.getCount() <= 0){
-            Log.d("RESOURCE", "A QUERY NAO ENCONTROU APPS INICIALIZADAS");
 			cursor.close();
 			return false;
 		}
-		else{
-            Log.d("RESOURCE", "A QUERY ENCONTROU APPS INICIALIZADAS:");
-            for (String s : cursor.getColumnNames()) {
-                Log.d("RESOURCE", s);
-            }
-        }
 		cursor.close();
 		return true;
 	}
