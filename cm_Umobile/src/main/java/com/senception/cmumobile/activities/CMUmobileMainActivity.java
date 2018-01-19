@@ -157,7 +157,7 @@ public class CMUmobileMainActivity extends Activity {
 
 				resUsgBoundService.stopForeGround();
 				doUnbindResourceService();
-				stopService(new Intent(CMUmobileMainActivity.this, ResourceUsageService.class));
+				stopService(new Intent(this, ResourceUsageService.class));
 
 				this.finish();
 

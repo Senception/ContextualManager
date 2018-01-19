@@ -291,7 +291,7 @@ public class CMUmobileDataSource {
 	    values.put(CMUmobileSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(CMUmobileSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(CMUmobileSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
-	    
+
 	    int rows = db.update(tableName, values, identifier, null);
 		
 	    return ((rows != 0)? true : false);
@@ -326,7 +326,7 @@ public class CMUmobileDataSource {
 	 * @return true, if successful.
 	 */
 	public boolean updateResourceUsage(PhysicalResourceUsage pru, String tableName){
-
+		String identifier = CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE + "='" + pru.getResourceType() + "'" +" COLLATE NOCASE ";
 		ContentValues values = new ContentValues();
 		StringBuilder arrayToDatabase = new StringBuilder();
 		for(int i = 0; i < pru.getUsagePerHour().size(); i++){
@@ -339,33 +339,21 @@ public class CMUmobileDataSource {
        	values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(pru.getDayOfTheWeek()));
 
-		int rows = 0;
-
-		if(pru.getResourceType().equals(PhysicalResourceType.ENERGY)) {
-			rows = db.update(tableName, values, "_id = 1", null);
-		}
-		else if(pru.getResourceType().equals(PhysicalResourceType.CPU)) {
-			rows = db.update(tableName, values, "_id = 2", null);
-		}
-		else if(pru.getResourceType().equals(PhysicalResourceType.MEMORY)) {
-			rows = db.update(tableName, values, "_id = 3", null);
-		}
-		else if(pru.getResourceType().equals(PhysicalResourceType.STORAGE)) {
-            rows = db.update(tableName, values, "_id = 4", null);
-		}
+		int rows = db.update(tableName, values, identifier, null);
 
 		return rows != 0 ? true : false;
 	}
 
     /**
-     * Function updateAppsUsage
+     * Function updateAppUsage
      * Update an app usage already registered by the application.
      * @param appUsg resource usage.
      * @param tableName name of the table on the database
      * @return true, if successful.
      */
     public boolean updateAppUsage(AppResourceUsage appUsg, String tableName){
-
+        int rows = 0;
+        String identifier = CMUmobileSQLiteHelper.COLUMN_APP_NAME + "='" + appUsg.getAppName() + "'" +" COLLATE NOCASE ";;
         ContentValues values = new ContentValues();
         StringBuilder arrayToDatabase = new StringBuilder();
         for(int i = 0; i < appUsg.getUsagePerHour().size(); i++){
@@ -376,27 +364,12 @@ public class CMUmobileDataSource {
         }
 
         values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
-        //values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(pru.getDayOfTheWeek()));
+        values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(appUsg.getDayOfTheWeek()));
 
-        int rows = 0;
-
-
-        //if the app exist on the database update it
-        /*if(rowExists(tableName, ))
-        //else insert into the database the new app
-
-        if(pru.getResourceType().equals(PhysicalResourceType.ENERGY)) {
-            rows = db.update(tableName, values, "_id = 1", null);
+        //try to update the app, if its not in the db then register it.
+        if ((rows = db.update(tableName, values, identifier, null)) == 0){
+            rows = (int) registerNewAppUsage(appUsg, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
         }
-        else if(pru.getResourceType().equals(PhysicalResourceType.CPU)) {
-            rows = db.update(tableName, values, "_id = 2", null);
-        }
-        else if(pru.getResourceType().equals(PhysicalResourceType.MEMORY)) {
-            rows = db.update(tableName, values, "_id = 3", null);
-        }
-        else if(pru.getResourceType().equals(PhysicalResourceType.STORAGE)) {
-            rows = db.update(tableName, values, "_id = 4", null);
-        }*/
 
         return rows != 0 ? true : false;
     }
@@ -845,6 +818,14 @@ public class CMUmobileDataSource {
 		return DatabaseUtils.queryNumEntries(db, CMUmobileSQLiteHelper.TABLE_VISITS);
 	}
 
+	/**
+	 * Check if there is in the database a row in the given
+	 * tableName with the given fieldValue, in the given columnName
+	 * @param tableName the name of the table to search on
+	 * @param fieldValue the value to search for
+	 * @param columnName the name of the column to search on
+	 * @return true in case the row exists, false otherwise
+	 */
 	public boolean rowExists(String tableName, String fieldValue, String columnName) {
 		String query = "Select * from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
 
