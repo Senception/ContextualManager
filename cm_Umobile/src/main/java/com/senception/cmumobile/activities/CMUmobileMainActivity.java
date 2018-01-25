@@ -48,13 +48,11 @@ import com.senception.cmumobile.services.CMUmobileService;
 public class CMUmobileMainActivity extends Activity {
 
 	private static final String TAG ="MAIN ACTIVITY--->";
-	static final int PERMISSION_REQUEST = 1;  // The request code
 	int backButtonCount = 0;
 	private CMUmobileService reportBoundService;
 	private ResourceUsageService resUsgBoundService;
 	private boolean resUsgServIsBound = false;
 	private boolean mIsServiceBound = false;
-	final Context context = this;
 
 	/**
 	 * The Connection to the PerSense Light service. 
@@ -123,8 +121,8 @@ public class CMUmobileMainActivity extends Activity {
 			locationDialog.show(manager, "Dialog");
 		}
 
-		//startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
-		//doBindReportService();
+		startService(new Intent (CMUmobileMainActivity.this, CMUmobileService.class));
+		doBindReportService();
 
 	}
 
@@ -157,7 +155,7 @@ public class CMUmobileMainActivity extends Activity {
 
 				resUsgBoundService.stopForeGround();
 				doUnbindResourceService();
-				stopService(new Intent(this, ResourceUsageService.class));
+				stopService(new Intent(CMUmobileMainActivity.this, ResourceUsageService.class));
 
 				this.finish();
 

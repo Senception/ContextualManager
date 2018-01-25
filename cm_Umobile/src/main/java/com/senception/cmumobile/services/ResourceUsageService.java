@@ -186,9 +186,9 @@ public class ResourceUsageService extends Service {
     public void onDestroy() {
         alarmManager.cancel(pendingIntentHourly);
         alarmManager.cancel(pendingIntentDaily);
-        dataSource.closeDB();
         unregisterReceiver(alarmReceiverHourly);
         unregisterReceiver(alarmReceiverDaily);
+        dataSource.closeDB();
         //super.onDestroy();
     }
 
@@ -247,7 +247,6 @@ public class ResourceUsageService extends Service {
             }
             //Saves the usage percentage into the database
             else{
-
                 Calendar day = Calendar.getInstance();
                 int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
                 printCalendar(day);
@@ -337,13 +336,11 @@ public class ResourceUsageService extends Service {
         //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
         int currentSecond = currentTime.get(Calendar.SECOND);
         for (int i = 0; i < ustats.size(); i++){
-            Log.d(TAG, ustats.get(i).getPackageName());
             long usage = ustats.get(i).getTotalTimeInForeground();
             int percentage = 0;
             if (usage != 0){
                 percentage = (int) ((usage/ (double) totalTimeSpent * 100.0) + 0.5);
             }
-            Log.d(TAG, ""+ percentage);
             apps.get(i).getUsagePerHour().set(currentSecond, percentage);
         }
     }
@@ -354,7 +351,7 @@ public class ResourceUsageService extends Service {
      */
     public void addPruToDataBase(PhysicalResourceUsage pru) {
         dataSource.updateResourceUsage(pru, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
-        backupDB();
+        //backupDB();
     }
 
     /**
@@ -375,16 +372,15 @@ public class ResourceUsageService extends Service {
                 if (isNetworkAvailable()) {
                     for (AppResourceUsage app : apps) {
                         String GOOGLE_URL = "https://play.google.com/store/apps/details?id=";
-                        final String query_url = GOOGLE_URL + app.getAppName();
+                        final String query_url = GOOGLE_URL + app.getAppName() + "&&hl=en";
 
                         Document doc;
                         try {
                             doc = Jsoup.connect(query_url).get();
                             String category = doc.select("span[itemprop=genre]").first().text();
                             app.setAppCategory(category);
-                            Log.d(TAG, "CATEGORYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY " + category);
                         } catch (IOException e) {
-                            Log.d(TAG, "This app hasn't a category a affiliated with goolgle play store.");
+                            Log.d(TAG, app.getAppName() + " doesn't have a category a affiliated with goolgle play store.");
                             //e.printStackTrace();
                         }
                     }

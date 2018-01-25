@@ -364,6 +364,7 @@ public class CMUmobileDataSource {
         }
 
         values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
         values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(appUsg.getDayOfTheWeek()));
 
         //try to update the app, if its not in the db then register it.
