@@ -44,6 +44,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 	public static final String TABLE_SUNDAY_PEERS = "sundaypeers";
     public static final String TABLE_RESOURCE_USAGE = "resourceusage";
 	public static final String TABLE_APPS_USAGE = "appsusage";
+	public static final String TABLE_WEIGHTS = "weights";
 
 	// IDENTIFICATION
 	public static final String COLUMN_ID = "_id";
@@ -70,6 +71,15 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 	//APPS USAGE
 	public static final String COLUMN_APP_NAME = "appname";
 	public static final String COLUMN_APP_CATEGORY = "appcategory";
+
+	//WEIGHTS
+	public static final String COLUMN_A = "a"; // Affinity network level of a node (measures node's centrality/popularity).
+	public static final String COLUMN_U = "u"; // Internal Usage weight of a node (measures the availability of the node)
+
+	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
+	   For instance, I can provide a measure of battery similarity over time between nodes.
+	   Or, it can provide a measure of similarity between category of applications.*/
+	//public static final String COLUMN_I = "i"
 
 	private static final String CREATE_MONDAY_TABLE = "create table "
 			+ TABLE_MONDAY + "("
@@ -252,6 +262,15 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVERAGE_USAGE_HOUR + " text not null, "
 			+ COLUMN_DAYOFTHEWEEK + " integer "
 			+ ");";
+
+	private static final String CREATE_WEIGHTS_TABLE = "create table "
+			+ TABLE_WEIGHTS + "("
+			+ COLUMN_ID + " integer primary key autoincrement, "
+			+ COLUMN_DATETIME + " text, "
+			+ COLUMN_A + " text not null, "
+			+ COLUMN_U + " text not null, "
+			+ COLUMN_DAYOFTHEWEEK + " integer "
+			+ ");";
 	
 	public CMUmobileSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -277,6 +296,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL(CREATE_SUNDAY_PEERS_TABLE);
         dataBase.execSQL(CREATE_RESOURCE_USAGE_TABLE);
 		dataBase.execSQL(CREATE_APPS_USAGE_TABLE);
+		dataBase.execSQL(CREATE_WEIGHTS_TABLE);
 	}
 
 	@Override
@@ -299,6 +319,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_SUNDAY_PEERS);
         dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_RESOURCE_USAGE);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_APPS_USAGE);
+		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHTS);
 		onCreate(dataBase);
 	}
 

@@ -14,8 +14,8 @@ import java.util.Calendar;
  * @author José Soares
  * @version 0.1
  *
- * @file Contains AppResourceUsage. This class represents an object that
- * records all the resource usage of an app.
+ * @file Contains AppResourceUsage. This class handles the
+ * the capture and persistence of the resource usage of all apps in the device.
  *
  */
 public class AppResourceUsage {
@@ -25,8 +25,10 @@ public class AppResourceUsage {
 
     private String appName;
     private String appCategory;
-    private ArrayList<Integer> usagePerHour;
+    private ArrayList<Integer> usagePerHour = new ArrayList<>();
     private int dayOfTheWeek;
+
+    public AppResourceUsage(){super();}
 
     public AppResourceUsage(String appName, String appCategory) {
 
@@ -63,16 +65,19 @@ public class AppResourceUsage {
         return this.usagePerHour;
     }
 
-    public void setUsagePerHour(ArrayList<Integer> usagePerHour) {
-        this.usagePerHour = usagePerHour;
+    public void setUsagePerHour(String usagePerHour) {
+        String [] items = usagePerHour.split("\\.");
+        for (String s : items ) {
+            this.usagePerHour.add(Integer.parseInt(s));
+        }
     }
 
     public int getDayOfTheWeek() {
         return dayOfTheWeek;
     }
 
-    public void setDayOfTheWeek(int dayOfTheWeek) {
-        this.dayOfTheWeek = dayOfTheWeek;
+    public void setDayOfTheWeek(String dayOfTheWeek) {
+        this.dayOfTheWeek = Integer.parseInt(dayOfTheWeek);
     }
 
     @Override

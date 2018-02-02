@@ -30,6 +30,7 @@ import android.util.Log;
 
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.modals.CMUmobileVisit;
+import com.senception.cmumobile.modals.CMUmobileWeight;
 import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceType;
 import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceUsage;
@@ -95,6 +96,7 @@ public class CMUmobileDataSource {
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_SUNDAY_PEERS);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
 		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
+		db.execSQL("DELETE FROM "+ CMUmobileSQLiteHelper.TABLE_WEIGHTS);
 	}
 	
 	/**
@@ -181,6 +183,7 @@ public class CMUmobileDataSource {
 	 * @param cursor Cursor pointing to a record of the Peers table.
 	 * @return the TKiddoAP object
 	 */
+
 	private CMUmobileAP cursorPeers(Cursor cursor) {
 		CMUmobileAP ap = new CMUmobileAP();
 		ap.setId(cursor.getInt(0));
@@ -191,6 +194,24 @@ public class CMUmobileDataSource {
 		ap.setLongitude(cursor.getDouble(5));
 		return ap;
 	}
+
+	private PhysicalResourceUsage cursorResourceUsage(Cursor cursor){
+		PhysicalResourceUsage pru = new PhysicalResourceUsage();
+		pru.setResourceType(cursor.getString(1));
+		pru.setUsagePerHour(cursor.getString(2));
+		pru.setDayOfTheWeek(cursor.getString(3));
+		return pru;
+	}
+
+	private AppResourceUsage cursorAppResourceUsage (Cursor cursor){
+		AppResourceUsage app = new AppResourceUsage();
+		app.setAppName(cursor.getString(1));
+		app.setAppCategory(cursor.getString(2));
+		app.setUsagePerHour(cursor.getString(3));
+		app.setDayOfTheWeek(cursor.getString(4));
+		return app;
+	}
+
 	/**
 	 * Function registerNewAP
 	 * Register a new AP in the application. It creates a new record on the AP table, with the information passed as CMUmobileAP.
@@ -273,6 +294,19 @@ public class CMUmobileDataSource {
         values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, appUsg.getDayOfTheWeek());
 		return db.insertOrThrow(tableName, null, values);
 	}
+
+	public long registerWeight(CMUmobileWeight weight, String tableName){
+		ContentValues values = new ContentValues();
+		values.put(CMUmobileSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
+
+		values.put(CMUmobileSQLiteHelper.COLUMN_A, weight.getA().toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_U, weight.getU().toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, weight.getDayOfTheWeek());
+
+		return db.insertOrThrow(tableName, null, values);
+	}
+
+
 
 	/**
 	 * Function updateAP
@@ -395,6 +429,7 @@ public class CMUmobileDataSource {
 		cursor.close();
 		return ap;
 	}
+
 	/**
 	 * Function getPeer
 	 * Gets an Peer already registered by the application. 
@@ -413,6 +448,32 @@ public class CMUmobileDataSource {
 		cursor.close();
 		return ap;
 	}
+
+	/**
+	 * Function getResourceUsage
+	 * Gets a PhysicalResourceUsage saved in the database.
+	 * @param type the physical resource usage type
+	 * @param tableName the name of the table
+	 * @return pru the physical resource usage
+	 */
+	public PhysicalResourceUsage getResourceUsage(String type, String tableName){
+		PhysicalResourceUsage pru = null;
+		Cursor cursor = db.query(tableName, allColumnsResourceUsage, CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE + "='" + type + "'"+ " COLLATE NOCASE ", null, null, null, null);
+		if (cursor.moveToFirst()){
+			pru = cursorResourceUsage(cursor);
+		}
+		return pru;
+	}
+
+	public AppResourceUsage getAppResourceUsage (String name, String tableName){
+		AppResourceUsage app = null;
+		Cursor cursor = db.query(tableName, allColumnsAppsUsage, CMUmobileSQLiteHelper.COLUMN_APP_NAME + "='" + name + "'"+ " COLLATE NOCASE ", null, null, null, null);
+		if (cursor.moveToFirst()){
+			app = cursorAppResourceUsage(cursor);
+		}
+		return app;
+	}
+
 	/**
 	 * Function getDayOrWeekAP
 	 * Gets the all the AP recorded by the application on the day or week table.

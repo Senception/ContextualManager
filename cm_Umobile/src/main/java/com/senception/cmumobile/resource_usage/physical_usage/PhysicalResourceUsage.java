@@ -3,7 +3,9 @@ package com.senception.cmumobile.resource_usage.physical_usage;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -15,7 +17,7 @@ import java.util.Calendar;
  * @version 0.1
  *
  * @file Contains PhysicalResourceUsage. This class represents an object that will
- * save the type of a physical resource being used and its usage per hour.
+ * save the type of a physical resource being used, its usage per hour, and day of the week.
  *
  */
 public class PhysicalResourceUsage {
@@ -24,8 +26,12 @@ public class PhysicalResourceUsage {
     private final int SECONDLY = 59;
 
     private PhysicalResourceType resourceType;
-    private ArrayList<Integer> usagePerHour;
+    private ArrayList<Integer> usagePerHour = new ArrayList<>();
     private int dayOfTheWeek;
+
+    public PhysicalResourceUsage() {
+        super();
+    }
 
     public PhysicalResourceUsage(PhysicalResourceType resourceType) {
 
@@ -51,5 +57,16 @@ public class PhysicalResourceUsage {
 
     public int getDayOfTheWeek(){return dayOfTheWeek;}
 
-    public void setDayOfTheWeek(int day){dayOfTheWeek = day;}
+    public void setDayOfTheWeek(String day){dayOfTheWeek = Integer.parseInt(day);}
+
+    public void setResourceType(String resourceType) {
+        this.resourceType = PhysicalResourceType.valueOf(resourceType);
+    }
+
+    public void setUsagePerHour(String usagePerHour) {
+        String [] items = usagePerHour.split("\\.");
+        for (String s : items ) {
+            this.usagePerHour.add(Integer.parseInt(s));
+        }
+    }
 }

@@ -1,7 +1,6 @@
 package com.senception.cmumobile.services;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -14,7 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -26,6 +24,7 @@ import com.senception.cmumobile.R;
 import com.senception.cmumobile.activities.CMUmobileMainActivity;
 import com.senception.cmumobile.databases.CMUmobileDataSource;
 import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
+import com.senception.cmumobile.modals.CMUmobileWeight;
 import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.BatteryUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.CPUUsage;
@@ -33,10 +32,10 @@ import com.senception.cmumobile.resource_usage.physical_usage.MemoryUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceType;
 import com.senception.cmumobile.resource_usage.physical_usage.PhysicalResourceUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.StorageUsage;
+import com.senception.cmumobile.inference.Availability;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,7 +52,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -65,9 +63,10 @@ import java.util.Map;
  * @author José Soares
  * @version 0.1
  *
- * @file Contains ResourceUsageService. This class run's in the
+ * @file Contains ResourceUsageService. This service runs in the
  * background, for each hour it gets the 4 resource usages (energy,
- * cpu, memory and storage) and saves them in to the database.
+ * cpu, memory and storage) and the apps usage, for each day it
+ * saves them into the database.
  */
 public class ResourceUsageService extends Service {
 
@@ -77,16 +76,18 @@ public class ResourceUsageService extends Service {
     private static PhysicalResourceUsage cpu;
     private static PhysicalResourceUsage memory;
     private static PhysicalResourceUsage storage;
-
+    private static CMUmobileWeight weight = new CMUmobileWeight();
+    private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
+    private static ArrayList<Integer> U = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<AppResourceUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
     private static AlarmManager alarmManager;
     private static PendingIntent pendingIntentHourly;
     private static PendingIntent pendingIntentDaily;
-    AlarmReceiver alarmReceiverHourly;
-    AlarmReceiver alarmReceiverDaily;
-    CMUmobileDataSource dataSource;
+    private static AlarmReceiver alarmReceiverHourly;
+    private static AlarmReceiver alarmReceiverDaily;
+    private static CMUmobileDataSource dataSource;
 
     @SuppressLint("NewApi")
     @Override
@@ -97,7 +98,7 @@ public class ResourceUsageService extends Service {
 
         /*
         * Initializes the physical resource usage table in the DB
-        * */
+        */
         energy = new PhysicalResourceUsage(PhysicalResourceType.ENERGY);
         initializeResourceTable(energy);
         cpu = new PhysicalResourceUsage(PhysicalResourceType.CPU);
@@ -117,7 +118,10 @@ public class ResourceUsageService extends Service {
             initializeAppsTable(app);
         }
 
-        getCategory();
+        // Creates a thread where the categories of all apps in the device will be determined
+        // by getting it's category in the google apstore, to make this possible, internet
+        // connection is necessary, if there is no internet connection, categories will not be available.
+        //getCategory();
 
         //Schedules the alarm to trigger every hour (from this exact moment)
         alarmReceiverHourly = new AlarmReceiver();
@@ -126,6 +130,10 @@ public class ResourceUsageService extends Service {
         alarmReceiverDaily = new AlarmReceiver();
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
         setAlarm();
+
+        //PhysicalResourceUsage teste = dataSource.getResourceUsage(PhysicalResourceType.ENERGY.toString(), CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+        //AppResourceUsage app = dataSource.getAppResourceUsage("com.google.android.youtube", CMUmobileSQLiteHelper.TABLE_APPS_USAGE );
+
 
         backupDB();
     }
@@ -153,6 +161,10 @@ public class ResourceUsageService extends Service {
         stopForeground(true);
     }
 
+    /**
+     * Checks if the given app is already in the apps usage table, if not, then adds it.
+     * @param app
+     */
     private void initializeAppsTable(AppResourceUsage app) {
         if (!dataSource.rowExists(CMUmobileSQLiteHelper.TABLE_APPS_USAGE, app.getAppName(), CMUmobileSQLiteHelper.COLUMN_APP_NAME)) {
             Log.d(TAG, "INICIALIZOU APPS");
@@ -161,7 +173,8 @@ public class ResourceUsageService extends Service {
     }
 
     /**
-     * Checks if the 4 types of resource are already in the resource usage table, if not, then adds them.
+     * Checks if the given pru is already in the resource usage table, if not, then adds it.
+     * @param pru
      */
     private void initializeResourceTable(PhysicalResourceUsage pru) {
         if (!dataSource.rowExists(CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE, pru.getResourceType().toString(), CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE)) {
@@ -169,6 +182,7 @@ public class ResourceUsageService extends Service {
             dataSource.registerNewResourceUsage(pru, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
         }
     }
+
 
     @Nullable
     @Override
@@ -242,6 +256,15 @@ public class ResourceUsageService extends Service {
                 capturePhysicalUsage(memory);
                 capturePhysicalUsage(storage);
 
+                // Captures de R (b*b*cpu*mem*storage) every hour
+                rList.add(Availability.calculateR(energy, cpu, memory, storage));
+                // Calculates de U(sum of all Rs) every hour
+                U = Availability.calculateU(rList);
+                // Saves U into the database
+                weight.setU(U);
+                dataSource.registerWeight(weight, CMUmobileSQLiteHelper.TABLE_WEIGHTS);
+                Log.d(TAG, "U saved into the database.");
+
                 /* Captures the apps usage */
                 captureAppsUsage(context);
             }
@@ -253,18 +276,18 @@ public class ResourceUsageService extends Service {
                 Log.d(TAG, "A CADA 2 MIN MANDA PARA BD"); //mudar para diariamente à meia noite
 
                 /*Saves the 4 physical resource usage into the database*/
-                energy.setDayOfTheWeek(newDayOfTheWeek);
-                addPruToDataBase(energy);
-                cpu.setDayOfTheWeek(newDayOfTheWeek);
-                addPruToDataBase(cpu);
-                memory.setDayOfTheWeek(newDayOfTheWeek);
-                addPruToDataBase(memory);
-                storage.setDayOfTheWeek(newDayOfTheWeek);
-                addPruToDataBase(storage);
+                energy.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
+                dataSource.updateResourceUsage(energy, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+                cpu.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
+                dataSource.updateResourceUsage(cpu, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+                memory.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
+                dataSource.updateResourceUsage(memory, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+                storage.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
+                dataSource.updateResourceUsage(storage, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
 
                 /*Saves the apps usage int othe database*/
                 for (AppResourceUsage app: apps){
-                    addAppToDataBase(app);
+                    dataSource.updateAppUsage(app, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
                 }
                 backupDB();
             }
@@ -343,23 +366,6 @@ public class ResourceUsageService extends Service {
             }
             apps.get(i).getUsagePerHour().set(currentSecond, percentage);
         }
-    }
-
-    /**
-     * Updates the given physical resource usage in the resource usage table in the database to
-     * @param pru the physical resource usage to update
-     */
-    public void addPruToDataBase(PhysicalResourceUsage pru) {
-        dataSource.updateResourceUsage(pru, CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
-        //backupDB();
-    }
-
-    /**
-     * Updates the given physical resource usage in the resource usage table in the database to
-     * @param app the physical resource usage to update
-     */
-    public void addAppToDataBase(AppResourceUsage app) {
-        dataSource.updateAppUsage(app, CMUmobileSQLiteHelper.TABLE_APPS_USAGE);
     }
 
     /**
