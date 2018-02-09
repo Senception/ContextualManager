@@ -69,4 +69,9 @@ public class PhysicalResourceUsage {
             this.usagePerHour.add(Integer.parseInt(s));
         }
     }
+
+    @Override
+    public String toString(){
+        return "\n\t" + this.getResourceType() + "\n\t" + this.getUsagePerHour() + "\n\t" + this.getDayOfTheWeek();
+    }
 }

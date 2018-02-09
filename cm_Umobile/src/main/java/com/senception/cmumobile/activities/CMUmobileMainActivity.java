@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import com.senception.cmumobile.fragments.LocationDialogFragment;
 import com.senception.cmumobile.fragments.UsageStatsDialogFragment;
 import com.senception.cmumobile.permissions.Permissions;
@@ -175,6 +176,11 @@ public class CMUmobileMainActivity extends Activity {
 				//send_report(get_report());
 
 				return true;
+            /*case R.id.GetU:
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
+                ArrayList<Integer> U = resUsgBoundService.getU(dateFormat.format(System.currentTimeMillis()));
+                Toast.makeText(getApplicationContext(), "The calculated U is: " + U.toString(), Toast.LENGTH_SHORT).show();
+*/
 			default:
 				return super.onOptionsItemSelected(item);
 		}

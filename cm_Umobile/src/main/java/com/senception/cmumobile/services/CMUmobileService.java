@@ -959,7 +959,6 @@ public class CMUmobileService extends Service{
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			// TODO Auto-generated method stub
 			saveCleanDay();
 		}
 	}

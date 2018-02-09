@@ -1,5 +1,10 @@
 package com.senception.cmumobile.inference;
 
+import com.senception.cmumobile.databases.CMUmobileDataSource;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+
 /**
  * Copyright (C) 2016 Senception Lda
  * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *

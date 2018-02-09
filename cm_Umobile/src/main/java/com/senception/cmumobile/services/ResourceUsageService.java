@@ -19,11 +19,15 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.senception.cmumobile.R;
 import com.senception.cmumobile.activities.CMUmobileMainActivity;
 import com.senception.cmumobile.databases.CMUmobileDataSource;
 import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
+import com.senception.cmumobile.inference.CMUmobileInferenceHandler;
+import com.senception.cmumobile.inference.Centrality;
+import com.senception.cmumobile.interfaces.CMUmobileInference;
 import com.senception.cmumobile.modals.CMUmobileWeight;
 import com.senception.cmumobile.resource_usage.app_usage.AppResourceUsage;
 import com.senception.cmumobile.resource_usage.physical_usage.BatteryUsage;
@@ -76,9 +80,9 @@ public class ResourceUsageService extends Service {
     private static PhysicalResourceUsage cpu;
     private static PhysicalResourceUsage memory;
     private static PhysicalResourceUsage storage;
-    private static CMUmobileWeight weight = new CMUmobileWeight();
     private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
     private static ArrayList<Integer> U = new ArrayList<>();
+    private static ArrayList<Integer> A = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<AppResourceUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
@@ -88,6 +92,7 @@ public class ResourceUsageService extends Service {
     private static AlarmReceiver alarmReceiverHourly;
     private static AlarmReceiver alarmReceiverDaily;
     private static CMUmobileDataSource dataSource;
+    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
 
     @SuppressLint("NewApi")
     @Override
@@ -95,6 +100,7 @@ public class ResourceUsageService extends Service {
         super.onCreate();
         dataSource = new CMUmobileDataSource(this);
         dataSource.openDB(true);
+        CMUmobileInferenceHandler inferenceHandler = new CMUmobileInferenceHandler(dataSource);
 
         /*
         * Initializes the physical resource usage table in the DB
@@ -131,9 +137,29 @@ public class ResourceUsageService extends Service {
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
         setAlarm();
 
-        //PhysicalResourceUsage teste = dataSource.getResourceUsage(PhysicalResourceType.ENERGY.toString(), CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
-        //AppResourceUsage app = dataSource.getAppResourceUsage("com.google.android.youtube", CMUmobileSQLiteHelper.TABLE_APPS_USAGE );
+        /*PhysicalResourceUsage teste = dataSource.getResourceUsage(PhysicalResourceType.ENERGY.toString(), CMUmobileSQLiteHelper.TABLE_RESOURCE_USAGE);
+        Log.d(TAG, teste.toString());
+        AppResourceUsage app = dataSource.getAppResourceUsage("com.google.android.youtube", CMUmobileSQLiteHelper.TABLE_APPS_USAGE );
+        Log.d(TAG, app.toString());*/
 
+
+        Boolean pediramU = false;
+        Boolean pediramA = false;
+        Boolean pediramI = false;
+        Boolean pediramALL = false;
+
+        if(pediramU){
+            Log.d(TAG, "U: " + inferenceHandler.getU().toString());
+        }
+        else if(pediramA){
+            inferenceHandler.getA();
+        }
+        else if(pediramI){
+            inferenceHandler.getI();
+        }
+        else if(pediramALL){
+            inferenceHandler.getAll();
+        }
 
         backupDB();
     }
@@ -243,6 +269,10 @@ public class ResourceUsageService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            Calendar day = Calendar.getInstance();
+            int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
+
             //Captures the usage
             if(intent.getAction().equals("com.example.resource_usage_hourly")) {
                 //get current time
@@ -257,21 +287,31 @@ public class ResourceUsageService extends Service {
                 capturePhysicalUsage(storage);
 
                 // Captures de R (b*b*cpu*mem*storage) every hour
-                rList.add(Availability.calculateR(energy, cpu, memory, storage));
-                // Calculates de U(sum of all Rs) every hour
+                rList.add(Availability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
+                // Calculates the U availability (sum of all Rs) every hour
                 U = Availability.calculateU(rList);
+                //Log.d(TAG, "U: " +  U.toString());
+
                 // Saves U into the database
+                String dateTime = dateFormat.format(System.currentTimeMillis());
+                CMUmobileWeight weight = new CMUmobileWeight(dateTime);
                 weight.setU(U);
+                //TODO weight.setA(A);
+                weight.updateDateTime();
+                weight.setDayOfTheWeek(newDayOfTheWeek);
                 dataSource.registerWeight(weight, CMUmobileSQLiteHelper.TABLE_WEIGHTS);
                 Log.d(TAG, "U saved into the database.");
+                backupDB();
+
+                // Calculates the A centrality every hour
+                //TODO A = Centrality.calculateA();
 
                 /* Captures the apps usage */
                 captureAppsUsage(context);
+
             }
             //Saves the usage percentage into the database
             else{
-                Calendar day = Calendar.getInstance();
-                int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
                 printCalendar(day);
                 Log.d(TAG, "A CADA 2 MIN MANDA PARA BD"); //mudar para diariamente à meia noite
 
@@ -370,7 +410,8 @@ public class ResourceUsageService extends Service {
 
     /**
      * Updates the category of each app in the apps list if there is internet connection
-     * and the respective app has a category affiliated in google play store
+     * and the respective app has a category affiliated in google play store -- To-complete
+     * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android
      */
     private void getCategory() {
         Thread downloadThread = new Thread() {
@@ -550,4 +591,5 @@ public class ResourceUsageService extends Service {
         }
         return result;
     }
+
 }

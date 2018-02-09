@@ -48,7 +48,6 @@ public class CMUmobileDataSource {
 	private CMUmobileSQLiteHelper dbHelper;
 	private boolean isDbOpen;
 	private GregorianCalendar cal;
-	private int count = 0;
 
 	/**
 	 * Constructor that takes Android Context as input.
@@ -106,6 +105,7 @@ public class CMUmobileDataSource {
 		dbHelper.close();
 		isDbOpen = false;
 	}
+
 	/**
 	 * List of all columns on the AP TABLE
 	 */
@@ -119,6 +119,7 @@ public class CMUmobileDataSource {
 			CMUmobileSQLiteHelper.COLUMN_LATITUDE,
 			CMUmobileSQLiteHelper.COLUMN_LONGITUDE
 	};
+
 	/**
 	 * List of all columns on the PEERS table.
 	 */
@@ -143,6 +144,9 @@ public class CMUmobileDataSource {
 			CMUmobileSQLiteHelper.COLUMN_HOUR
 	};
 
+	/**
+	 * List of all columns on the ResourceUsage table
+	 */
 	private String[] allColumnsResourceUsage = {
 			CMUmobileSQLiteHelper.COLUMN_ID,
 			CMUmobileSQLiteHelper.COLUMN_TYPE_OF_RESOURCE,
@@ -150,11 +154,25 @@ public class CMUmobileDataSource {
 			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
 	};
 
+	/**
+	 * List of all columns on the AppsUsage table
+	 */
 	private String[] allColumnsAppsUsage = {
 			CMUmobileSQLiteHelper.COLUMN_ID,
 			CMUmobileSQLiteHelper.COLUMN_APP_NAME,
 			CMUmobileSQLiteHelper.COLUMN_APP_CATEGORY,
 			CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR,
+			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
+	};
+
+	/**
+	 * List of all columns on the Weights table
+	 */
+	private String[] allColumnsWeight = {
+			CMUmobileSQLiteHelper.COLUMN_ID,
+			CMUmobileSQLiteHelper.COLUMN_DATETIME,
+			CMUmobileSQLiteHelper.COLUMN_A,
+			CMUmobileSQLiteHelper.COLUMN_U,
 			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
 	};
 
@@ -174,16 +192,15 @@ public class CMUmobileDataSource {
 		ap.setDateTime(cursor.getString(5));
 		ap.setLatitude(cursor.getDouble(6));
 		ap.setLongitude(cursor.getDouble(7));
-	
 		return ap;
 	}
+
 	/**
 	 * Function cursorPeers
 	 * Converts a cursor pointing to a record in the Peers table to a TKiddoAP object.
 	 * @param cursor Cursor pointing to a record of the Peers table.
 	 * @return the TKiddoAP object
 	 */
-
 	private CMUmobileAP cursorPeers(Cursor cursor) {
 		CMUmobileAP ap = new CMUmobileAP();
 		ap.setId(cursor.getInt(0));
@@ -195,6 +212,12 @@ public class CMUmobileDataSource {
 		return ap;
 	}
 
+	/**
+	 * Function cursorResourceUsage
+	 * Converts a cursor pointing to a record in the ResourceUsage table to a Contextual Manager object.
+	 * @param cursor Cursor pointing to a record of the ResourceUsage table.
+	 * @return the Contextual Manager object
+	 */
 	private PhysicalResourceUsage cursorResourceUsage(Cursor cursor){
 		PhysicalResourceUsage pru = new PhysicalResourceUsage();
 		pru.setResourceType(cursor.getString(1));
@@ -203,6 +226,12 @@ public class CMUmobileDataSource {
 		return pru;
 	}
 
+	/**
+	 * Function cursorAppResourceUsage
+	 * Converts a cursor pointing to a record in the AppsResourceUsage table to a Contextual Manager object.
+	 * @param cursor Cursor pointing to a record of the AppsResourceUsage table.
+	 * @return the Contextual Manager object
+	 */
 	private AppResourceUsage cursorAppResourceUsage (Cursor cursor){
 		AppResourceUsage app = new AppResourceUsage();
 		app.setAppName(cursor.getString(1));
@@ -210,6 +239,21 @@ public class CMUmobileDataSource {
 		app.setUsagePerHour(cursor.getString(3));
 		app.setDayOfTheWeek(cursor.getString(4));
 		return app;
+	}
+
+	/**
+	 * Function cursorWeight
+	 * Converts a cursor pointing to a record in the Weights table to a Contextual Manager object.
+	 * @param cursor Cursor pointing to a record of the Weight table.
+	 * @return the Contextual Manager object
+	 */
+	private CMUmobileWeight cursorWeight(Cursor cursor){
+		CMUmobileWeight weight = new CMUmobileWeight();
+		weight.setDateTime(cursor.getString(1));
+		weight.setA(cursor.getString(2));
+		weight.setU(cursor.getString(3));
+		weight.setDayOfTheWeek(cursor.getString(4));
+		return weight;
 	}
 
 	/**
@@ -245,7 +289,6 @@ public class CMUmobileDataSource {
 	    values.put(CMUmobileSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(CMUmobileSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(CMUmobileSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
-	    
 	    return db.insert(tableName, null, values);
 	}
 
@@ -268,7 +311,6 @@ public class CMUmobileDataSource {
 		}
 		values.put(CMUmobileSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(resUsg.getDayOfTheWeek()));
-		count++;
 		return db.insert(tableName, null, values);
 	}
 
@@ -298,15 +340,22 @@ public class CMUmobileDataSource {
 	public long registerWeight(CMUmobileWeight weight, String tableName){
 		ContentValues values = new ContentValues();
 		values.put(CMUmobileSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
-
-		values.put(CMUmobileSQLiteHelper.COLUMN_A, weight.getA().toString());
-		values.put(CMUmobileSQLiteHelper.COLUMN_U, weight.getU().toString());
+		StringBuilder A = new StringBuilder();
+		StringBuilder U = new StringBuilder();
+		for(int i = 0; i < weight.getA().size(); i++){
+			A.append(weight.getA().get(i));
+			U.append(weight.getU().get(i));
+			if( i < weight.getA().size() - 1 ){
+				A.append(".");
+				U.append(".");
+			}
+		}
+		values.put(CMUmobileSQLiteHelper.COLUMN_A, A.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_U, U.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, weight.getDayOfTheWeek());
 
 		return db.insertOrThrow(tableName, null, values);
 	}
-
-
 
 	/**
 	 * Function updateAP
@@ -409,8 +458,6 @@ public class CMUmobileDataSource {
         return rows != 0 ? true : false;
     }
 
-
-
 	/**
 	 * Function getAP
 	 * Gets an AP already registered by the application. 
@@ -465,6 +512,13 @@ public class CMUmobileDataSource {
 		return pru;
 	}
 
+	/**
+	 * Function getAppResourceUsage
+	 * Gets from database the app resource usage with the given name.
+	 * @param name name of the app to get from database
+	 * @param tableName the name of the table
+	 * @return app the app resource usage
+	 */
 	public AppResourceUsage getAppResourceUsage (String name, String tableName){
 		AppResourceUsage app = null;
 		Cursor cursor = db.query(tableName, allColumnsAppsUsage, CMUmobileSQLiteHelper.COLUMN_APP_NAME + "='" + name + "'"+ " COLLATE NOCASE ", null, null, null, null);
@@ -472,6 +526,24 @@ public class CMUmobileDataSource {
 			app = cursorAppResourceUsage(cursor);
 		}
 		return app;
+	}
+
+	/**
+	 * Function getWeight
+	 * Gets from database the weight with the given datetime.
+	 * @param tableName the name of the table
+	 * @return app the app resource usage
+	 */
+	public CMUmobileWeight getWeight (String tableName){
+		CMUmobileWeight weight = null;
+		//Cursor cursor = db.query(tableName, allColumnsWeight, CMUmobileSQLiteHelper.COLUMN_DATETIME + "='" + dateTime + "'"+ " COLLATE NOCASE ", null, null, null, null);
+		// query to get last row of the weight's table
+		String selectQuery = "SELECT * FROM " + tableName + " ORDER BY " + CMUmobileSQLiteHelper.COLUMN_DATETIME + " DESC LIMIT 1";
+		Cursor cursor = db.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()){
+			weight = cursorWeight(cursor);
+		}
+		return weight;
 	}
 
 	/**

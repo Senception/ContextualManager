@@ -1,5 +1,7 @@
 package com.senception.cmumobile.modals;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,19 +24,27 @@ public class CMUmobileWeight {
     private final int SECONDLY = 59;
 
     private int id;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
     private String dateTime;
     private ArrayList<Integer> A = new ArrayList<>();
     private ArrayList<Integer> U = new ArrayList<>();
     private int dayOfTheWeek;
 
-    public CMUmobileWeight() {
-        dateTime = dateFormat.format(System.currentTimeMillis());
+
+    public CMUmobileWeight() { super();}
+
+    public CMUmobileWeight(String dateTime) {
         A = new ArrayList<>(SECONDLY);
         U = new ArrayList<>(SECONDLY);
         //fill both A and U with -1 (24 of them, since we're capturing this every hour-> 24h a day)
         for (int i = 0; i <= SECONDLY; i++){
             A.add(i, -1);
+
             U.add(i, -1);
         }
         Calendar day = Calendar.getInstance();
@@ -53,27 +63,45 @@ public class CMUmobileWeight {
         return A;
     }
 
-    public void setA(ArrayList<Integer> a) {
-        A = a;
+    public void setA(String A) {
+        String [] items = A.split("\\.");
+        for (String s : items ) {
+            this.A.add(Integer.parseInt(s));
+        }
+    }
+
+    public void setU(ArrayList<Integer> U){
+        this.U = U;
+    }
+
+    public void setU(String U) {
+        String [] items = U.split("\\.");
+        for (String s : items ) {
+            this.U.add(Integer.parseInt(s));
+        }
     }
 
     public ArrayList<Integer> getU() {
         return U;
     }
 
-    public void setU(ArrayList<Integer> u) {
-        U = u;
-    }
-
     public int getDayOfTheWeek() {
         return dayOfTheWeek;
     }
 
-    public void setDayOfTheWeek(int dayOfTheWeek) {
+    public void setDayOfTheWeek(String dayOfTheWeek) {
+        this.dayOfTheWeek = Integer.parseInt(dayOfTheWeek);
+    }
+
+    public void setDayOfTheWeek(int dayOfTheWeek){
         this.dayOfTheWeek = dayOfTheWeek;
     }
 
     public String getDateTime() {
         return dateTime;
+    }
+
+    public void updateDateTime() {
+        this.dateTime =  dateFormat.format(System.currentTimeMillis());
     }
 }
