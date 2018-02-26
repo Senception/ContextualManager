@@ -1,2 +1,2 @@
-include ':showcaselib'
+include ':showcaselib', ':cm_library_jar'
 include ':cm_Umobile'

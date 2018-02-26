@@ -74,7 +74,7 @@ public class CMUmobileWifiP2P extends BroadcastReceiver {
 						//
 						peersList.clear();
 						for(WifiP2pDevice dev : peers.getDeviceList()){
-
+							//dev.
 							CMUmobileAP peerfound = new CMUmobileAP();
 							peerfound.setSSID(dev.deviceName);
 							peerfound.setBSSID(dev.deviceAddress);

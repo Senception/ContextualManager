@@ -16,13 +16,41 @@ package com.senception.cmumobile.modals;
 public class CMUmobileAP {
 
 	private int id;
-	private String BSSID;
-	private String SSID;
-	private double attractiveness;
+	private String BSSID; //mac address of the WAP (wireless access point)
+	private String SSID; //Name of the WAP
+	private double attractiveness; //What i belive is the centrality
 	private  String dateTime;
 	private String DayOfWeek;
 	private double latitude;
 	private double longitude;
+	private long startTime;
+	private long endTime;
+	private long numEncounters;
+
+	public long getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+	public long getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+	public long getNumEncounters() {
+		return numEncounters;
+	}
+
+	public void setNumEncounters(long numEncounters) {
+		this.numEncounters = numEncounters;
+	}
+
 	/**
 	 *Get the id of this AP
 	 *@return the id

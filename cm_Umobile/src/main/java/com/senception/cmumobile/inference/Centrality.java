@@ -1,5 +1,11 @@
 package com.senception.cmumobile.inference;
 
+import com.senception.cmumobile.databases.CMUmobileDataSource;
+import com.senception.cmumobile.databases.CMUmobileSQLiteHelper;
+import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.modals.CMUmobileVisit;
+import com.senception.cmumobile.services.CMUmobileService;
+
 import java.util.ArrayList;
 
 /**
@@ -29,9 +35,22 @@ public class Centrality {
      d(i,j) ∈ [0,100]
     */
 
-    public static ArrayList<Integer> calculateA(String encounter, double encounterDuration, String d){
+    private static int numEncounters;
+    private static long avg_enc_dur;
+    private static long currentDur;
+
+    public static ArrayList<Integer> calculateA(CMUmobileDataSource dataSource){
+        ArrayList<Integer> centrality = new ArrayList<>();
+        //get peer list
+        //ArrayList<CMUmobileAP> peersList = dataSource.getAllAP(,CMUmobileService.checkWeek("ap"));
+
+        //get peers number of connections/encounters (list.length)
+        //get those encounter durations
+        //calculate avg duration
         //Todo: Calculate A
-        return null;
+
+
+        return centrality;
     }
 
 

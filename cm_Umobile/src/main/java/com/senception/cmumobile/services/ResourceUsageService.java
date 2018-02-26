@@ -286,25 +286,32 @@ public class ResourceUsageService extends Service {
                 capturePhysicalUsage(memory);
                 capturePhysicalUsage(storage);
 
+                /*Availability Calculation:*/
                 // Captures de R (b*b*cpu*mem*storage) every hour
                 rList.add(Availability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 // Calculates the U availability (sum of all Rs) every hour
                 U = Availability.calculateU(rList);
                 //Log.d(TAG, "U: " +  U.toString());
 
-                // Saves U into the database
+                /*Centrality Calculation:*/
+                // Calculates the A centrality every hour
+
+                //get peer list
+                //get peers number of connections/encounters (list.length)
+                //get those encounter durations
+                //calculate avg duration
+                ArrayList<Integer> A = Centrality.calculateA(dataSource);
+
+                // Saves U and A into the database
                 String dateTime = dateFormat.format(System.currentTimeMillis());
                 CMUmobileWeight weight = new CMUmobileWeight(dateTime);
                 weight.setU(U);
-                //TODO weight.setA(A);
+                weight.setA(A);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
                 dataSource.registerWeight(weight, CMUmobileSQLiteHelper.TABLE_WEIGHTS);
                 Log.d(TAG, "U saved into the database.");
                 backupDB();
-
-                // Calculates the A centrality every hour
-                //TODO A = Centrality.calculateA();
 
                 /* Captures the apps usage */
                 captureAppsUsage(context);

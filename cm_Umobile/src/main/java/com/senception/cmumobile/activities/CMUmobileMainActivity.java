@@ -24,6 +24,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.senception.cmumobile.aidl.CManagerInterface;
 import com.senception.cmumobile.fragments.LocationDialogFragment;
 import com.senception.cmumobile.fragments.UsageStatsDialogFragment;
 import com.senception.cmumobile.permissions.Permissions;
@@ -32,6 +33,7 @@ import com.senception.cmumobile.interfaces.CMUmobileDataBaseChangeListener;
 import com.senception.cmumobile.modals.CMUmobileAP;
 import com.senception.cmumobile.services.ResourceUsageService;
 import com.senception.cmumobile.services.CMUmobileService;
+import com.senception.cmumobile.services.aidlService;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -52,8 +54,10 @@ public class CMUmobileMainActivity extends Activity {
 	int backButtonCount = 0;
 	private CMUmobileService reportBoundService;
 	private ResourceUsageService resUsgBoundService;
+	private aidlService aidlBoundService;
 	private boolean resUsgServIsBound = false;
 	private boolean mIsServiceBound = false;
+	private boolean aidlIsServiceBound = false;
 
 	/**
 	 * The Connection to the PerSense Light service. 
@@ -98,12 +102,29 @@ public class CMUmobileMainActivity extends Activity {
 		}
 	};
 
+	/**
+	 * The Connection to the Contextual Manager service.
+	 */
+	private ServiceConnection aidlConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			aidlBoundService = ((aidlService.LocalBinder)service).getService();
+			aidlIsServiceBound = true;
+		}
+
+		public void onServiceDisconnected(ComponentName className) {
+			aidlBoundService = null;
+			aidlIsServiceBound = false;
+		}
+	};
+
 
 	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
+
+		//doBindAidlService();
 
 		FragmentManager manager = getFragmentManager();
 
@@ -137,6 +158,11 @@ public class CMUmobileMainActivity extends Activity {
 		if(resUsgServIsBound && resourceConnection == null){
 			doBindResourceService();
 		}
+
+		if(aidlIsServiceBound && aidlConnection == null){
+			doBindAidlService();
+		}
+
 	}
 
 	@Override
@@ -157,6 +183,10 @@ public class CMUmobileMainActivity extends Activity {
 				resUsgBoundService.stopForeGround();
 				doUnbindResourceService();
 				stopService(new Intent(CMUmobileMainActivity.this, ResourceUsageService.class));
+
+				aidlBoundService.stopForeGround();
+				doUnbindAidlService();
+				stopService(new Intent(CMUmobileMainActivity.this, aidlService.class));
 
 				this.finish();
 
@@ -204,6 +234,15 @@ public class CMUmobileMainActivity extends Activity {
 	}
 
 	/**
+	 * Bind the aidl service in case it is not already binded.
+	 */
+	private void doBindAidlService() {
+		if(!aidlIsServiceBound) {
+			bindService(new Intent(CMUmobileMainActivity.this, aidlService.class), aidlConnection, Context.BIND_AUTO_CREATE);
+		}
+	}
+
+	/**
 	 * Un-bind the report service in case it is binded.
 	 */
 	void doUnbindReportService() {
@@ -218,6 +257,15 @@ public class CMUmobileMainActivity extends Activity {
 	void doUnbindResourceService() {
 		if (resUsgServIsBound && resourceConnection != null) {
 			unbindService(resourceConnection);
+		}
+	}
+
+	/**
+	 * Un-bind the aidl service in case it is binded.
+	 */
+	void doUnbindAidlService() {
+		if (aidlIsServiceBound && aidlConnection != null) {
+			unbindService(aidlConnection);
 		}
 	}
 

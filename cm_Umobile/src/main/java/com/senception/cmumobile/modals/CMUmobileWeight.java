@@ -63,6 +63,10 @@ public class CMUmobileWeight {
         return A;
     }
 
+    public void setA(ArrayList<Integer> A){
+        this.A = A;
+    }
+
     public void setA(String A) {
         String [] items = A.split("\\.");
         for (String s : items ) {

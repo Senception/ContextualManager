@@ -63,7 +63,7 @@ public class CMUmobileInferenceHandler implements CMUmobileInference {
         ArrayList<ArrayList<Integer>> all = new ArrayList<>();
         all.add(getU());
         all.add(getA());
-        all.add(getI());
+        //all.add(getI());
         return all;
     }
 }

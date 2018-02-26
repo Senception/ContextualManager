@@ -38,6 +38,15 @@
             android:value="AIzaSyA-A0yak9wCocbpfAAIuas_YgGjDMLmzl0" />
 
         <service
+            android:name="com.senception.cmumobile.services.aidlService"
+            android:label="Contextual Manager Aidl Interface"
+            android:process=":remote">
+            <intent-filter>
+                <action android:name="aidlService"/>
+            </intent-filter>
+        </service>
+
+        <service
             android:name="com.senception.cmumobile.services.CMUmobileService"
             android:label="Contextual Manager Report" >
         </service>

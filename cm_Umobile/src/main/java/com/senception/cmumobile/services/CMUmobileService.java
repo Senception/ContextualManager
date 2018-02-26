@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.opencsv.CSVWriter;
+import com.senception.cmumobile.aidl.CManagerInterface;
 import com.senception.cmumobile.databases.CMUmobileDataSource;
 import com.senception.cmumobile.pipelines.CMUmobileFusedLocation;
 import com.senception.cmumobile.activities.CMUmobileMainActivity;
@@ -65,6 +66,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 //import android.util.Log;
@@ -110,6 +112,11 @@ public class CMUmobileService extends Service{
 		public CMUmobileService getService(){
 			return CMUmobileService.this;
 		}
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+			return mBinder;
 	}
 
 	@Override
@@ -194,6 +201,8 @@ public class CMUmobileService extends Service{
 		if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
+			long startTime = System.currentTimeMillis();
+			long endTime = System.currentTimeMillis();
 
 			for(CMUmobileAP item: peerPersence){
 				CMUmobileAP ap = new CMUmobileAP();
@@ -203,16 +212,21 @@ public class CMUmobileService extends Service{
 					ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
-
+					//ap.setContactTime(0);
+					ap.setNumEncounters(1);
+					//ap.set
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
 				}
 				else{
+					CMUmobileAP peer = dataSource.getPeer(item.getBSSID(), checkWeek("peers"));
 					ap.setSSID(item.getSSID());
 					ap.setBSSID(item.getBSSID());
 					ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
-
+					//ap.setContactTime(peer.getContactTime());
+					//get from db last numEncounters
+					//ap.setNumEncounters(datasource.getNumEncounters()+1);
 					dataSource.updatePeer(ap, checkWeek("peers"));
 				}
 			}
@@ -787,11 +801,11 @@ public class CMUmobileService extends Service{
 			notifyDataBaseChange();
 		}
 	}
-	@Override
+	/*@Override
 	public IBinder onBind(Intent intent){
 		return mBinder;
 
-	}
+	}*/
 	public void addListener(CMUmobileWifiP2PChangeListener listener){
 		listenersWifiP2p.add(listener);
 	}

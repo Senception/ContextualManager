@@ -705,6 +705,39 @@ public class CMUmobileDataSource {
 		visit.setHourOfTheDay(cursor.getInt(3));
 		return visit;
 	}
+
+	/*public long getContactTime(CMUmobileAP ap){
+		String bssid = ap.getBSSID();
+		long sationaryTime = 0;
+		long count = 0;
+		long startTime = 0;
+		long endTime = 0;
+		Cursor cursor = db.query(CMUmobileSQLiteHelper., allColumnsVisit, CMUmobileSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null, null, null, null);
+
+		if (cursor.moveToFirst()) {
+			while (!cursor.isAfterLast()) {
+				startTime = cursor.getLong(2);
+				endTime = cursor.getLong(3);
+				if ((endTime - startTime) > 0) {
+					sationaryTime = sationaryTime + (endTime - startTime);
+					count++;
+				}
+				cursor.moveToNext();
+			}
+			cursor.close();
+
+			if (count > 0)
+				sationaryTime = sationaryTime/count;
+
+		}
+		else {
+			cursor.close();
+		}
+
+		return sationaryTime/1000;
+
+	}
+*/
 	/**
      * Function getStationaryTime
      * Computes the Stationary Time for a given AP.
@@ -814,6 +847,7 @@ public class CMUmobileDataSource {
 			 return (0.3*getStationaryTime(ap) + 0.7*currentDuration) * (countVisits(ap) + 1) * ap.getAttractiveness();
 		 }
 	}
+	
 	 /**
      * Function registerNewVisit
      * Register a new visit into the database.
