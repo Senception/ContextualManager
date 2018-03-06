@@ -31,7 +31,7 @@ public class Availability {
      * @param rList list of all R's calculated so far.
      * @return U the array
      */
-    public static ArrayList<Integer> calculateU(ArrayList<ArrayList<Integer>> rList){
+    public static ArrayList<Integer> calculateA(ArrayList<ArrayList<Integer>> rList){
         ArrayList<Integer> U = rList.get(0);
         for (int i = 1; i < rList.size(); i++) {
             U = sumArrays(U, rList.get(i)); //U = R1 // U = U(R1) + R2 + R3 --> R1+R2

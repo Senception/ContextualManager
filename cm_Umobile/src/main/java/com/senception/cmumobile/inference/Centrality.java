@@ -39,8 +39,11 @@ public class Centrality {
     private static long avg_enc_dur;
     private static long currentDur;
 
-    public static ArrayList<Integer> calculateA(CMUmobileDataSource dataSource){
+    public static ArrayList<Integer> calculateC(CMUmobileDataSource dataSource){
         ArrayList<Integer> centrality = new ArrayList<>();
+        for (int i = 0; i <= 59; i++){
+            centrality.add(i, -1);
+        }
         //get peer list
         //ArrayList<CMUmobileAP> peersList = dataSource.getAllAP(,CMUmobileService.checkWeek("ap"));
 

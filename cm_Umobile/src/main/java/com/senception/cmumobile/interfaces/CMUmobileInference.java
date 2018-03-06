@@ -22,13 +22,13 @@ public interface CMUmobileInference {
      * Method to calculate U - availability
      * @return the availability per hour in the given instant.
      */
-    public ArrayList<Integer> getU();
+    public ArrayList<Integer> getA();
 
     /**
      * Method to calculate C - centrality
      * @return the centrality per hour in the given instant.
      */
-    public ArrayList<Integer> getA();
+    public ArrayList<Integer> getC();
 
     /**
      * Method to calculate I - similarity

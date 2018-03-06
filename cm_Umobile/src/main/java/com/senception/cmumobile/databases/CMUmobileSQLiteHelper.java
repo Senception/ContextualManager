@@ -74,7 +74,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 
 	//WEIGHTS
 	public static final String COLUMN_A = "a"; // Affinity network level of a node (measures node's centrality/popularity).
-	public static final String COLUMN_U = "u"; // Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_C = "c"; // Internal Usage weight of a node (measures the availability of the node)
 
 	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
 	   For instance, I can provide a measure of battery similarity over time between nodes.
@@ -268,7 +268,7 @@ public class CMUmobileSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_ID + " integer primary key autoincrement, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_A + " text not null, "
-			+ COLUMN_U + " text not null, "
+			+ COLUMN_C + " text not null, "
 			+ COLUMN_DAYOFTHEWEEK + " integer "
 			+ ");";
 	

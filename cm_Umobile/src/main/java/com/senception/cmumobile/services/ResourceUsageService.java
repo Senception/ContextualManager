@@ -81,8 +81,8 @@ public class ResourceUsageService extends Service {
     private static PhysicalResourceUsage memory;
     private static PhysicalResourceUsage storage;
     private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
-    private static ArrayList<Integer> U = new ArrayList<>();
     private static ArrayList<Integer> A = new ArrayList<>();
+    private static ArrayList<Integer> C = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<AppResourceUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
@@ -149,7 +149,7 @@ public class ResourceUsageService extends Service {
         Boolean pediramALL = false;
 
         if(pediramU){
-            Log.d(TAG, "U: " + inferenceHandler.getU().toString());
+            Log.d(TAG, "U: " + inferenceHandler.getA().toString());
         }
         else if(pediramA){
             inferenceHandler.getA();
@@ -289,28 +289,28 @@ public class ResourceUsageService extends Service {
                 /*Availability Calculation:*/
                 // Captures de R (b*b*cpu*mem*storage) every hour
                 rList.add(Availability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
-                // Calculates the U availability (sum of all Rs) every hour
-                U = Availability.calculateU(rList);
-                //Log.d(TAG, "U: " +  U.toString());
+                // Calculates the A availability (sum of all Rs) every hour
+                A = Availability.calculateA(rList);
+                //Log.d(TAG, "A: " +  U.toString());
 
                 /*Centrality Calculation:*/
-                // Calculates the A centrality every hour
+                // Calculates the C centrality every hour
 
                 //get peer list
                 //get peers number of connections/encounters (list.length)
                 //get those encounter durations
                 //calculate avg duration
-                ArrayList<Integer> A = Centrality.calculateA(dataSource);
+                C = Centrality.calculateC(dataSource);
 
-                // Saves U and A into the database
+                // Saves A and C into the database
                 String dateTime = dateFormat.format(System.currentTimeMillis());
                 CMUmobileWeight weight = new CMUmobileWeight(dateTime);
-                weight.setU(U);
                 weight.setA(A);
+                weight.setC(C);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
                 dataSource.registerWeight(weight, CMUmobileSQLiteHelper.TABLE_WEIGHTS);
-                Log.d(TAG, "U saved into the database.");
+                Log.d(TAG, "A saved into the database.");
                 backupDB();
 
                 /* Captures the apps usage */

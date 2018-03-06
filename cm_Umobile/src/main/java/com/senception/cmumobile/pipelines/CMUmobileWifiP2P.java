@@ -22,9 +22,11 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.util.Log;
 
 import com.senception.cmumobile.services.CMUmobileService;
 import com.senception.cmumobile.modals.CMUmobileAP;
+import com.senception.cmumobile.services.aidlService;
 //import android.util.Log;
 
 @SuppressLint("NewApi")
@@ -34,6 +36,7 @@ public class CMUmobileWifiP2P extends BroadcastReceiver {
 	private static WifiP2pManager manager;
 	private static Channel channel;
 	private CMUmobileService service;
+	private aidlService serviceAidl;
 	ArrayList<CMUmobileAP> peersList = new ArrayList<CMUmobileAP>();
 	ArrayList<CMUmobileAP> arrayPersence = new ArrayList<CMUmobileAP>();
 	public String peerName;
@@ -51,6 +54,7 @@ public class CMUmobileWifiP2P extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
+		Log.d("Receiver", "ENTROU NO ONRECEIVE DO CMUMOBILEWIFIP2P");
 		mContext = context;
 		String action = intent.getAction();
 		if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
@@ -78,7 +82,7 @@ public class CMUmobileWifiP2P extends BroadcastReceiver {
 							CMUmobileAP peerfound = new CMUmobileAP();
 							peerfound.setSSID(dev.deviceName);
 							peerfound.setBSSID(dev.deviceAddress);
-					
+
 							peersList.add(peerfound);
 						}
 						

@@ -172,7 +172,7 @@ public class CMUmobileDataSource {
 			CMUmobileSQLiteHelper.COLUMN_ID,
 			CMUmobileSQLiteHelper.COLUMN_DATETIME,
 			CMUmobileSQLiteHelper.COLUMN_A,
-			CMUmobileSQLiteHelper.COLUMN_U,
+			CMUmobileSQLiteHelper.COLUMN_C,
 			CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK,
 	};
 
@@ -251,7 +251,7 @@ public class CMUmobileDataSource {
 		CMUmobileWeight weight = new CMUmobileWeight();
 		weight.setDateTime(cursor.getString(1));
 		weight.setA(cursor.getString(2));
-		weight.setU(cursor.getString(3));
+		weight.setC(cursor.getString(3));
 		weight.setDayOfTheWeek(cursor.getString(4));
 		return weight;
 	}
@@ -341,17 +341,18 @@ public class CMUmobileDataSource {
 		ContentValues values = new ContentValues();
 		values.put(CMUmobileSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
 		StringBuilder A = new StringBuilder();
-		StringBuilder U = new StringBuilder();
+		StringBuilder C = new StringBuilder();
 		for(int i = 0; i < weight.getA().size(); i++){
 			A.append(weight.getA().get(i));
-			U.append(weight.getU().get(i));
+			//Log.d("Resource", "C: " +  weight.getC().get(i));
+			C.append(weight.getC().get(i));
 			if( i < weight.getA().size() - 1 ){
 				A.append(".");
-				U.append(".");
+				C.append(".");
 			}
 		}
 		values.put(CMUmobileSQLiteHelper.COLUMN_A, A.toString());
-		values.put(CMUmobileSQLiteHelper.COLUMN_U, U.toString());
+		values.put(CMUmobileSQLiteHelper.COLUMN_C, C.toString());
 		values.put(CMUmobileSQLiteHelper.COLUMN_DAYOFTHEWEEK, weight.getDayOfTheWeek());
 
 		return db.insertOrThrow(tableName, null, values);

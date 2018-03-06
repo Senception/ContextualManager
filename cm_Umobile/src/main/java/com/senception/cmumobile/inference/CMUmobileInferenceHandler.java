@@ -32,16 +32,16 @@ public class CMUmobileInferenceHandler implements CMUmobileInference {
      * Function to get the availability
      */
     @Override
-    public ArrayList<Integer> getU() {
+    public ArrayList<Integer> getA() {
         CMUmobileWeight weight = dataSource.getWeight(CMUmobileSQLiteHelper.TABLE_WEIGHTS);
-        return weight.getU();
+        return weight.getA();
     }
 
     /**
      * Function to get the centrality
      */
     @Override
-    public ArrayList<Integer> getA() {
+    public ArrayList<Integer> getC() {
         CMUmobileWeight weight = dataSource.getWeight(CMUmobileSQLiteHelper.TABLE_WEIGHTS);
         return weight.getA();
     }
@@ -61,8 +61,8 @@ public class CMUmobileInferenceHandler implements CMUmobileInference {
     @Override
     public ArrayList<ArrayList<Integer>> getAll() {
         ArrayList<ArrayList<Integer>> all = new ArrayList<>();
-        all.add(getU());
         all.add(getA());
+        all.add(getC());
         //all.add(getI());
         return all;
     }

@@ -32,7 +32,7 @@ public class CMUmobileWeight {
 
     private String dateTime;
     private ArrayList<Integer> A = new ArrayList<>();
-    private ArrayList<Integer> U = new ArrayList<>();
+    private ArrayList<Integer> C = new ArrayList<>();
     private int dayOfTheWeek;
 
 
@@ -40,12 +40,12 @@ public class CMUmobileWeight {
 
     public CMUmobileWeight(String dateTime) {
         A = new ArrayList<>(SECONDLY);
-        U = new ArrayList<>(SECONDLY);
-        //fill both A and U with -1 (24 of them, since we're capturing this every hour-> 24h a day)
+        C = new ArrayList<>(SECONDLY);
+        //fill both A and C with -1 (24 of them, since we're capturing this every hour-> 24h a day)
         for (int i = 0; i <= SECONDLY; i++){
             A.add(i, -1);
 
-            U.add(i, -1);
+            C.add(i, -1);
         }
         Calendar day = Calendar.getInstance();
         dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
@@ -74,19 +74,19 @@ public class CMUmobileWeight {
         }
     }
 
-    public void setU(ArrayList<Integer> U){
-        this.U = U;
+    public ArrayList<Integer> getC() {
+        return C;
     }
 
-    public void setU(String U) {
-        String [] items = U.split("\\.");
+    public void setC(ArrayList<Integer> C){
+        this.C = C;
+    }
+
+    public void setC(String C) {
+        String [] items = C.split("\\.");
         for (String s : items ) {
-            this.U.add(Integer.parseInt(s));
+            this.C.add(Integer.parseInt(s));
         }
-    }
-
-    public ArrayList<Integer> getU() {
-        return U;
     }
 
     public int getDayOfTheWeek() {

@@ -66,7 +66,6 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 //import android.util.Log;
@@ -108,6 +107,12 @@ public class CMUmobileService extends Service{
 	private ArrayList<CMUmobileWifiP2PChangeListener> listenersWifiP2p = new ArrayList<CMUmobileWifiP2PChangeListener>();
 	private final IBinder mBinder = new LocalBinder();
 
+	public ArrayList<CMUmobileAP> getPeersList() {
+		return peersList;
+	}
+
+	private ArrayList<CMUmobileAP> peersList;
+
 	public class LocalBinder extends Binder{
 		public CMUmobileService getService(){
 			return CMUmobileService.this;
@@ -121,6 +126,7 @@ public class CMUmobileService extends Service{
 
 	@Override
 	public void onCreate(){
+		Log.d("Resource", "ENTROU NO UMSERVICE");
 		super.onCreate();
 
 		fusedLocation = new CMUmobileFusedLocation(CMUmobileService.this);
@@ -197,6 +203,12 @@ public class CMUmobileService extends Service{
 	 * @param peerPersence arraylist of all discovered wifi p2p devices
 	 */
 	public void discoveredPeers(ArrayList<CMUmobileAP> peerPersence){
+        /*Log.d("Resource", "DISCOVEREDPEERS LIST: ");
+        for(CMUmobileAP a : peerPersence){
+            Log.d("Resource", "SSID: " + a.getSSID());
+        }*/
+
+		this.peersList = peerPersence;
 
 		if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
@@ -251,6 +263,7 @@ public class CMUmobileService extends Service{
 
 			List<ScanResult> ar = wifiManager.getLastScanResults();
 			for(ScanResult scan: ar){
+				//scan.
 				if(!dataSource.hasAP(scan.BSSID, checkWeek("ap"))){
 					CMUmobileAP ap = new CMUmobileAP();
 					if(latitude != 0.0 && longitude != 0.0 ){
