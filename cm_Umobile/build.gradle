@@ -5,8 +5,8 @@ android {
     buildToolsVersion '26.0.0'
 
     defaultConfig {
-        applicationId "com.senception.cmumobile"
-        minSdkVersion 14
+        applicationId "com.senception.contextualmanager"
+        minSdkVersion 18
         targetSdkVersion 22
         multiDexEnabled = true
     }
