@@ -9,7 +9,7 @@ interface CManagerInterface {
     int getAvailability();
     int [] getCentrality();
 
-    //Similarity
+    //ContextualManagerSimilarity
     //int [] getI(TYPE, NODE);
 
     //    List<MyObject> getAll(in int[] peerList);
