@@ -31,9 +31,11 @@ public class ContextualManagerSend {
 
     public ContextualManagerSend(Context context) {
         mContext = context;
+        Log.d("Communication", "A TENTAR ENVIAR:");
+
         /*double A;
         double C;
-        Log.d("Communication", "A TENTAR ENVIAR:");
+
         ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
         dataSource.openDB(true);
         if (!dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)) {
