@@ -122,6 +122,7 @@ public class ContextualManagerCaptureService extends Service {
         }
 
         /*
+        * TODO implement category of an app
         * Creates a thread where the categories of all apps in the device will be determined
         * by getting it's category in the google apstore, to make this possible, internet
         * connection is necessary, if there is no internet connection, categories will not be available.
@@ -134,6 +135,7 @@ public class ContextualManagerCaptureService extends Service {
         //Schedules the alarm to trigger every day (from midnight on)
         alarmReceiverDaily = new AlarmReceiver();
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
+
         setAlarm();
 
         /*ContextualManagerPhysicalUsage teste = dataSource.getResourceUsage(ContextualManagerPhysicalResourceType.ENERGY.toString(), ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
@@ -217,7 +219,7 @@ public class ContextualManagerCaptureService extends Service {
      */
     public void setAlarm(){
         //To start at the current time.
-        Long timeStartHourly = new GregorianCalendar().getTimeInMillis();
+        Long timeStartHourly = System.currentTimeMillis();
         //To start at midnight
         Calendar midnight = Calendar.getInstance();
         midnight.set(Calendar.MILLISECOND, 0);
@@ -234,9 +236,9 @@ public class ContextualManagerCaptureService extends Service {
 
         // Schedule the alarms!
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        //set alarm to start immediately, and repeating for each hour
+        //set alarm to start immediately, and repeating for each hour (for tests: every min)
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStartHourly, 60*1000/*AlarmManager.INTERVAL_HOUR*/, pendingIntentHourly);
-        //set alarm to start at midnight, and repeating for each day
+        //set alarm to start at midnight, and repeating for each day (for tests: every 2 min)
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStartDaily, 2*60*1000/*AlarmManager.INTERVAL_DAY*/, pendingIntentDaily);
     }
 
@@ -269,37 +271,44 @@ public class ContextualManagerCaptureService extends Service {
                 /*ContextualManagerAvailability Calculation:*/
                 // Captures de R (b*b*cpu*mem*storage) every hour
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
-                // Calculates the A availability (sum of all Rs) every hour
+                // Calculates the A availability (sum of all Rs) every hour (for tests: min)
                 A = ContextualManagerAvailability.calculateA(rList);
-                //Log.d(TAG, "A: " +  U.toString());
+                Log.d("Resource", "A: " + A.toString());
 
                 /*ContextualManagerCentrality Calculation:*/
                 // Calculates the C centrality every hour
-
-                //get peer list
-                //get peers number of connections/encounters (list.length)
-                //get those encounter durations
-                //calculate avg duration
+                // 1) get peers number of connections/encounters (list.length)
+                // 2) get those encounter durations
+                // 3) calculate avg duration
                 C = ContextualManagerCentrality.calculateC(dataSource);
 
-                // Saves A and C into the database
+                /* Saves A and C into the database */
                 String dateTime = dateFormat.format(System.currentTimeMillis());
+                //int currentSecond = currentTime.get(Calendar.SECOND);
+                int currentMinute = currentTime.get(Calendar.MINUTE);
+                //Log.d("resource", "currentMinute:" + currentMinute);
                 ContextualManagerWeight weight = new ContextualManagerWeight(dateTime);
-                weight.setA(A);
-                weight.setC(C);
+                weight.setA(A.get(currentMinute));
+                weight.setC(C.get(currentMinute));
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
-                dataSource.registerWeight(weight, ContextualManagerSQLiteHelper.TABLE_WEIGHTS);
-                Log.d(TAG, "A saved into the database.");
+                if (!dataSource.hasWeight(newDayOfTheWeek)){
+                    dataSource.registerWeight(weight);
+                    Log.d(TAG, "A saved into the database.");
+                }
+                else {
+                    dataSource.updateWeight(weight);
+                    Log.d("Communication", "A updated on the database.");
+                }
                 backupDB();
 
                 /* Captures the apps usage */
-                captureAppsUsage(context);
+                captureAppsUsage();
 
             }
             //Saves the usage percentage into the database
-            else{
-                printCalendar(day);
+            else{ // if daily
+                //printCalendar(day);
                 Log.d(TAG, "A CADA 2 MIN MANDA PARA BD"); //mudar para diariamente à meia noite
 
                 /*Saves the 4 physical resource usage into the database*/
@@ -312,7 +321,7 @@ public class ContextualManagerCaptureService extends Service {
                 storage.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
                 dataSource.updateResourceUsage(storage, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
 
-                /*Saves the apps usage int othe database*/
+                /*Saves the apps usage into the database*/
                 for (ContextualManagerAppUsage app: apps){
                     dataSource.updateAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
                 }
@@ -332,33 +341,34 @@ public class ContextualManagerCaptureService extends Service {
 
         //get current hour
         //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-        int currentSecond = currentTime.get(Calendar.SECOND);
-
+        //int currentSecond = currentTime.get(Calendar.SECOND);
+        int currentMinute = currentTime.get(Calendar.MINUTE);
+        //Log.d("resource", "currentMinute: " + currentMinute);
         //printCalendar(currentTime);
 
         switch(pru.getResourceType()){
             case ENERGY:
                 int level = ContextualManagerBattery.getEnergyLevel(this);
                 //Log.d(TAG, "BATTERY: " + String.valueOf(level) + "%");
-                pru.getUsagePerHour().set(currentSecond, level);
+                pru.getUsagePerHour().set(currentMinute, level);
                 //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case CPU:
                 int cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
                 //Log.d(TAG, "CPU: " + String.valueOf(cpuUsage) + "%");
-                pru.getUsagePerHour().set(currentSecond, cpuUsage);
+                pru.getUsagePerHour().set(currentMinute, cpuUsage);
                 //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case MEMORY:
                 int mem = ContextualManagerMemory.getCurrentRam(this);
                 //Log.d(TAG, "MEMORY: " + String.valueOf(mem) + "%");
-                pru.getUsagePerHour().set(currentSecond, mem);
+                pru.getUsagePerHour().set(currentMinute, mem);
                 //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case STORAGE:
                 int storageUsg = ContextualManagerStorage.getCurrentStorage(this);
                 //Log.d(TAG, "STORAGE: " + String.valueOf(storageUsg) + "%");
-                pru.getUsagePerHour().set(currentSecond, storageUsg);
+                pru.getUsagePerHour().set(currentMinute, storageUsg);
                 //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             default:
@@ -368,107 +378,34 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
-     * captures the usage of the five more used apps on the device
-     * @param context the context
+     * Captures the usage of the five more used apps on the device
      */
     @SuppressLint("NewApi")
-    private static void captureAppsUsage(Context context) {
+    private static void captureAppsUsage() {
 
         int totalTimeSpent = 0;
         for (UsageStats ustat : ustats){
             totalTimeSpent += ustat.getTotalTimeInForeground(); //time in miliseconds
         }
 
+        //Log.d("resource", "totaltime:" + totalTimeSpent);
+
         //get current time
         Calendar currentTime = Calendar.getInstance();
-
-        //get current hour
         //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-        int currentSecond = currentTime.get(Calendar.SECOND);
+        //int currentSecond = currentTime.get(Calendar.SECOND);
+        int currentMinute = currentTime.get(Calendar.MINUTE);
+
         for (int i = 0; i < ustats.size(); i++){
             long usage = ustats.get(i).getTotalTimeInForeground();
+            //Log.d("resource",ustats.get(i).getPackageName() + " used : " + usage);
             int percentage = 0;
             if (usage != 0){
                 percentage = (int) ((usage/ (double) totalTimeSpent * 100.0) + 0.5);
+                //Log.d("resource", ustats.get(i).getPackageName() + " percentage : " + percentage);
             }
-            apps.get(i).getUsagePerHour().set(currentSecond, percentage);
+            apps.get(i).getUsagePerHour().set(currentMinute, percentage);
         }
-    }
-
-    /**
-     * Updates the category of each app in the apps list if there is internet connection
-     * and the respective app has a category affiliated in google play store -- To-complete
-     * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android
-     */
-    private void getCategory() {
-        Thread downloadThread = new Thread() {
-            public void run() {
-                if (isNetworkAvailable()) {
-                    for (ContextualManagerAppUsage app : apps) {
-                        String GOOGLE_URL = "https://play.google.com/store/apps/details?id=";
-                        final String query_url = GOOGLE_URL + app.getAppName() + "&&hl=en";
-
-                        Document doc;
-                        try {
-                            doc = Jsoup.connect(query_url).get();
-                            String category = doc.select("span[itemprop=genre]").first().text();
-                            app.setAppCategory(category);
-                        } catch (IOException e) {
-                            Log.d(TAG, app.getAppName() + " doesn't have a category a affiliated with goolgle play store.");
-                            //e.printStackTrace();
-                        }
-                    }
-                }
-            }
-        };
-
-        downloadThread.start();
-    }
-
-    /**
-     * Checks if there is currently any network available
-     * @return true if there is internet access.
-     */
-    public boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks for the 5 more used apps in the given list of apps, in the current time
-     * @param stats list of UsageStats
-     * @return mostUsed ArrayList with 5 elements that are the most used apps from the given list
-     */
-    @SuppressLint("NewApi")
-    public static ArrayList<UsageStats> getMostUsedApps(List<UsageStats> stats){
-        ArrayList<UsageStats> mostUsed = new ArrayList<>(4); //gets the 5 more used from the given list
-        Map<UsageStats, Long> usageAppsMap = new HashMap<UsageStats, Long>();
-
-        for (UsageStats stat: stats) {
-            long totalTimeInForeground = stat.getTotalTimeInForeground()/1000/60; //time in minutes
-            usageAppsMap.put(stat, totalTimeInForeground);
-        }
-
-        Map<UsageStats, Long> sortedMap = sortByValue(usageAppsMap);
-
-        int id = 0;
-        for (UsageStats usageStat: sortedMap.keySet()){
-
-            if(id < 5){
-                mostUsed.add(usageStat);
-            }
-            String key =usageStat.getPackageName();
-            String value = usageAppsMap.get(usageStat).toString();
-            //Log.d(TAG, id + " - " + key + " " + value);
-            id++;
-        }
-        return mostUsed;
     }
 
     /**
@@ -539,13 +476,88 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
+     * Updates the category of each app in the apps list if there is internet connection
+     * and the respective app has a category affiliated in google play store -- To-complete
+     * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android
+     */
+    private void getCategory() {
+        Thread downloadThread = new Thread() {
+            public void run() {
+                if (isNetworkAvailable()) {
+                    for (ContextualManagerAppUsage app : apps) {
+                        String GOOGLE_URL = "https://play.google.com/store/apps/details?id=";
+                        final String query_url = GOOGLE_URL + app.getAppName() + "&&hl=en";
+
+                        Document doc;
+                        try {
+                            doc = Jsoup.connect(query_url).get();
+                            String category = doc.select("span[itemprop=genre]").first().text();
+                            app.setAppCategory(category);
+                        } catch (IOException e) {
+                            Log.d(TAG, app.getAppName() + " doesn't have a category a affiliated with goolgle play store.");
+                            //e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        };
+
+        downloadThread.start();
+    }
+
+    /**
+     * Checks if there is currently any network available
+     * @return true if there is internet access.
+     */
+    public boolean isNetworkAvailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        // if no network is available networkInfo will be null
+        // otherwise check if we are connected
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks for the 5 more used apps in the given list of apps, in the current time
+     * @param stats list of UsageStats
+     * @return mostUsed ArrayList with 5 elements that are the most used apps from the given list
+     */
+    @SuppressLint("NewApi")
+    public static ArrayList<UsageStats> getMostUsedApps(List<UsageStats> stats) {
+        ArrayList<UsageStats> mostUsed = new ArrayList<>(4); //gets the 5 more used from the given list
+        Map<UsageStats, Long> usageAppsMap = new HashMap<UsageStats, Long>();
+
+        for (UsageStats stat : stats) {
+            long totalTimeInForeground = stat.getTotalTimeInForeground() / 1000 / 60; //time in minutes
+            usageAppsMap.put(stat, totalTimeInForeground);
+        }
+
+        Map<UsageStats, Long> sortedMap = sortByValue(usageAppsMap);
+
+        int id = 0;
+        for (UsageStats usageStat : sortedMap.keySet()) {
+
+            if (id < 5) {
+                mostUsed.add(usageStat);
+            }
+            String key = usageStat.getPackageName();
+            String value = usageAppsMap.get(usageStat).toString();
+            //Log.d(TAG, id + " - " + key + " " + value);
+            id++;
+        }
+        return mostUsed;
+    }
+
+    /**
      * Return date in specified format.
      * @param milliSeconds Date in milliseconds
      * @param dateFormat Date format
      * @return String representing date in specified format
      */
-    public static String getDate(long milliSeconds, String dateFormat)
-    {
+    public static String getDate(long milliSeconds, String dateFormat) {
         // Create a DateFormatter object for displaying date in specified format.
         SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 

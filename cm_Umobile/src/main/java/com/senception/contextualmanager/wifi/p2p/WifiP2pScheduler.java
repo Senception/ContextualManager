@@ -47,11 +47,10 @@ class WifiP2pScheduler implements Runnable {
             mDiscState = 1;
             mHandler.postDelayed(this, ((new Random().nextInt(6 - 1) + 15) * 1000));
         } else if (mDiscState == 1) {
-            mWifiP2pGo.createGroup();
+            mWifiP2pGo.startLocalService();
             mDiscState = 2;
             mHandler.postDelayed(this, ((new Random().nextInt(6 - 1) + 7) * 1000));
         } else if (mDiscState == 2) {
-            mWifiP2pGo.removeGroup();
             mDiscState = new Random().nextInt(2);
             mHandler.postDelayed(this, 4000);
         }

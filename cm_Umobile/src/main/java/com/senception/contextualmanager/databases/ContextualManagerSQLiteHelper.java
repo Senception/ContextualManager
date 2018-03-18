@@ -57,20 +57,18 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 
 	// IDENTIFICATION
 	public static final String COLUMN_ID = "_id";
-	public static final String COLUMN_SSID = "uuid";
+	public static final String COLUMN_SSID = "ssid";
 	public static final String COLUMN_BSSID = "mac";
 	public static final String COLUMN_GROUPID = "groupid";
     public static final String COLUMN_DAYOFTHEWEEK = "dayoftheweek"; //for peers, resource and apps usage
-
-	//ContextualManagerAvailability and ContextualManagerCentrality
-	public static final String COLUMN_AVAILABILITY = "a";
-	public static final String COLUMN_CENTRALITY = "c";
 
 	// ACCESS POINTS
 	public static final String COLUMN_ATTRACTIVENESS = "attractiveness";
 	public static final String COLUMN_DATETIME = "dateTime";
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
+	public static final String COLUMN_NUM_ENCOUNTERS = "encounters";
+    public static final String COLUMN_ENCOUNTER_DURATION = "duration";
 
 	// VISITS
 	public static final String COLUMN_TIMEON = "timeon";
@@ -86,8 +84,8 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_APP_CATEGORY = "appcategory";
 
 	//WEIGHTS
-	//public static final String COLUMN_A = "a"; // Affinity network level of a node (measures node's centrality/popularity).
-	//public static final String COLUMN_C = "c"; // Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_AVAILABILITY = "a"; //Affinity network level of a node (measures node's centrality/popularity).
+	public static final String COLUMN_CENTRALITY = "c"; // Internal Usage weight of a node (measures the availability of the node)
 
 	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
 	   For instance, I can provide a measure of battery similarity over time between nodes.
@@ -97,9 +95,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_MONDAY_TABLE = "create table "
 			+ TABLE_MONDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -109,9 +107,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_TUESDAY_TABLE = "create table "
 			+ TABLE_TUESDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -121,9 +119,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_WEDNESDAY_TABLE = "create table "
 			+ TABLE_WEDNESDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -133,9 +131,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_THURSDAY_TABLE = "create table "
 			+ TABLE_THURSDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -145,9 +143,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_FRIDAY_TABLE = "create table "
 			+ TABLE_FRIDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -157,9 +155,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_SATURDAY_TABLE = "create table "
 			+ TABLE_SATURDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -169,9 +167,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	private static final String CREATE_SUNDAY_TABLE = "create table "
 			+ TABLE_SUNDAY + "("
 			+ COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_SSID + " text, "
 			+ COLUMN_BSSID + " text, "
 			+ COLUMN_DAYOFTHEWEEK + " text, "
-			+ COLUMN_SSID + " text, "
 			+ COLUMN_ATTRACTIVENESS + " integer not null, "
 			+ COLUMN_DATETIME + " text, "
 			+ COLUMN_LATITUDE + " integer, "
@@ -187,7 +185,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_TUESDAY_PEERS_TABLE = "create table "
@@ -199,7 +199,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_WEDNESDAY_PEERS_TABLE = "create table "
@@ -211,7 +213,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
             + COLUMN_AVAILABILITY + " text, "
-            + COLUMN_CENTRALITY + " text"
+            + COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_THURSDAY_PEERS_TABLE = "create table "
@@ -223,7 +227,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_FRIDAY_PEERS_TABLE = "create table "
@@ -235,7 +241,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_SATURDAY_PEERS_TABLE = "create table "
@@ -247,7 +255,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_SUNDAY_PEERS_TABLE = "create table "
@@ -259,7 +269,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LATITUDE + " integer, "
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
-			+ COLUMN_CENTRALITY + " text "
+			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
 	private static final String CREATE_VISITS_TABLE = "create table "

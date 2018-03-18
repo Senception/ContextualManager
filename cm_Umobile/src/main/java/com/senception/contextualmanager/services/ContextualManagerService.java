@@ -44,6 +44,7 @@ import com.senception.contextualmanager.interfaces.ContextualManagerWifiChangeLi
 import com.senception.contextualmanager.interfaces.ContextualManagerWifiP2PChangeListener;
 import com.senception.contextualmanager.pipelines.ContextualManagerWifiP2P;
 import com.senception.contextualmanager.wifi.Wifi;
+import com.senception.security.MacSecurity;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
@@ -214,34 +215,36 @@ public class ContextualManagerService extends Service{
 			long startTime = System.currentTimeMillis();
 			long endTime = System.currentTimeMillis();
 			long contactTime = 0;
-			int numEncounters = 1;
 
 			for(ContextualManagerAP item: cmPeerList){
+                String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
 				ContextualManagerAP ap = new ContextualManagerAP();
-				if(!dataSource.hasPeer(item.getBSSID(), checkWeek("peers"))){
-					Log.d("Resource", "SAVED A PEER ON DB (1st time): " + item.getSSID());
+				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
+
 					ap.setSSID(item.getSSID());
-					ap.setBSSID(item.getBSSID());
+					ap.setBSSID(hashBSSID);
+                    //ap.setBSSID(item.getBSSID());
 					ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
-					//ap.setContactTime(contactTime);
+					//TODO ap.setContactTime(contactTime);
 					ap.setNumEncounters(1);
-					//ap.set
+                    ap.setAvailability(0.0);
+                    ap.setCentrality(0.0);
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
+                    Log.d("Resource", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
 				}
 				else{
-					Log.d("Resource", "UPDATED A PEER ON DB (2nd + time): " + item.getSSID());
-					ContextualManagerAP peer = dataSource.getPeer(item.getBSSID(), checkWeek("peers"));
+					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
 					peer.setSSID(item.getSSID());
 					peer.setBSSID(item.getBSSID());
 					peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);
 					//ap.setContactTime(peer.getContactTime());
-
 					peer.setNumEncounters(peer.getNumEncounters()+1);
 					dataSource.updatePeer(peer, checkWeek("peers"));
+                    Log.d("Resource", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
 				}
 			}
 		}
@@ -269,14 +272,18 @@ public class ContextualManagerService extends Service{
 				if(!dataSource.hasAP(scan.BSSID, checkWeek("ap"))){
 					ContextualManagerAP ap = new ContextualManagerAP();
 					if(latitude != 0.0 && longitude != 0.0 ){
-						String hashSSID = MD5hash(scan.SSID);
-						ap.setBSSID(scan.BSSID);
+						//String hashSSID = MD5hash(scan.SSID);
+						ap.setSSID(scan.SSID);
+                        String hashBSSID = MacSecurity.MD5hash(scan.BSSID);
+                        //ap.setBSSID(scan.BSSID);
+                        ap.setBSSID(hashBSSID);
 						ap.setDayOfWeek(sdf.format(date));
 						if(scan.SSID == "" || scan.SSID == null || scan.SSID.isEmpty()){
 							ap.setSSID("Unknown");
 						}
 						else{
-							ap.setSSID(hashSSID);
+							//ap.setSSID(hashSSID);
+                            ap.setSSID(scan.SSID);
 						}
 						ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
 						ap.setLatitude(latitude);
@@ -286,7 +293,7 @@ public class ContextualManagerService extends Service{
 				}
 				else{
 					if(latitude != 0.0 && longitude != 0.0){
-						String hashSSID = MD5hash(scan.SSID);
+						String hashSSID = MacSecurity.MD5hash(scan.SSID);
 						ContextualManagerAP ap = dataSource.getAP(scan.BSSID, checkWeek("ap"));
 						ap.setBSSID(scan.BSSID);
 						ap.setDayOfWeek(sdf.format(date));
@@ -303,26 +310,6 @@ public class ContextualManagerService extends Service{
 			//Log.d(TAG, "[*] APSCANRESULT --> Waiting for coordinate");
 		}
 	}
-
-    /**
-     * Hashes the given string using MD5
-     * @param strToHash
-     * @return hashed string
-     */
-    public String MD5hash(String strToHash) {
-        try {
-            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
-            byte[] array = md.digest(strToHash.getBytes());
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
-            }
-            return sb.toString();
-        } catch (java.security.NoSuchAlgorithmException e) {
-        }
-        return null;
-    }
-
 
 	/**
 	 * Funtion checkWeek
@@ -547,8 +534,6 @@ public class ContextualManagerService extends Service{
 		unregisterReceiver(mReceiver);
 
 		wifiManager.close(this);
-
-
 
 		dataSource.closeDB();
 		fusedLocation.stopLocationUpdates();

@@ -31,38 +31,38 @@ public class ContextualManagerSend {
 
     public ContextualManagerSend(Context context) {
         mContext = context;
-        ArrayList<Integer> A;
-        ArrayList<Integer> C;
-
+        /*double A;
+        double C;
+        Log.d("Communication", "A TENTAR ENVIAR:");
         ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
         dataSource.openDB(true);
-        if (!dataSource.isWeightsEmpty()) {
-            ContextualManagerWeight weight = dataSource.getWeight(ContextualManagerSQLiteHelper.TABLE_WEIGHTS);
+        if (!dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)) {
+
+            ContextualManagerWeight weight = dataSource.getWeight();
 
             A = weight.getA();
-            Log.d("Communication", "A: " + A);
-
-            Calendar currentTime = Calendar.getInstance();
-            int currentSecond = currentTime.get(Calendar.SECOND);
-            //TODO PASSAR DE INTEIRO PARA DOUBLE
-            int availability = A.get(currentSecond);
-            Log.d("Communication", "Current Second: "+ currentSecond);
-            Log.d("Communication", "A: "+ availability);
             C = weight.getC();
+            Log.d("Communication", "A: " + A);
+            Log.d("Communication", "C: " + C);
 
+            //TODO PASSAR DE INTEIRO PARA DOUBLE
 
-            WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(availability));
-            WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
+            WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
+            Log.d("Communication", "O valor enviado de A é: " + String.valueOf(A)); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
+            WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
             WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
         }
         else{
-            Log.d("COMMUNICATION", "A TABELA AINDA ESTA VAZIA");
-        }
+            Log.d("Communication", "A TABELA AINDA ESTA VAZIA");
+            WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "");
+            WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "");
+            WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "");
+        }*/
 
-        /*
+
         WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "20.5");
         WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
         WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
-        */
+
     }
 }

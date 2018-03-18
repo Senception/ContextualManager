@@ -28,6 +28,22 @@ public class ContextualManagerAP {
 	private double Availability;
 	private double Centrality;
 
+	public double getAvailability() {
+		return Availability;
+	}
+
+	public void setAvailability(double availability) {
+		Availability = availability;
+	}
+
+	public double getCentrality() {
+		return Centrality;
+	}
+
+	public void setCentrality(double centrality) {
+		Centrality = centrality;
+	}
+
 	public long getStartTime() {
 		return startTime;
 	}

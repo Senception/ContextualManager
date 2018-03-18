@@ -347,25 +347,20 @@ public class ContextualManagerDataSource {
 		return db.insertOrThrow(tableName, null, values);
 	}
 
-	public long registerWeight(ContextualManagerWeight weight, String tableName){
+	/**
+	 * Method that registers a new wheight on the wheight table
+     * this table will save the wheight of the device (A,C and I)
+	 * @param weight - the wheight to be stored
+	 * @return the row ID of the newly inserted row, or -1 if an error occurred
+	 */
+	public long registerWeight(ContextualManagerWeight weight){
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
-		StringBuilder A = new StringBuilder();
-		StringBuilder C = new StringBuilder();
-		for(int i = 0; i < weight.getA().size(); i++){
-			A.append(weight.getA().get(i));
-			//Log.d("Resource", "C: " +  weight.getC().get(i));
-			C.append(weight.getC().get(i));
-			if( i < weight.getA().size() - 1 ){
-				A.append(".");
-				C.append(".");
-			}
-		}
-		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, A.toString());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, C.toString());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, weight.getA());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, weight.getC());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, weight.getDayOfTheWeek());
 
-		return db.insertOrThrow(tableName, null, values);
+		return db.insertOrThrow(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, null, values);
 	}
 
 	/**
@@ -405,6 +400,8 @@ public class ContextualManagerDataSource {
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
 	    
 	    int rows = db.update(tableName, values, identifier, null);
 		
@@ -439,6 +436,7 @@ public class ContextualManagerDataSource {
 	}
 
     /**
+     * TODO get the parameter "tablename" out -> unnecessary
      * Function updateAppUsage
      * Update an app usage already registered by the application.
      * @param appUsg resource usage.
@@ -447,7 +445,7 @@ public class ContextualManagerDataSource {
      */
     public boolean updateAppUsage(ContextualManagerAppUsage appUsg, String tableName){
         int rows = 0;
-        String identifier = ContextualManagerSQLiteHelper.COLUMN_APP_NAME + "='" + appUsg.getAppName() + "'" +" COLLATE NOCASE ";;
+        String identifier = ContextualManagerSQLiteHelper.COLUMN_APP_NAME + "='" + appUsg.getAppName() + "'" +" COLLATE NOCASE ";
         ContentValues values = new ContentValues();
         StringBuilder arrayToDatabase = new StringBuilder();
         for(int i = 0; i < appUsg.getUsagePerHour().size(); i++){
@@ -468,6 +466,29 @@ public class ContextualManagerDataSource {
 
         return rows != 0 ? true : false;
     }
+
+	/**
+	 * Function that updates the Weights table
+	 * Update a weight already registered by the application.
+	 * @param weight the weight
+	 * @return true, if successful.
+	 */
+	public boolean updateWeight(ContextualManagerWeight weight){
+		int rows;
+		String identifier = ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + "='" + String.valueOf(weight.getDayOfTheWeek()) + "'" +" COLLATE NOCASE ";
+		ContentValues values = new ContentValues();
+        values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, weight.getA());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, weight.getC());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(weight.getDayOfTheWeek()));
+
+		//try to update the app, if its not in the db then register it.
+		if ((rows = db.update(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, values, identifier, null)) == 0){
+			rows = (int) registerWeight(weight);
+		}
+
+		return rows != 0 ? true : false;
+	}
 
 	/**
 	 * Function getAP
@@ -540,26 +561,29 @@ public class ContextualManagerDataSource {
 	}
 
 	/**
-	 * Function getWeight
-	 * Gets from database the weight with the given datetime.
-	 * @param tableName the name of the table
-	 * @return app the app resource usage
+	 * Method to get the device's weight
+	 * @return weight the weight of the device (A,C,I)
 	 */
-	public ContextualManagerWeight getWeight (String tableName){
+	public ContextualManagerWeight getWeight (){
 		ContextualManagerWeight weight = null;
 		//Cursor cursor = db.query(tableName, allColumnsWeight, ContextualManagerSQLiteHelper.COLUMN_DATETIME + "='" + dateTime + "'"+ " COLLATE NOCASE ", null, null, null, null);
 		// query to get last row of the weight's table
-		String selectQuery = "SELECT * FROM " + tableName + " ORDER BY " + ContextualManagerSQLiteHelper.COLUMN_DATETIME + " DESC LIMIT 1";
+		String selectQuery = "SELECT * FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " ORDER BY " + ContextualManagerSQLiteHelper.COLUMN_DATETIME + " DESC LIMIT 1";
 		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst() && cursor.getCount()>0){
-			weight = cursorWeight(cursor);
-		}
+		if (cursor.moveToFirst() && cursor.getCount()>0) {
+            weight = cursorWeight(cursor);
+        }
 		return weight;
 	}
 
-	public boolean isWeightsEmpty(){
+	/**
+	 * Method that checks whether a table is empty or not.
+	 * @param tableName table to check if is empty
+	 * @return true if table with tableName is empty
+	 */
+	public boolean isTableEmpty(String tableName){
         boolean isEmpty = true;
-		String count = "SELECT count(*) FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS;
+		String count = "SELECT count(*) FROM " + tableName;
 		Cursor mcursor = db.rawQuery(count, null);
 		mcursor.moveToFirst();
 		int icount = mcursor.getInt(0);
@@ -661,6 +685,10 @@ public class ContextualManagerDataSource {
 	public boolean hasPeer(String bssid, String tableName) {
         return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+ " COLLATE NOCASE ", null) == 0)? false : true;
 	}
+
+    public boolean hasWeight(int dayOfTheWeek) {
+        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + " = '" + dayOfTheWeek + "'", null) == 0)? false : true;
+    }
 
 	/**
 	 * Function getBestAP
@@ -1030,4 +1058,6 @@ public class ContextualManagerDataSource {
 		cursor.close();
 		return true;
 	}
+
+
 }

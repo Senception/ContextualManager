@@ -29,22 +29,16 @@ public class ContextualManagerWeight {
     }
 
     private String dateTime;
-    private ArrayList<Integer> A = new ArrayList<>();
-    private ArrayList<Integer> C = new ArrayList<>();
+    private double A;
+    private double C;
     private int dayOfTheWeek;
 
 
     public ContextualManagerWeight() { super();}
 
     public ContextualManagerWeight(String dateTime) {
-        A = new ArrayList<>(SECONDLY);
-        C = new ArrayList<>(SECONDLY);
-        //fill both A and C with -1 (24 of them, since we're capturing this every hour-> 24h a day)
-        for (int i = 0; i <= SECONDLY; i++){
-            A.add(i, -1);
-
-            C.add(i, -1);
-        }
+        A = -1;
+        C = -1;
         Calendar day = Calendar.getInstance();
         dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
     }
@@ -57,34 +51,28 @@ public class ContextualManagerWeight {
         this.id = id;
     }
 
-    public ArrayList<Integer> getA() {
+    public double getA() {
         return A;
     }
 
-    public void setA(ArrayList<Integer> A){
+    public void setA(double A){
         this.A = A;
     }
 
-    public void setA(String A) {
-        String [] items = A.split("\\.");
-        for (String s : items ) {
-            this.A.add(Integer.parseInt(s));
-        }
+    public void setA(String A){
+        this.A = Double.parseDouble(A);
     }
 
-    public ArrayList<Integer> getC() {
+    public double getC() {
         return C;
     }
 
-    public void setC(ArrayList<Integer> C){
+    public void setC(double C){
         this.C = C;
     }
 
-    public void setC(String C) {
-        String [] items = C.split("\\.");
-        for (String s : items ) {
-            this.C.add(Integer.parseInt(s));
-        }
+    public void setC(String C){
+        this.C = Double.parseDouble(C);
     }
 
     public int getDayOfTheWeek() {

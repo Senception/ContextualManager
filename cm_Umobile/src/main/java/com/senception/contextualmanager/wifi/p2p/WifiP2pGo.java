@@ -87,7 +87,7 @@ class WifiP2pGo implements WifiP2pManager.ConnectionInfoListener, WifiP2pManager
     /**
      * This method starts the local service
      */
-    private void startLocalService() {
+    public void startLocalService() {
         final Map<String, String> txtRecord =  WifiP2pTxtRecord.getEntries(mContext);
         final WifiP2pDnsSdServiceInfo wifiP2pDnsSdServiceInfo = WifiP2pDnsSdServiceInfo.newInstance("uuid", Identity.SVC_INSTANCE_TYPE, txtRecord);
 

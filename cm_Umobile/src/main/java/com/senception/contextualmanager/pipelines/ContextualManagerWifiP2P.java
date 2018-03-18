@@ -14,6 +14,7 @@
 package com.senception.contextualmanager.pipelines;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 
 import android.annotation.SuppressLint;
@@ -65,9 +66,9 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 		if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
 			int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
 			if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-
+				//TODO
 			} else {
-
+				//TODO
 			}
 			//Log.d(TAG, "P2P state changed - " + state);
 		} else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -75,6 +76,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 			if (manager != null) {
+                Log.d("Resource", "MAKING A PEER SCAN");
 				manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
 
 					@Override
@@ -83,9 +85,10 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 						//
 						peersList.clear();
 						for(WifiP2pDevice dev : peers.getDeviceList()){
-							Log.d("Resource", "FOUND A PEER: " + dev.deviceName);
+							//Log.d("Resource", "FOUND A PEER: " + dev.deviceName);
 							ContextualManagerAP peerfound = new ContextualManagerAP();
 							peerfound.setSSID(dev.deviceName);
+                            Log.d("resource", "peerfound: " + dev.deviceName);
 							peerfound.setBSSID(dev.deviceAddress);
 
 							peersList.add(peerfound);
