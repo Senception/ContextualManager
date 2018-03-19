@@ -11,6 +11,8 @@ import com.senception.contextualmanager.wifi.p2p.WifiP2pTxtRecord;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -31,40 +33,47 @@ public class ContextualManagerSend {
 
     public ContextualManagerSend(Context context) {
         mContext = context;
-        Log.d("Communication", "A TENTAR ENVIAR:");
 
-        /*double A;
-        double C;
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("Communication", "A TENTAR ENVIAR:");
+                double A;
+                double C;
 
-        ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
-        dataSource.openDB(true);
-        if (!dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)) {
+                ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
+                dataSource.openDB(true);
+                if (!dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)) {
 
-            ContextualManagerWeight weight = dataSource.getWeight();
+                    ContextualManagerWeight weight = dataSource.getWeight();
 
-            A = weight.getA();
-            C = weight.getC();
-            Log.d("Communication", "A: " + A);
-            Log.d("Communication", "C: " + C);
+                    A = weight.getA();
+                    C = weight.getC();
+                    Log.d("Communication", "A: " + A);
+                    Log.d("Communication", "C: " + C);
 
-            //TODO PASSAR DE INTEIRO PARA DOUBLE
+                    //TODO PASSAR DE INTEIRO PARA DOUBLE
 
-            WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
-            Log.d("Communication", "O valor enviado de A é: " + String.valueOf(A)); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
-            WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
-            WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
-        }
-        else{
-            Log.d("Communication", "A TABELA AINDA ESTA VAZIA");
-            WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "");
-            WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "");
-            WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "");
-        }*/
+                    WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
+                    Log.d("Communication", "O valor enviado de A é: " + String.valueOf(A)); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
+                    WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
+                    WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
+                }
+                else{
+                    Log.d("Communication", "A TABELA AINDA ESTA VAZIA");
+                    //WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "");
+                    //WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "");
+                    //WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "");
+                }
 
 
-        WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "20.5");
-        WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
-        WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
+                /*Log.d("Communication", "A TENTAR ENVIAR:");
+                WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "20.5");
+                WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
+                WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");*/
+            }
+        }, 0, 60000);
+
 
     }
 }

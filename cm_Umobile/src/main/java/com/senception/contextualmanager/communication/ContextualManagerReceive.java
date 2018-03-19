@@ -6,13 +6,10 @@ import android.util.Log;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
-import com.senception.contextualmanager.modals.ContextualManagerAP;
-import com.senception.contextualmanager.modals.ContextualManagerWeight;
 import com.senception.contextualmanager.wifi.p2p.Identity;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListener;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListenerManager;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pTxtRecord;
-import com.senception.security.MacSecurity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,11 +41,11 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
         dataSource.openDB(true);
         WifiP2pListenerManager.registerListener(this);
 
-        //Log.d("Communication", "A TENTAR ENVIAR:");
+        /*Log.d("Communication", "A TENTAR ENVIAR:");
 
-        /*WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "20.5");
-        WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
-        WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");*/
+        WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "40.5");
+        WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "49.7");
+        WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "410");*/
 
     }
 

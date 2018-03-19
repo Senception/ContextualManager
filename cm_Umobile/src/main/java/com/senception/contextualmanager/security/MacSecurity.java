@@ -1,4 +1,4 @@
-package com.senception.security;
+package com.senception.contextualmanager.security;
 
 /**
  * Created by Senception on 16/03/2018.

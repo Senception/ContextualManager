@@ -44,7 +44,7 @@ import com.senception.contextualmanager.interfaces.ContextualManagerWifiChangeLi
 import com.senception.contextualmanager.interfaces.ContextualManagerWifiP2PChangeListener;
 import com.senception.contextualmanager.pipelines.ContextualManagerWifiP2P;
 import com.senception.contextualmanager.wifi.Wifi;
-import com.senception.security.MacSecurity;
+import com.senception.contextualmanager.security.MacSecurity;
 
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
