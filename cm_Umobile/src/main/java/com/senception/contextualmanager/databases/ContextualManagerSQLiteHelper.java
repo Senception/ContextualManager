@@ -186,7 +186,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -200,7 +200,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -214,7 +214,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
             + COLUMN_AVAILABILITY + " text, "
             + COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -228,7 +228,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -242,7 +242,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -256,7 +256,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	
@@ -270,7 +270,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
-            + COLUMN_NUM_ENCOUNTERS + " text, "
+            + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_ENCOUNTER_DURATION + " text "
 			+ ");";
 	

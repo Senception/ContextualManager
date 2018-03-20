@@ -24,7 +24,7 @@ public class ContextualManagerAP {
 	private double longitude;
 	private long startTime;
 	private long endTime;
-	private long numEncounters;
+	private int numEncounters;
 	private double Availability;
 	private double Centrality;
 
@@ -60,11 +60,11 @@ public class ContextualManagerAP {
 		this.endTime = endTime;
 	}
 
-	public long getNumEncounters() {
+	public int getNumEncounters() {
 		return numEncounters;
 	}
 
-	public void setNumEncounters(long numEncounters) {
+	public void setNumEncounters(int numEncounters) {
 		this.numEncounters = numEncounters;
 	}
 
@@ -185,13 +185,6 @@ public class ContextualManagerAP {
 	 */
 	public ContextualManagerAP(){
 		super();
-	}
-
-	public String setWeights(String data){
-		// Formato: "A.C" ->> split(data)
-		// Availability = split[0]
-		// ContextualManagerCentrality = split[1]
-		return null;
 	}
 
 }

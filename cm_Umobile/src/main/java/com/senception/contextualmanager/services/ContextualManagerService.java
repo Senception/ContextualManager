@@ -237,7 +237,7 @@ public class ContextualManagerService extends Service{
 				else{
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
 					peer.setSSID(item.getSSID());
-					peer.setBSSID(item.getBSSID());
+					peer.setBSSID(hashBSSID);
 					peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);

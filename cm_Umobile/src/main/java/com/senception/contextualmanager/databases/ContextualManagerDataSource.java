@@ -137,7 +137,11 @@ public class ContextualManagerDataSource {
 			ContextualManagerSQLiteHelper.COLUMN_BSSID,
 			ContextualManagerSQLiteHelper.COLUMN_DATETIME,
 			ContextualManagerSQLiteHelper.COLUMN_LATITUDE,
-			ContextualManagerSQLiteHelper.COLUMN_LONGITUDE
+			ContextualManagerSQLiteHelper.COLUMN_LONGITUDE,
+            ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY,
+            ContextualManagerSQLiteHelper.COLUMN_CENTRALITY,
+            ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS,
+            ContextualManagerSQLiteHelper.COLUMN_ENCOUNTER_DURATION,
 	};
 
 	/**
@@ -217,6 +221,9 @@ public class ContextualManagerDataSource {
 		ap.setDateTime(cursor.getString(3));
 		ap.setLatitude(cursor.getDouble(4));
 		ap.setLongitude(cursor.getDouble(5));
+        ap.setAvailability(cursor.getDouble(6));
+        ap.setCentrality(cursor.getDouble(7));
+        ap.setNumEncounters(cursor.getInt(8));
 		return ap;
 	}
 
@@ -297,8 +304,9 @@ public class ContextualManagerDataSource {
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
-		//values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability();
-		//values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality();
+		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
 	    return db.insert(tableName, null, values);
 	}
 
@@ -394,15 +402,17 @@ public class ContextualManagerDataSource {
 	 */
 	public boolean updatePeer(ContextualManagerAP ap, String tableName) {
 		String identifier = ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getBSSID() + "'"+" COLLATE NOCASE ";
+
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
-        values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
-        values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
-	    
+		values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
+
 	    int rows = db.update(tableName, values, identifier, null);
 		
 	    return ((rows != 0)? true : false);

@@ -49,31 +49,24 @@ public class ContextualManagerSend {
 
                     A = weight.getA();
                     C = weight.getC();
-                    Log.d("Communication", "A: " + A);
+                    Log.d("Communication", "A: " + A); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
                     Log.d("Communication", "C: " + C);
 
-                    //TODO PASSAR DE INTEIRO PARA DOUBLE
-
+                    //TODO Change A and C from int to double if needed
+                    // TODO if txtRecord = {} we shouldn't send it
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
-                    Log.d("Communication", "O valor enviado de A é: " + String.valueOf(A)); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
                     WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");
                 }
                 else{
                     Log.d("Communication", "A TABELA AINDA ESTA VAZIA");
-                    //WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "");
-                    //WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "");
-                    //WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "");
                 }
 
-
-                /*Log.d("Communication", "A TENTAR ENVIAR:");
+                /*
                 WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, "20.5");
                 WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, "9.7");
                 WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "10");*/
             }
-        }, 0, 60000);
-
-
+        }, 0, 1*60000); //5 em 5 min
     }
 }

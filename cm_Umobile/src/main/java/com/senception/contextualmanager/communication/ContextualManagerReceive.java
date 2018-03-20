@@ -6,6 +6,8 @@ import android.util.Log;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
+import com.senception.contextualmanager.modals.ContextualManagerAP;
+import com.senception.contextualmanager.security.MacSecurity;
 import com.senception.contextualmanager.wifi.p2p.Identity;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListener;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListenerManager;
@@ -64,43 +66,50 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
 
         Log.i("Communication", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
 
-        /*if(txtRecordMap != null) {
+        if(txtRecordMap != null && txtRecordMap.size() != 0) {
             double A = Double.parseDouble(txtRecordMap.get(Identity.AVAILABILITY));
             Log.d("Communication", "A recebido: " + A);
             double C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
             Log.d("Communication", "C recebido: " + C);
 
-
             Log.i(TAG, fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
             //deviceAddress - Mac (BSSID) | deviceName - Device name (SSID)
 
-            if (!dataSource.hasPeer(MacSecurity.MD5hash(srcDevice.deviceAddress), checkWeek("peers"))) {
+            String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
+            Log.d("communication", "hash of the device mac: " + hashSrcDeviceBSSID);
+            if (!dataSource.hasPeer(hashSrcDeviceBSSID, checkWeek("peers"))) {
                 ContextualManagerAP peer = new ContextualManagerAP();
                 peer.setSSID(srcDevice.deviceName);
-                peer.setBSSID(srcDevice.deviceAddress);
+                peer.setBSSID(hashSrcDeviceBSSID);
                 peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
-                peer.setAvailability(A);
-                peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
+                //TODO ap.setContactTime(contactTime);
+                peer.setAvailability(A);
+                peer.setCentrality(C);
+                peer.setNumEncounters(1);
                 dataSource.registerNewPeers(peer, checkWeek("peers"));
-                Log.d("Communication", "registei o novo tel na bd.");
+                Log.d("Communication", "New peer device registered on DB (1st time)");
             } else {
-                ContextualManagerAP peer = dataSource.getPeer(srcDevice.deviceAddress, checkWeek("peers"));
+                ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceBSSID, checkWeek("peers"));
                 peer.setSSID(srcDevice.deviceName);
-                peer.setBSSID(srcDevice.deviceAddress);
+                peer.setBSSID(hashSrcDeviceBSSID);
                 peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
                 //TODO ap.setContactTime(peer.getContactTime());
-                //TODO peer.setNumEncounters(peer.getNumEncounters()+1);
+                peer.setNumEncounters(peer.getNumEncounters()+1);
+                Log.d("communication", "numEncounters: " + peer.getNumEncounters());
                 dataSource.updatePeer(peer, checkWeek("peers"));
-                Log.d("Communication", "fiz update do novo tel na bd.");
+                Log.d("Communication", "New peer device updated on the DB (2nd+ time).");
             }
             //txtRecordMap.values();
-        }*/
+        }
+        else{
+            Log.d("Communication", "The txt Record was null or empty");
+        }
 
     }
 

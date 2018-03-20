@@ -76,7 +76,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 			if (manager != null) {
-                Log.d("Resource", "MAKING A PEER SCAN");
+                Log.d("communication", "making a scan");
 				manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
 
 					@Override
@@ -85,10 +85,9 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 						//
 						peersList.clear();
 						for(WifiP2pDevice dev : peers.getDeviceList()){
-							//Log.d("Resource", "FOUND A PEER: " + dev.deviceName);
 							ContextualManagerAP peerfound = new ContextualManagerAP();
 							peerfound.setSSID(dev.deviceName);
-                            Log.d("resource", "peerfound: " + dev.deviceName);
+                            Log.d("communication", "peerfound: " + dev.deviceName);
 							peerfound.setBSSID(dev.deviceAddress);
 
 							peersList.add(peerfound);
