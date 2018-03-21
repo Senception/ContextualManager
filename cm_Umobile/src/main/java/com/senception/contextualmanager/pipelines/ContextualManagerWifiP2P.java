@@ -59,7 +59,6 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		Log.d("Receiver", "ENTROU NO ONRECEIVE DO CMUMOBILEWIFIP2P");
 		mContext = context;
 		String action = intent.getAction();
 
@@ -76,7 +75,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 			if (manager != null) {
-                Log.d("communication", "making a scan");
+                Log.d("teste", "making a scan");
 				manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
 
 					@Override
@@ -87,7 +86,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 						for(WifiP2pDevice dev : peers.getDeviceList()){
 							ContextualManagerAP peerfound = new ContextualManagerAP();
 							peerfound.setSSID(dev.deviceName);
-                            Log.d("communication", "peerfound: " + dev.deviceName);
+                            Log.d("teste", "peerfound: " + dev.deviceName);
 							peerfound.setBSSID(dev.deviceAddress);
 
 							peersList.add(peerfound);

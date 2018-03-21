@@ -62,53 +62,50 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
         *
         * srcDevice.deviceName: SAMSUNG NEO
         */
-        Log.d("Communication", "A TENTAR RECEBER:");
+        Log.d("teste", "A TENTAR RECEBER:");
 
-        Log.i("Communication", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
+        Log.i("teste", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
 
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
             double A = Double.parseDouble(txtRecordMap.get(Identity.AVAILABILITY));
-            Log.d("Communication", "A recebido: " + A);
+            Log.d("teste", "A recebido: " + A);
             double C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
-            Log.d("Communication", "C recebido: " + C);
+            Log.d("teste", "C recebido: " + C);
 
             Log.i(TAG, fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
             //deviceAddress - Mac (BSSID) | deviceName - Device name (SSID)
 
             String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
-            Log.d("communication", "hash of the device mac: " + hashSrcDeviceBSSID);
+            Log.d("teste", "hash of the device mac: " + hashSrcDeviceBSSID);
             if (!dataSource.hasPeer(hashSrcDeviceBSSID, checkWeek("peers"))) {
                 ContextualManagerAP peer = new ContextualManagerAP();
                 peer.setSSID(srcDevice.deviceName);
                 peer.setBSSID(hashSrcDeviceBSSID);
-                peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
-                //TODO ap.setContactTime(contactTime);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 peer.setNumEncounters(1);
+                peer.setStartEncounter(String.valueOf(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                 dataSource.registerNewPeers(peer, checkWeek("peers"));
-                Log.d("Communication", "New peer device registered on DB (1st time)");
+                Log.d("teste", "New peer device registered on DB (1st time)");
             } else {
                 ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceBSSID, checkWeek("peers"));
                 peer.setSSID(srcDevice.deviceName);
                 peer.setBSSID(hashSrcDeviceBSSID);
-                peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
-                //TODO ap.setContactTime(peer.getContactTime());
                 peer.setNumEncounters(peer.getNumEncounters()+1);
-                Log.d("communication", "numEncounters: " + peer.getNumEncounters());
+                Log.d("teste", "numEncounters: " + peer.getNumEncounters());
                 dataSource.updatePeer(peer, checkWeek("peers"));
-                Log.d("Communication", "New peer device updated on the DB (2nd+ time).");
+                Log.d("teste", "New peer device updated on the DB (2nd+ time).");
             }
             //txtRecordMap.values();
         }
         else{
-            Log.d("Communication", "The txt Record was null or empty");
+            Log.d("teste", "The txt Record was null or empty");
         }
 
     }

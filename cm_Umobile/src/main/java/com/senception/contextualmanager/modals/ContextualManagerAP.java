@@ -22,8 +22,8 @@ public class ContextualManagerAP {
 	private String DayOfWeek;
 	private double latitude;
 	private double longitude;
-	private long startTime;
-	private long endTime;
+	private String startEncounter;
+	private String endEncounter;
 	private int numEncounters;
 	private double Availability;
 	private double Centrality;
@@ -44,20 +44,20 @@ public class ContextualManagerAP {
 		Centrality = centrality;
 	}
 
-	public long getStartTime() {
-		return startTime;
+	public String getStartEncounter() {
+		return startEncounter;
 	}
 
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
+	public void setStartEncounter(String startTime) {
+		this.startEncounter = startTime;
 	}
 
-	public long getEndTime() {
-		return endTime;
+	public String getEndEncounter() {
+		return endEncounter;
 	}
 
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
+	public void setEndEncounter(String endTime) {
+		this.endEncounter = endTime;
 	}
 
 	public int getNumEncounters() {

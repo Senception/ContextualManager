@@ -188,7 +188,7 @@ public class ContextualManagerService extends Service{
 
 	public void runAsForeground(){
 		Intent notificationIntent = new Intent(this, ContextualManagerMainActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);//there was Intent.FLAG_ACTIVITY_NEW_TASK); instead of flag 0 (last one)
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.cmumobilelight)
 				.setContentText(getString(R.string.app_name))
@@ -208,45 +208,57 @@ public class ContextualManagerService extends Service{
 	 * @param cmPeerList arraylist of all discovered wifi p2p devices
 	 */
 	public void discoveredPeers(ArrayList<ContextualManagerAP> cmPeerList){
-
-		if(fusedLocation.mCurrentLocation != null){
+        if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
-			long startTime = System.currentTimeMillis();
-			long endTime = System.currentTimeMillis();
 			long contactTime = 0;
 
+            /*GET A LIST WITH ALL THE PEERS ON THE DATABASE*/
+            /*ArrayList<ContextualManagerAP> allPeersOnDB = dataSource.getAllPeers(checkWeek("peers"));
+            for (ContextualManagerAP peer : allPeersOnDB) {
+                Log.d("teste", "Peer na bd: " + peer.getSSID());
+            }*/
+
 			for(ContextualManagerAP item: cmPeerList){
+
+                /*CHECKS IF THE ANY PEER IS ON THE DB*/
                 String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
 				ContextualManagerAP ap = new ContextualManagerAP();
 				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
-
 					ap.setSSID(item.getSSID());
 					ap.setBSSID(hashBSSID);
-                    //ap.setBSSID(item.getBSSID());
-					ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
-					//TODO ap.setContactTime(contactTime);
-					ap.setNumEncounters(1);
+					//TODO when does the encounter end?
                     ap.setAvailability(0.0);
                     ap.setCentrality(0.0);
+                    ap.setNumEncounters(1);
+                    ap.setStartEncounter(String.valueOf(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
-                    Log.d("Resource", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
+                    Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
+                    //takes the peer out of allPeersOnDB cause there's no need for it to be there anymore
+                    //allPeersOnDB.remove(item);
 				}
 				else{
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
 					peer.setSSID(item.getSSID());
 					peer.setBSSID(hashBSSID);
-					peer.setDateTime(dataFormat.format(System.currentTimeMillis()));
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);
-					//ap.setContactTime(peer.getContactTime());
 					peer.setNumEncounters(peer.getNumEncounters()+1);
 					dataSource.updatePeer(peer, checkWeek("peers"));
-                    Log.d("Resource", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
+                    Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
+                    //takes the peer out of the allPeersOnDB cause there's no need for it to be there anymore
+                    //allPeersOnDB.remove(item);
 				}
-			}
+
+				/*IF AN ELEMENT OF THE DB IS NOT IN THE PEER LIST THEN IT WAS DISCONNECTED*/
+                /*for (ContextualManagerAP peer : allPeersOnDB) {
+                    Log.d("teste", "Peer na bd: " + peer.getSSID());
+                    peer.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
+                    dataSource.updatePeer(peer, checkWeek("peers"));
+                }*/
+            }
 		}
 		else{
 			//Log.d(TAG, "[*] DISCOVERED PEERS --> Wait for coordinates");

@@ -13,6 +13,7 @@
 
 package com.senception.contextualmanager.databases;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
@@ -135,13 +136,14 @@ public class ContextualManagerDataSource {
 			ContextualManagerSQLiteHelper.COLUMN_ID,
 			ContextualManagerSQLiteHelper.COLUMN_SSID,
 			ContextualManagerSQLiteHelper.COLUMN_BSSID,
-			ContextualManagerSQLiteHelper.COLUMN_DATETIME,
 			ContextualManagerSQLiteHelper.COLUMN_LATITUDE,
 			ContextualManagerSQLiteHelper.COLUMN_LONGITUDE,
             ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY,
             ContextualManagerSQLiteHelper.COLUMN_CENTRALITY,
             ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS,
             ContextualManagerSQLiteHelper.COLUMN_ENCOUNTER_DURATION,
+            ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER,
+            ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER,
 	};
 
 	/**
@@ -218,12 +220,13 @@ public class ContextualManagerDataSource {
 		ap.setId(cursor.getInt(0));
 		ap.setSSID(cursor.getString(1));
 		ap.setBSSID(cursor.getString(2));
-		ap.setDateTime(cursor.getString(3));
-		ap.setLatitude(cursor.getDouble(4));
-		ap.setLongitude(cursor.getDouble(5));
-        ap.setAvailability(cursor.getDouble(6));
-        ap.setCentrality(cursor.getDouble(7));
-        ap.setNumEncounters(cursor.getInt(8));
+		ap.setLatitude(cursor.getDouble(3));
+		ap.setLongitude(cursor.getDouble(4));
+        ap.setAvailability(cursor.getDouble(5));
+        ap.setCentrality(cursor.getDouble(6));
+        ap.setNumEncounters(cursor.getInt(7));
+        ap.setStartEncounter(cursor.getString(9));
+        ap.setEndEncounter(cursor.getString(10));
 		return ap;
 	}
 
@@ -301,13 +304,15 @@ public class ContextualManagerDataSource {
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
         values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
-	    return db.insert(tableName, null, values);
+        values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
+	    long rows = db.insert(tableName, null, values);
+        return rows;
 	}
 
 	/**
@@ -406,13 +411,13 @@ public class ContextualManagerDataSource {
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, ap.getDateTime());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
-
+        values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
 	    int rows = db.update(tableName, values, identifier, null);
 		
 	    return ((rows != 0)? true : false);
@@ -586,6 +591,27 @@ public class ContextualManagerDataSource {
 		return weight;
 	}
 
+    /**
+     * Function getAllAP
+     * Gets the all the Peers recorded by the application on the Peers table.
+     * @param tableName name of the table on the database
+     * @return A list with all the peer objects.
+     */
+    public ArrayList<ContextualManagerAP> getAllPeers( String tableName) {
+        String query = "SELECT * FROM "+ tableName;
+        Cursor cursor = db.rawQuery(query, null);
+        ArrayList<ContextualManagerAP> peerList = new ArrayList<>();
+
+        while(cursor.moveToNext()){
+            ContextualManagerAP peer = cursorPeers(cursor);
+            peerList.add(peer);
+        }
+
+        cursor.close();
+        db.close();
+        return peerList;
+    }
+
 	/**
 	 * Method that checks whether a table is empty or not.
 	 * @param tableName table to check if is empty
@@ -675,6 +701,7 @@ public class ContextualManagerDataSource {
 	    cursor.close();
 	    return apMap;
 	}
+
 	/**
 	 * Function hasAP
 	 * Checks if a given AP has already been registered by the application.
