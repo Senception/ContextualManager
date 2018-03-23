@@ -224,10 +224,11 @@ public class ContextualManagerService extends Service{
             //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
-                Log.d("teste", "Peer na bd: " + allPeersOnDB.get(i).getSSID());
+                ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
+                Log.d("teste", "Peer na bd: " + peerOnDB.getSSID());
 
                 for (int j = 0; j < cmPeerList.size(); j++) {
-                    if(allPeersOnDB.get(i).getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
+                    if(peerOnDB.getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
                         connectionLost = false;
                         break;
                     }
@@ -237,13 +238,21 @@ public class ContextualManagerService extends Service{
                 }
                 //We lost connection of a peer
                 if( connectionLost &&  allPeersOnDB.get(i).getIsConnected() == 1 ) {
-                    Log.d("teste", "peerConnection was lost, endEncounter from " + allPeersOnDB.get(i).getSSID() + " updated on db");
-                    //peer = allPeersOnDB.get(i);
+                    Log.d("teste", "peerConnection was lost, endEncounter from " + peerOnDB.getSSID() + " updated on db");
+                    peerOnDB.setEndEncounter((int)(System.currentTimeMillis() / 1000));
+                    peerOnDB.setIsConnected(0);
 
-                    allPeersOnDB.get(i).setEndEncounter(String.valueOf(System.currentTimeMillis() / 1000));
-                    allPeersOnDB.get(i).setIsConnected(0);
-                    //todo allPeersOnDB.get(i).setAvgEncounterDuration((allPeersOnDB.get(i).getEncounterDuration() + (allPeersOnDB.get(i).getEndEncounter()-allPeersOnDB.get(i).getStartEncounter()))/System.currentTimeMillis() / 1000);
-                    dataSource.updatePeer(allPeersOnDB.get(i), checkWeek("peers"));
+                    /*AVG ENCOUNTER CALCULATION*/
+                    double peerOnDBAvgEncounterDuration = peerOnDB.getAvgEncounterDuration();
+                    int peerOnDBEndEncounter = peerOnDB.getEndEncounter();
+                    int peerOnDBStartEncounter = peerOnDB.getStartEncounter();
+                    double count = (peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter))/ (double) (System.currentTimeMillis() / 1000);
+                    Log.d("teste", "avgduration: " + count);
+                    Log.d("teste", "sum: " + (peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter)));
+                    Log.d("teste", "tempoactual: " + System.currentTimeMillis());
+                    //todo check if avgEnv is saved on the db and produce C after it's finished
+                    peerOnDB.setAvgEncounterDuration((peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter))/ (double) (System.currentTimeMillis() / 1000));
+                    dataSource.updatePeer(peerOnDB, checkWeek("peers"));
                 }
             }
 
@@ -260,9 +269,9 @@ public class ContextualManagerService extends Service{
                     ap.setAvailability(0.0);
                     ap.setCentrality(0.0);
                     ap.setNumEncounters(1);
-                    ap.setStartEncounter(String.valueOf(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
-                    ap.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
-                    ap.setAvgEncounterDuration(String.valueOf(0));
+                    ap.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
+                    ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
+                    ap.setAvgEncounterDuration(0);
                     ap.setIsConnected(1);
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
@@ -274,8 +283,11 @@ public class ContextualManagerService extends Service{
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);
 					peer.setNumEncounters(peer.getNumEncounters()+1);
-                    peer.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
-                    peer.setIsConnected(1); // if a peer was disconnected, and reconnected
+                    peer.setEndEncounter((int)(System.currentTimeMillis()/1000));
+                    if(peer.getIsConnected() == 0) {
+                        peer.setIsConnected(1); // if a peer was disconnected, and reconnected
+                        peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
+                    }
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
 				}
@@ -285,6 +297,7 @@ public class ContextualManagerService extends Service{
 			//Log.d(TAG, "[*] DISCOVERED PEERS --> Wait for coordinates");
 		}
 	}
+
 	/**
 	 * Function apScanResult
 	 * Scan for available Access Point

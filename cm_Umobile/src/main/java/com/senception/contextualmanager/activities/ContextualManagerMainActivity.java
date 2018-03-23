@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -116,6 +117,39 @@ public class ContextualManagerMainActivity extends Activity {
 		}
 	};
 
+    /**
+     * Since the database on the device is only visible through root, to check the
+     * database tables this method creates a backup in a place that the database is visible.
+     * (main folder of the android device)
+     */
+    private void backupDB() {
+
+        try {
+            File sd = Environment.getExternalStorageDirectory();
+
+            if (sd.canWrite()) {
+                String DB_PATH = this.getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
+                //String currentDBPath = "cmumobile.db";
+                String currentDBPath = "contextualmanager.db";
+                String backupDBPath = "contextualmanagerbackup.db";
+                File currentDB = new File(DB_PATH, currentDBPath);
+                File backupDB = new File(sd, backupDBPath);
+
+                if (currentDB.exists()) {
+                    FileChannel src = new FileInputStream(currentDB).getChannel();
+                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                    dst.transferFrom(src, 0, src.size());
+                    //Log.d(TAG, "Backup Done");
+                    src.close();
+                    dst.close();
+                    Log.d(TAG, "FEZ BACKUP");
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 	@SuppressLint("NewApi")
 	@Override
@@ -123,9 +157,11 @@ public class ContextualManagerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
+        backupDB();
+
 		//doBindAidlService();
 
-		FragmentManager manager = getFragmentManager();
+		/*FragmentManager manager = getFragmentManager();
 
 		//Asks user for permission to get usage stats
 		if(!ContextualManagerPermissions.usageStatsPermission(getApplicationContext())) {
@@ -143,7 +179,7 @@ public class ContextualManagerMainActivity extends Activity {
 		}
 
 		startService(new Intent (ContextualManagerMainActivity.this, ContextualManagerService.class));
-		doBindReportService();
+		doBindReportService();*/
 
 	}
 

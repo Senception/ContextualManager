@@ -86,7 +86,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 peer.setNumEncounters(1);
-                peer.setStartEncounter(String.valueOf(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
+                peer.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                 dataSource.registerNewPeers(peer, checkWeek("peers"));
                 Log.d("teste", "New peer device registered on DB (1st time)");
             } else {

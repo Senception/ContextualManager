@@ -226,9 +226,9 @@ public class ContextualManagerDataSource {
         ap.setAvailability(cursor.getDouble(5)); // a
         ap.setCentrality(cursor.getDouble(6)); // c
         ap.setNumEncounters(cursor.getInt(7)); // num enc
-        ap.setStartEncounter(cursor.getString(8)); // start enc
-        ap.setEndEncounter(cursor.getString(9)); // end enc
-        ap.setAvgEncounterDuration(cursor.getString(10)); // avg encounter duration
+        ap.setStartEncounter(cursor.getInt(8)); // start enc
+        ap.setEndEncounter(cursor.getInt(9)); // end enc
+        ap.setAvgEncounterDuration(cursor.getDouble(10)); // avg encounter duration
         ap.setIsConnected(cursor.getInt(11)); // is connected
 
 		return ap;

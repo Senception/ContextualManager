@@ -24,10 +24,10 @@ public class ContextualManagerAP {
 	private double longitude;
 	private double Availability;
 	private double Centrality;
-    private String startEncounter;
-    private String endEncounter;
+    private int startEncounter;
+    private int endEncounter;
     private int numEncounters;
-    private String avgEncounterDuration;
+    private double avgEncounterDuration;
     private int isConnected; //0 - not connected | 1 - connected
 
     //TODO Javadoc for all gets and sets
@@ -40,12 +40,12 @@ public class ContextualManagerAP {
         this.isConnected = isConnected;
     }
 
-    public String getAvgEncounterDuration() {
+    public double getAvgEncounterDuration() {
         return avgEncounterDuration;
     }
 
-    public void setAvgEncounterDuration(String encounterDuration) {
-        this.avgEncounterDuration = encounterDuration;
+    public void setAvgEncounterDuration(double avgEncounterDuration) {
+        this.avgEncounterDuration = avgEncounterDuration;
     }
 
 	public double getAvailability() {
@@ -64,19 +64,19 @@ public class ContextualManagerAP {
 		Centrality = centrality;
 	}
 
-	public String getStartEncounter() {
+	public int getStartEncounter() {
 		return startEncounter;
 	}
 
-	public void setStartEncounter(String startTime) {
+	public void setStartEncounter(int startTime) {
 		this.startEncounter = startTime;
 	}
 
-	public String getEndEncounter() {
+	public int getEndEncounter() {
 		return endEncounter;
 	}
 
-	public void setEndEncounter(String endTime) {
+	public void setEndEncounter(int endTime) {
 		this.endEncounter = endTime;
 	}
 

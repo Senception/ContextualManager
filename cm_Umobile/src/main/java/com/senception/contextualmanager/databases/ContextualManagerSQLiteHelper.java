@@ -191,9 +191,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -207,9 +207,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -223,9 +223,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_AVAILABILITY + " text, "
             + COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -239,9 +239,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -255,9 +255,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -271,9 +271,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
@@ -287,9 +287,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
-            + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text, "
-            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_START_ENCOUNTER + " integer, "
+            + COLUMN_END_ENCOUNTER + " integer, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " real, "
             + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
