@@ -87,6 +87,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 							ContextualManagerAP peerfound = new ContextualManagerAP();
 							peerfound.setSSID(dev.deviceName);
                             Log.d("teste", "peerfound: " + dev.deviceName);
+
 							peerfound.setBSSID(dev.deviceAddress);
 
 							peersList.add(peerfound);

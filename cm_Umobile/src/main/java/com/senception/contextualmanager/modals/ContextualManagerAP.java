@@ -22,11 +22,31 @@ public class ContextualManagerAP {
 	private String DayOfWeek;
 	private double latitude;
 	private double longitude;
-	private String startEncounter;
-	private String endEncounter;
-	private int numEncounters;
 	private double Availability;
 	private double Centrality;
+    private String startEncounter;
+    private String endEncounter;
+    private int numEncounters;
+    private String avgEncounterDuration;
+    private int isConnected; //0 - not connected | 1 - connected
+
+    //TODO Javadoc for all gets and sets
+
+    public int getIsConnected() {
+        return isConnected;
+    }
+
+    public void setIsConnected(int isConnected) {
+        this.isConnected = isConnected;
+    }
+
+    public String getAvgEncounterDuration() {
+        return avgEncounterDuration;
+    }
+
+    public void setAvgEncounterDuration(String encounterDuration) {
+        this.avgEncounterDuration = encounterDuration;
+    }
 
 	public double getAvailability() {
 		return Availability;

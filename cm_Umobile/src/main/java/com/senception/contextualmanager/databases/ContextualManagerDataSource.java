@@ -141,9 +141,10 @@ public class ContextualManagerDataSource {
             ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY,
             ContextualManagerSQLiteHelper.COLUMN_CENTRALITY,
             ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS,
-            ContextualManagerSQLiteHelper.COLUMN_ENCOUNTER_DURATION,
             ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER,
             ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER,
+            ContextualManagerSQLiteHelper.COLUMN_AVG_ENCOUNTER_DURATION,
+            ContextualManagerSQLiteHelper.COLUMN_IS_CONNECTED,
 	};
 
 	/**
@@ -217,16 +218,19 @@ public class ContextualManagerDataSource {
 	 */
 	private ContextualManagerAP cursorPeers(Cursor cursor) {
 		ContextualManagerAP ap = new ContextualManagerAP();
-		ap.setId(cursor.getInt(0));
-		ap.setSSID(cursor.getString(1));
-		ap.setBSSID(cursor.getString(2));
-		ap.setLatitude(cursor.getDouble(3));
-		ap.setLongitude(cursor.getDouble(4));
-        ap.setAvailability(cursor.getDouble(5));
-        ap.setCentrality(cursor.getDouble(6));
-        ap.setNumEncounters(cursor.getInt(7));
-        ap.setStartEncounter(cursor.getString(9));
-        ap.setEndEncounter(cursor.getString(10));
+		ap.setId(cursor.getInt(0)); //id
+		ap.setSSID(cursor.getString(1)); // ssid
+		ap.setBSSID(cursor.getString(2)); // bssid
+		ap.setLatitude(cursor.getDouble(3)); // latitude
+		ap.setLongitude(cursor.getDouble(4)); // longitude
+        ap.setAvailability(cursor.getDouble(5)); // a
+        ap.setCentrality(cursor.getDouble(6)); // c
+        ap.setNumEncounters(cursor.getInt(7)); // num enc
+        ap.setStartEncounter(cursor.getString(8)); // start enc
+        ap.setEndEncounter(cursor.getString(9)); // end enc
+        ap.setAvgEncounterDuration(cursor.getString(10)); // avg encounter duration
+        ap.setIsConnected(cursor.getInt(11)); // is connected
+
 		return ap;
 	}
 
@@ -311,6 +315,8 @@ public class ContextualManagerDataSource {
         values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
         values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
         values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_AVG_ENCOUNTER_DURATION, ap.getAvgEncounterDuration());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_IS_CONNECTED, ap.getIsConnected());
 	    long rows = db.insert(tableName, null, values);
         return rows;
 	}
@@ -418,6 +424,8 @@ public class ContextualManagerDataSource {
         values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
         values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
         values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_AVG_ENCOUNTER_DURATION, ap.getAvgEncounterDuration());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_IS_CONNECTED, ap.getIsConnected());
 	    int rows = db.update(tableName, values, identifier, null);
 		
 	    return ((rows != 0)? true : false);
@@ -608,7 +616,6 @@ public class ContextualManagerDataSource {
         }
 
         cursor.close();
-        db.close();
         return peerList;
     }
 

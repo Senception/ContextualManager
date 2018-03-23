@@ -213,15 +213,43 @@ public class ContextualManagerService extends Service{
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
 			long contactTime = 0;
 
-            /*GET A LIST WITH ALL THE PEERS ON THE DATABASE*/
-            /*ArrayList<ContextualManagerAP> allPeersOnDB = dataSource.getAllPeers(checkWeek("peers"));
-            for (ContextualManagerAP peer : allPeersOnDB) {
-                Log.d("teste", "Peer na bd: " + peer.getSSID());
-            }*/
+            ArrayList<ContextualManagerAP> allPeersOnDB = new ArrayList<>();
+
+            //GET A LIST WITH ALL THE PEERS ON THE DATABASE*/
+            if(!dataSource.isTableEmpty(checkWeek("peers"))) {
+                allPeersOnDB = dataSource.getAllPeers(checkWeek("peers"));
+            }
+
+            /*CHECKS IF WE LOST CONNECTION WITH ANY PEER*/
+            //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
+            boolean connectionLost = false;
+            for (int i = 0; i < allPeersOnDB.size(); i++) {
+                Log.d("teste", "Peer na bd: " + allPeersOnDB.get(i).getSSID());
+
+                for (int j = 0; j < cmPeerList.size(); j++) {
+                    if(allPeersOnDB.get(i).getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
+                        connectionLost = false;
+                        break;
+                    }
+                    else {
+                        connectionLost = true;
+                    }
+                }
+                //We lost connection of a peer
+                if( connectionLost &&  allPeersOnDB.get(i).getIsConnected() == 1 ) {
+                    Log.d("teste", "peerConnection was lost, endEncounter from " + allPeersOnDB.get(i).getSSID() + " updated on db");
+                    //peer = allPeersOnDB.get(i);
+
+                    allPeersOnDB.get(i).setEndEncounter(String.valueOf(System.currentTimeMillis() / 1000));
+                    allPeersOnDB.get(i).setIsConnected(0);
+                    //todo allPeersOnDB.get(i).setAvgEncounterDuration((allPeersOnDB.get(i).getEncounterDuration() + (allPeersOnDB.get(i).getEndEncounter()-allPeersOnDB.get(i).getStartEncounter()))/System.currentTimeMillis() / 1000);
+                    dataSource.updatePeer(allPeersOnDB.get(i), checkWeek("peers"));
+                }
+            }
 
 			for(ContextualManagerAP item: cmPeerList){
 
-                /*CHECKS IF THE ANY PEER IS ON THE DB*/
+                /*CHECKS IF ANY PEER IS ON THE DB*/
                 String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
 				ContextualManagerAP ap = new ContextualManagerAP();
 				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
@@ -229,15 +257,15 @@ public class ContextualManagerService extends Service{
 					ap.setBSSID(hashBSSID);
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
-					//TODO when does the encounter end?
                     ap.setAvailability(0.0);
                     ap.setCentrality(0.0);
                     ap.setNumEncounters(1);
                     ap.setStartEncounter(String.valueOf(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
+                    ap.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
+                    ap.setAvgEncounterDuration(String.valueOf(0));
+                    ap.setIsConnected(1);
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
-                    //takes the peer out of allPeersOnDB cause there's no need for it to be there anymore
-                    //allPeersOnDB.remove(item);
 				}
 				else{
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
@@ -246,18 +274,11 @@ public class ContextualManagerService extends Service{
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);
 					peer.setNumEncounters(peer.getNumEncounters()+1);
+                    peer.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
+                    peer.setIsConnected(1); // if a peer was disconnected, and reconnected
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
-                    //takes the peer out of the allPeersOnDB cause there's no need for it to be there anymore
-                    //allPeersOnDB.remove(item);
 				}
-
-				/*IF AN ELEMENT OF THE DB IS NOT IN THE PEER LIST THEN IT WAS DISCONNECTED*/
-                /*for (ContextualManagerAP peer : allPeersOnDB) {
-                    Log.d("teste", "Peer na bd: " + peer.getSSID());
-                    peer.setEndEncounter(String.valueOf(System.currentTimeMillis()/1000));
-                    dataSource.updatePeer(peer, checkWeek("peers"));
-                }*/
             }
 		}
 		else{

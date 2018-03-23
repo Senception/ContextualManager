@@ -72,7 +72,8 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_START_ENCOUNTER = "startencounter";
     public static final String COLUMN_END_ENCOUNTER = "endencounter";
 	public static final String COLUMN_NUM_ENCOUNTERS = "encounters";
-    public static final String COLUMN_ENCOUNTER_DURATION = "duration";
+    public static final String COLUMN_AVG_ENCOUNTER_DURATION = "avgduration";
+    public static final String COLUMN_IS_CONNECTED = "connected";
 
 	// VISITS
 	public static final String COLUMN_TIMEON = "timeon";
@@ -191,7 +192,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_TUESDAY_PEERS_TABLE = "create table "
@@ -205,7 +208,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_WEDNESDAY_PEERS_TABLE = "create table "
@@ -219,7 +224,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
             + COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_THURSDAY_PEERS_TABLE = "create table "
@@ -233,7 +240,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_FRIDAY_PEERS_TABLE = "create table "
@@ -247,7 +256,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_SATURDAY_PEERS_TABLE = "create table "
@@ -261,7 +272,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_SUNDAY_PEERS_TABLE = "create table "
@@ -275,7 +288,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_CENTRALITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " text, "
-            + COLUMN_END_ENCOUNTER + " text "
+            + COLUMN_END_ENCOUNTER + " text, "
+            + COLUMN_AVG_ENCOUNTER_DURATION + " text, "
+            + COLUMN_IS_CONNECTED + " integer "
 			+ ");";
 	
 	private static final String CREATE_VISITS_TABLE = "create table "
