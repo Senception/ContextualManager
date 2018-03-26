@@ -157,11 +157,9 @@ public class ContextualManagerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
-        backupDB();
-
 		//doBindAidlService();
 
-		/*FragmentManager manager = getFragmentManager();
+		FragmentManager manager = getFragmentManager();
 
 		//Asks user for permission to get usage stats
 		if(!ContextualManagerPermissions.usageStatsPermission(getApplicationContext())) {
@@ -179,7 +177,7 @@ public class ContextualManagerMainActivity extends Activity {
 		}
 
 		startService(new Intent (ContextualManagerMainActivity.this, ContextualManagerService.class));
-		doBindReportService();*/
+		doBindReportService();
 
 	}
 
@@ -351,6 +349,7 @@ public class ContextualManagerMainActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
+        backupDB();
 		super.onDestroy();
 	}
 

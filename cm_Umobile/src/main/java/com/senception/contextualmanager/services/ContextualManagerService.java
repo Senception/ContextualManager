@@ -222,6 +222,7 @@ public class ContextualManagerService extends Service{
 
             /*CHECKS IF WE LOST CONNECTION WITH ANY PEER*/
             //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
+            //todo optimize this function (find the symmetric difference list)
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
@@ -241,17 +242,6 @@ public class ContextualManagerService extends Service{
                     Log.d("teste", "peerConnection was lost, endEncounter from " + peerOnDB.getSSID() + " updated on db");
                     peerOnDB.setEndEncounter((int)(System.currentTimeMillis() / 1000));
                     peerOnDB.setIsConnected(0);
-
-                    /*AVG ENCOUNTER CALCULATION*/
-                    double peerOnDBAvgEncounterDuration = peerOnDB.getAvgEncounterDuration();
-                    int peerOnDBEndEncounter = peerOnDB.getEndEncounter();
-                    int peerOnDBStartEncounter = peerOnDB.getStartEncounter();
-                    double count = (peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter))/ (double) (System.currentTimeMillis() / 1000);
-                    Log.d("teste", "avgduration: " + count);
-                    Log.d("teste", "sum: " + (peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter)));
-                    Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    //todo check if avgEnv is saved on the db and produce C after it's finished
-                    peerOnDB.setAvgEncounterDuration((peerOnDBAvgEncounterDuration + (peerOnDBEndEncounter-peerOnDBStartEncounter))/ (double) (System.currentTimeMillis() / 1000));
                     dataSource.updatePeer(peerOnDB, checkWeek("peers"));
                 }
             }
@@ -273,6 +263,16 @@ public class ContextualManagerService extends Service{
                     ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
                     ap.setAvgEncounterDuration(0);
                     ap.setIsConnected(1);
+                    /*AVG ENCOUNTER CALCULATION*/
+                    double peerAvgEncDur = ap.getAvgEncounterDuration();
+                    int peerEndEnc = ap.getEndEncounter();
+                    int peerStartEnc = ap.getStartEncounter();
+                    double avgEncDur = (peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000);
+
+                    //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
+                    //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
+                    //Log.d("teste", "avgduration: " + avgEncDur);
+                    ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
 				}
@@ -288,6 +288,17 @@ public class ContextualManagerService extends Service{
                         peer.setIsConnected(1); // if a peer was disconnected, and reconnected
                         peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
                     }
+
+                    /*AVG ENCOUNTER CALCULATION*/
+                    double peerAvgEncDur = peer.getAvgEncounterDuration();
+                    int peerEndEnc = peer.getEndEncounter();
+                    int peerStartEnc = peer.getStartEncounter();
+                    double avgEncDur = (peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000);
+
+                    Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
+                    Log.d("teste", "tempoactual: " + System.currentTimeMillis());
+                    Log.d("teste", "avgduration: " + avgEncDur);
+                    peer.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
 				}
