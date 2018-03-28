@@ -62,15 +62,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 		mContext = context;
 		String action = intent.getAction();
 
-		if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
-			int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
-			if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-				//TODO
-			} else {
-				//TODO
-			}
-			//Log.d(TAG, "P2P state changed - " + state);
-		} else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+		if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 			// request available peers from the wifi p2p manager. This is an
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
@@ -80,8 +72,6 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 
 					@Override
 					public void onPeersAvailable(WifiP2pDeviceList peers) {
-						// TODO Auto-generated method stub
-						//
 						peersList.clear();
 						for(WifiP2pDevice dev : peers.getDeviceList()){
 							ContextualManagerAP peerfound = new ContextualManagerAP();
@@ -119,8 +109,6 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 
 			@Override
 			public void onSuccess() {
-				// TODO Auto-generated method stub
-
 				//Log.d(TAG, "ONSUCESS");
 			}
 

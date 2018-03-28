@@ -79,7 +79,7 @@ public class ContextualManagerCaptureService extends Service {
     private static ContextualManagerPhysicalUsage storage;
     private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
     private static ArrayList<Integer> A = new ArrayList<>();
-    private static ArrayList<Integer> C = new ArrayList<>();
+    private static double C;
     private static List<UsageStats> ustats;
     private static List<ContextualManagerAppUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
@@ -289,16 +289,16 @@ public class ContextualManagerCaptureService extends Service {
                 //Log.d("resource", "currentMinute:" + currentMinute);
                 ContextualManagerWeight weight = new ContextualManagerWeight(dateTime);
                 weight.setA(A.get(currentMinute));
-                weight.setC(C.get(currentMinute));
+                weight.setC(C);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
                 if (!dataSource.hasWeight(newDayOfTheWeek)){
                     dataSource.registerWeight(weight);
-                    Log.d(TAG, "A saved into the database.");
+                    Log.d("teste", "A and C saved into the database.");
                 }
                 else {
                     dataSource.updateWeight(weight);
-                    Log.d("Communication", "A updated on the database.");
+                    Log.d("teste", "A and C updated on the database.");
                 }
                 backupDB();
 

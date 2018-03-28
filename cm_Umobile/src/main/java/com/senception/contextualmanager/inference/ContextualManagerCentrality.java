@@ -1,8 +1,14 @@
 package com.senception.contextualmanager.inference;
 
-import com.senception.contextualmanager.databases.ContextualManagerDataSource;
+import android.util.Log;
 
+import com.senception.contextualmanager.databases.ContextualManagerDataSource;
+import com.senception.contextualmanager.modals.ContextualManagerAP;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -22,8 +28,8 @@ public class ContextualManagerCentrality {
 
     /*
      p(j)= (encounter * average_encounter_duration)/ (d(i,j) + 1)
-     encounter: encontro entre 2 pares
-     average_encounter_duration: média de duração entre encontro desses 2 pares
+     encounter: encounter between a pair
+     average_encounter_duration: avg duration of an encounter between a pair
      d(i,j):
 
      λ ∈ [0,1]
@@ -35,29 +41,22 @@ public class ContextualManagerCentrality {
     private static long avg_enc_dur;
     private static long currentDur;
 
-    public static ArrayList<Integer> calculateC(ContextualManagerDataSource dataSource){
-        ArrayList<Integer> centrality = new ArrayList<>();
-        for (int i = 0; i <= 59; i++){
-            centrality.add(i, -1);
-        }
+    public static double calculateC(ContextualManagerDataSource dataSource){
+        double centrality = -1;
 
-        //1) Get the encounter duration
-
-        //2) Get the number of encounters
-        //3) Get the average encounter duration
-
-
-
-
-
-        //get peer list
-        //ArrayList<ContextualManagerAP> peersList = dataSource.getAllAP(,ContextualManagerService.checkWeek("ap"));
-
-        //get peers number of connections/encounters (list.length)
-        //get those encounter durations
-        //calculate avg duration
         //Todo: Calculate C
+        //get peer list
+        ArrayList<ContextualManagerAP> peerList;
 
+        if(!dataSource.isTableEmpty(checkWeek("peers"))) {
+            peerList = dataSource.getAllPeers(checkWeek("peers"));
+
+            double totalDuration = 0;
+            for (ContextualManagerAP peer : peerList) {
+                totalDuration += peer.getAvgEncounterDuration();
+            }
+            Log.d("teste", "Total duration of avgEnc : " + totalDuration);
+        }
 
         return centrality;
     }

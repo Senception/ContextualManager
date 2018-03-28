@@ -62,11 +62,12 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
         *
         * srcDevice.deviceName: SAMSUNG NEO
         */
-        Log.d("teste", "A TENTAR RECEBER:");
+        Log.d("teste", "MAKING A SCAN:");
 
         Log.i("teste", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
 
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
+            Log.d("teste", "ENCONTREI PEER:");
             double A = Double.parseDouble(txtRecordMap.get(Identity.AVAILABILITY));
             Log.d("teste", "A recebido: " + A);
             double C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
@@ -76,7 +77,6 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
             //deviceAddress - Mac (BSSID) | deviceName - Device name (SSID)
 
             String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
-            Log.d("teste", "hash of the device mac: " + hashSrcDeviceBSSID);
             if (!dataSource.hasPeer(hashSrcDeviceBSSID, checkWeek("peers"))) {
                 ContextualManagerAP peer = new ContextualManagerAP();
                 peer.setSSID(srcDevice.deviceName);
@@ -88,7 +88,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 peer.setNumEncounters(1);
                 peer.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                 dataSource.registerNewPeers(peer, checkWeek("peers"));
-                Log.d("teste", "New peer device registered on DB (1st time)");
+                Log.d("teste", "SAVED PEER");
             } else {
                 ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceBSSID, checkWeek("peers"));
                 peer.setSSID(srcDevice.deviceName);
@@ -98,9 +98,8 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
                 peer.setNumEncounters(peer.getNumEncounters()+1);
-                Log.d("teste", "numEncounters: " + peer.getNumEncounters());
                 dataSource.updatePeer(peer, checkWeek("peers"));
-                Log.d("teste", "New peer device updated on the DB (2nd+ time).");
+                Log.d("teste", "UPDATED PEER");
             }
             //txtRecordMap.values();
         }

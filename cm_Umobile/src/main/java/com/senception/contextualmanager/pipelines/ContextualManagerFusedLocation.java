@@ -84,7 +84,6 @@ public class ContextualManagerFusedLocation implements LocationListener, GoogleA
 
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-		// TODO Auto-generated method stub
 		//Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
 		if (!result.hasResolution()) {
 			// show the localized error dialog.
@@ -93,7 +92,6 @@ public class ContextualManagerFusedLocation implements LocationListener, GoogleA
 	}
 	@Override
 	public void onConnected(Bundle arg0) {
-		// TODO Auto-generated method stub
 		startLocationUpdates();
 	}
 	@Override
@@ -103,7 +101,6 @@ public class ContextualManagerFusedLocation implements LocationListener, GoogleA
 	}
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
 		if(location != null){
 			mCurrentLocation = location;
 			

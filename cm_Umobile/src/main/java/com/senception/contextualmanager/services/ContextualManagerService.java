@@ -211,7 +211,6 @@ public class ContextualManagerService extends Service{
         if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
-			long contactTime = 0;
 
             ArrayList<ContextualManagerAP> allPeersOnDB = new ArrayList<>();
 
@@ -246,7 +245,7 @@ public class ContextualManagerService extends Service{
                 }
             }
 
-			for(ContextualManagerAP item: cmPeerList){
+			for(ContextualManagerAP item: cmPeerList){ // the peer found is new
 
                 /*CHECKS IF ANY PEER IS ON THE DB*/
                 String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
@@ -271,12 +270,12 @@ public class ContextualManagerService extends Service{
 
                     //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
                     //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    //Log.d("teste", "avgduration: " + avgEncDur);
+                    Log.d("teste", "avgduration: " + avgEncDur);
                     ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
 				}
-				else{
+				else{ //the peer found was already on the database
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
 					peer.setSSID(item.getSSID());
 					peer.setBSSID(hashBSSID);

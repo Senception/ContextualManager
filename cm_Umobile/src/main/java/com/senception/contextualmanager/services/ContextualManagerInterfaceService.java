@@ -45,8 +45,8 @@ public class ContextualManagerInterfaceService extends Service {
 
             for (int i = 0; i < peerList.length; i++){
                 //peerList[i] == peerId
-                if(dataSource.hasPeer(peerList[i], checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(peerList[i], checkWeek("peers"));
+                if(dataSource.hasPeer(peerList[i], ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(peerList[i], ContextualManagerService.checkWeek("peers"));
                     availability[i] = peer.getAvailability();
                 }
                 else
@@ -61,8 +61,8 @@ public class ContextualManagerInterfaceService extends Service {
 
             for (int i = 0; i < peerList.length; i++){
                 //peerList[i] == peerId
-                if(dataSource.hasPeer(String.valueOf(peerList[i]), checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList[i]), checkWeek("peers"));
+                if(dataSource.hasPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"));
                     centrality[i] = peer.getAvailability();
                 }
                 else
@@ -103,40 +103,4 @@ public class ContextualManagerInterfaceService extends Service {
         super.onDestroy();
     }
 
-    /**
-     * Funtion checkWeek
-     * Check if it is peer or an ap, and what day
-     * @param peerON value to check if is peer or not
-     * @return tableName current AP or PEERS
-     */
-    public static String checkWeek(String peerON){
-
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE");
-        Date date = new Date();
-        String dw = sdf.format(date);
-        String tableName = "";
-
-        if(dw.equalsIgnoreCase("Mon") || dw.equalsIgnoreCase("Seg")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_MONDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_MONDAY;
-        }
-        else if(dw.equalsIgnoreCase("Tue") || dw.equalsIgnoreCase("Ter")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_TUESDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_TUESDAY;
-        }
-        else if(dw.equalsIgnoreCase("Wed") || dw.equalsIgnoreCase("Qua")){
-            tableName =(peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_WEDNESDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_WEDNESDAY;
-        }
-        else if(dw.equalsIgnoreCase("Thu") || dw.equalsIgnoreCase("Qui")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_THURSDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_THURSDAY;
-        }
-        else if(dw.equalsIgnoreCase("Fri") || dw.equalsIgnoreCase("Sex")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_FRIDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_FRIDAY;
-        }
-        else if(dw.equalsIgnoreCase("Sat") || dw.equalsIgnoreCase("Sáb")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_SATURDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_SATURDAY;
-        }
-        else if(dw.equalsIgnoreCase("Sun") || dw.equalsIgnoreCase("Dom")){
-            tableName = (peerON.equalsIgnoreCase("peers")) ? ContextualManagerSQLiteHelper.TABLE_SUNDAY_PEERS : ContextualManagerSQLiteHelper.TABLE_SUNDAY;
-        }
-        return tableName;
-    }
 }
