@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
+import com.senception.contextualmanager.modals.ContextualManagerWeight;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -37,29 +38,20 @@ public class ContextualManagerCentrality {
      d(i,j) ∈ [0,100]
     */
 
-    private static int numEncounters;
-    private static long avg_enc_dur;
-    private static long currentDur;
-
     public static double calculateC(ContextualManagerDataSource dataSource){
-        double centrality = -1;
 
         //Todo: Calculate C
         //get peer list
         ArrayList<ContextualManagerAP> peerList;
-
+        double centrality = 0;
         if(!dataSource.isTableEmpty(checkWeek("peers"))) {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
 
-            double totalDuration = 0;
             for (ContextualManagerAP peer : peerList) {
-                totalDuration += peer.getAvgEncounterDuration();
+                centrality += peer.getNumEncounters()*peer.getAvgEncounterDuration();
             }
-            Log.d("teste", "Total duration of avgEnc : " + totalDuration);
+            Log.d("teste", "Sum = " + centrality);
         }
-
         return centrality;
     }
-
-
 }

@@ -1,5 +1,7 @@
 package com.senception.contextualmanager.inference;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -26,12 +28,22 @@ public class ContextualManagerAvailability {
      * @param rList list of all R's calculated so far.
      * @return U the array
      */
-    public static ArrayList<Integer> calculateA(ArrayList<ArrayList<Integer>> rList){
-        ArrayList<Integer> U = rList.get(0);
-        for (int i = 1; i < rList.size(); i++) {
-            U = sumArrays(U, rList.get(i)); //U = R1 // U = U(R1) + R2 + R3 --> R1+R2
+    public static ArrayList<Double> calculateA(ArrayList<ArrayList<Integer>> rList){
+        ArrayList<Double> A = new ArrayList<>();
+
+        for (int j = 0; j < rList.get(0).size(); j++) {
+            A.add((double)rList.get(0).get(j)); //if there's only 1 R -> A = that R converted to double
         }
-        return U;
+        if( rList.size() == 1){
+            return A;
+        }
+        else { //if there's more then 1 R -> A = A + R1 + R2...RN
+            for (int i = 1; i < rList.size(); i++) {
+                A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
+            }
+        }
+        Log.d("teste", "A calculated: " + A.toString());
+        return A;
     }
 
     /**
@@ -42,35 +54,35 @@ public class ContextualManagerAvailability {
      * @param usagePerHour2 list of usage 2 (list2)
      * @return the resulting list with the sum's result in each index.
      */
-    private static ArrayList<Integer> sumArrays(ArrayList<Integer> usagePerHour1, ArrayList<Integer> usagePerHour2){
+    private static ArrayList<Double> sumArrays(ArrayList<Double> usagePerHour1, ArrayList<Integer> usagePerHour2){
 
         Calendar calendar = Calendar.getInstance();
         int hour = calendar.get(Calendar.HOUR_OF_DAY); // hour
 
-        ArrayList<Integer> res = new ArrayList<>();
+        ArrayList<Double> res = new ArrayList<>();
         for (int i = 0; i < usagePerHour1.size(); i++) {
             //-1 + -1 = -1
             if(usagePerHour1.get(i) == -1 && usagePerHour2.get(i) == -1){
                 res.add(usagePerHour1.get(i));
             }
-            //-1+0,3 = 0,3 --> 0,3/currentHour
+            //-1+30 = 30 --> 30/currentHour
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add(usagePerHour2.get(i) / hour);
+                res.add((double) usagePerHour2.get(i) / hour);
             }
-            //0,3+-1 = 0,3 --> 0,3/currentHour
+            //30+-1 = 30 --> 30/currentHour
             else if (usagePerHour2.get(i) == -1 && usagePerHour1.get(i) != -1){
                 res.add(usagePerHour1.get(i) / hour);
             }
-            //0,3+0,3 = 0.6 --> 0.6/currentHour
+            //30+30 = 60 --> 60/currentHour
             else{
-                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / hour);
+                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / hour); //todo optimize without divide for the hour in the sumArrays method
             }
         }
         return res;
     }
 
     /**
-     * This method calculates a number that will be used to measure
+     * This method calculates an array of numbers that will be used to measure
      * whether or not a device is good to establish connection to.
      * @param e the physical resource usage energy
      * @param cpu the physical resource usage cpu
@@ -80,11 +92,11 @@ public class ContextualManagerAvailability {
      */
     public static ArrayList<Integer> calculateR(ArrayList<Integer> e, ArrayList<Integer>
             cpu, ArrayList<Integer> mem, ArrayList<Integer> storage){
-        ArrayList<Integer> e2 = multiplyArrays(e, e); // e square ---> working
-        ArrayList<Integer> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu ---> working
-        ArrayList<Integer> memStor = multiplyArrays(mem, storage); // mem * storage ---> working
+        ArrayList<Integer> e2 = multiplyArrays(e, e); // e square
+        ArrayList<Integer> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
+        ArrayList<Integer> memStor = multiplyArrays(mem, storage); // mem * storage
 
-        ArrayList<Integer> r = multiplyArrays(e2Cpu, memStor); // testing
+        ArrayList<Integer> r = multiplyArrays(e2Cpu, memStor);
         return r;
     }
 
@@ -102,15 +114,15 @@ public class ContextualManagerAvailability {
             if(usagePerHour1.get(i) == -1 && usagePerHour2.get(i) == -1){
                 res.add(usagePerHour1.get(i));
             }
-            //-1*0,3 = 0,3
+            //-1*30 = 30
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
                 res.add(usagePerHour2.get(i));
             }
-            //0,3*-1 = 0,3
+            //30*-1 = 30
             else if (usagePerHour1.get(i) != -1 && usagePerHour2.get(i) == -1 ){
                 res.add(usagePerHour1.get(i));
             }
-            //0,3*0,3 = 0.09
+            //30*30 = 900
             else {
                 res.add(usagePerHour1.get(i) * usagePerHour2.get(i));
             }

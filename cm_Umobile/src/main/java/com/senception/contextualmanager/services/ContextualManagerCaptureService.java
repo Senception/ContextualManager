@@ -78,7 +78,7 @@ public class ContextualManagerCaptureService extends Service {
     private static ContextualManagerPhysicalUsage memory;
     private static ContextualManagerPhysicalUsage storage;
     private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
-    private static ArrayList<Integer> A = new ArrayList<>();
+    private static ArrayList<Double> A = new ArrayList<>();
     private static double C;
     private static List<UsageStats> ustats;
     private static List<ContextualManagerAppUsage> apps = new ArrayList<>();
@@ -273,7 +273,7 @@ public class ContextualManagerCaptureService extends Service {
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 // Calculates the A availability (sum of all Rs) every hour (for tests: min)
                 A = ContextualManagerAvailability.calculateA(rList);
-                Log.d("Resource", "A: " + A.toString());
+                Log.d("teste", "A: " + A.toString());
 
                 /*ContextualManagerCentrality Calculation:*/
                 // Calculates the C centrality every hour
@@ -288,7 +288,8 @@ public class ContextualManagerCaptureService extends Service {
                 int currentMinute = currentTime.get(Calendar.MINUTE);
                 //Log.d("resource", "currentMinute:" + currentMinute);
                 ContextualManagerWeight weight = new ContextualManagerWeight(dateTime);
-                weight.setA(A.get(currentMinute));
+                double t = A.get(currentMinute);
+                weight.setA(t);
                 weight.setC(C);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);

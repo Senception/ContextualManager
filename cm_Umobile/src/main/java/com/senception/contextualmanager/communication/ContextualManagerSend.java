@@ -49,7 +49,7 @@ public class ContextualManagerSend {
 
                     A = weight.getA();
                     C = weight.getC();
-                    Log.d("Communication", "A: " + A); // A com valor 1.3872E7 significa 1.3872 * 10^7, notação cientifica
+                    Log.d("Communication", "A: " + A); // A with value 1.3872E7 means 1.3872 * 10^7, cientific notation
                     Log.d("Communication", "C: " + C);
 
                     //TODO Change A and C from int to double if needed

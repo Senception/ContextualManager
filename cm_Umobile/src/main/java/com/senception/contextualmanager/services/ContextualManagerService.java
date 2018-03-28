@@ -225,7 +225,7 @@ public class ContextualManagerService extends Service{
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
-                Log.d("teste", "Peer na bd: " + peerOnDB.getSSID());
+                //Log.d("teste", "Peer na bd: " + peerOnDB.getSSID());
 
                 for (int j = 0; j < cmPeerList.size(); j++) {
                     if(peerOnDB.getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
@@ -238,7 +238,7 @@ public class ContextualManagerService extends Service{
                 }
                 //We lost connection of a peer
                 if( connectionLost &&  allPeersOnDB.get(i).getIsConnected() == 1 ) {
-                    Log.d("teste", "peerConnection was lost, endEncounter from " + peerOnDB.getSSID() + " updated on db");
+                    //Log.d("teste", "peerConnection was lost, endEncounter from " + peerOnDB.getSSID() + " updated on db");
                     peerOnDB.setEndEncounter((int)(System.currentTimeMillis() / 1000));
                     peerOnDB.setIsConnected(0);
                     dataSource.updatePeer(peerOnDB, checkWeek("peers"));
@@ -270,10 +270,10 @@ public class ContextualManagerService extends Service{
 
                     //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
                     //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    Log.d("teste", "avgduration: " + avgEncDur);
+                    //Log.d("teste", "avgduration: " + avgEncDur);
                     ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
-                    Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
+                    //Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
 				}
 				else{ //the peer found was already on the database
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
@@ -294,12 +294,12 @@ public class ContextualManagerService extends Service{
                     int peerStartEnc = peer.getStartEncounter();
                     double avgEncDur = (peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000);
 
-                    Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
-                    Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    Log.d("teste", "avgduration: " + avgEncDur);
+                    //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
+                    //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
+                    //Log.d("teste", "avgduration: " + avgEncDur);
                     peer.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.updatePeer(peer, checkWeek("peers"));
-                    Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
+                    //Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
 				}
             }
 		}

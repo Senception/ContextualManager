@@ -62,8 +62,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
         *
         * srcDevice.deviceName: SAMSUNG NEO
         */
-        Log.d("teste", "MAKING A SCAN:");
-
+        Log.d("teste", "MAKING A SCAN ON TXTRECORD:");
         Log.i("teste", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
 
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
@@ -77,6 +76,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
             //deviceAddress - Mac (BSSID) | deviceName - Device name (SSID)
 
             String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
+            //if it's the first time we see this peer
             if (!dataSource.hasPeer(hashSrcDeviceBSSID, checkWeek("peers"))) {
                 ContextualManagerAP peer = new ContextualManagerAP();
                 peer.setSSID(srcDevice.deviceName);
@@ -91,13 +91,16 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 Log.d("teste", "SAVED PEER");
             } else {
                 ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceBSSID, checkWeek("peers"));
+                //if we've already seen this peer and it is disconnected then it is again connected and we increade numEnc
                 peer.setSSID(srcDevice.deviceName);
                 peer.setBSSID(hashSrcDeviceBSSID);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
-                peer.setNumEncounters(peer.getNumEncounters()+1);
+                if(peer.getIsConnected() == 0){
+                    peer.setNumEncounters(peer.getNumEncounters()+1);
+                }
                 dataSource.updatePeer(peer, checkWeek("peers"));
                 Log.d("teste", "UPDATED PEER");
             }
