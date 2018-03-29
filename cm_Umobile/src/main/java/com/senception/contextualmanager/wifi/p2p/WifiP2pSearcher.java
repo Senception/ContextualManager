@@ -16,6 +16,9 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.util.Log;
 
+import com.senception.contextualmanager.pipelines.ContextualManagerWifiP2P;
+import com.senception.contextualmanager.services.ContextualManagerService;
+
 import java.util.Map;
 
 
@@ -69,7 +72,8 @@ class WifiP2pSearcher implements DnsSdServiceResponseListener, DnsSdTxtRecordLis
      * This method starts the discoveries
      */
     void startDiscovery() {
-        discoverPeers();
+        ContextualManagerWifiP2P.discoverPeer(); // using the CM discovery
+        //discoverPeers();
         discoverServices();
     }
 
@@ -91,7 +95,7 @@ class WifiP2pSearcher implements DnsSdServiceResponseListener, DnsSdTxtRecordLis
     /**
      * This method does the discovery peers
      */
-    private void discoverPeers() {
+    /*private void discoverPeers() {
         mWifiP2pManager.discoverPeers(mChannel, new android.net.wifi.p2p.WifiP2pManager.ActionListener() {
 
             @Override
@@ -104,7 +108,7 @@ class WifiP2pSearcher implements DnsSdServiceResponseListener, DnsSdTxtRecordLis
                 Log.i(TAG, "Peers discovery failed, reason: " + reason);
             }
         });
-    }
+    }*/
 
     /**
      * This method does the discovery services

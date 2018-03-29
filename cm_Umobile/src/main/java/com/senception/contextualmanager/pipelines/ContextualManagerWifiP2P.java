@@ -66,7 +66,16 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 			// request available peers from the wifi p2p manager. This is an
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
-			if (manager != null) {
+
+            /*if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
+                int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
+                if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
+                    //TODO
+                } else {
+                    //TODO
+                }
+                //Log.d(TAG, "P2P state changed - " + state);
+            } else */if (manager != null) {
                 Log.d("teste", "making a scan");
 				manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
 

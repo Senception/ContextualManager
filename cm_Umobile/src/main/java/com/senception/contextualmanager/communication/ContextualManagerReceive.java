@@ -62,6 +62,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
         *
         * srcDevice.deviceName: SAMSUNG NEO
         */
+
         Log.d("teste", "MAKING A SCAN ON TXTRECORD:");
         Log.i("teste", fullDomainName + " " + txtRecordMap + " " + srcDevice.deviceName);
 
@@ -98,9 +99,6 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
-                if(peer.getIsConnected() == 0){
-                    peer.setNumEncounters(peer.getNumEncounters()+1);
-                }
                 dataSource.updatePeer(peer, checkWeek("peers"));
                 Log.d("teste", "UPDATED PEER");
             }

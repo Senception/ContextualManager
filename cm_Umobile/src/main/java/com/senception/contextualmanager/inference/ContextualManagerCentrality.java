@@ -22,7 +22,6 @@ import static com.senception.contextualmanager.services.ContextualManagerService
  *
  * @file Contains ContextualManagerCentrality. Class that handles the inference of the centrality.
  */
-// (C) Affinity/ContextualManagerCentrality
 public class ContextualManagerCentrality {
 
     //Formula: C(i) = 1/λ Σj A(j) * p(j)
@@ -32,13 +31,18 @@ public class ContextualManagerCentrality {
      encounter: encounter between a pair
      average_encounter_duration: avg duration of an encounter between a pair
      d(i,j):
+     A(j) = adjacency's matrix (vector of 1s e 0s) -- considered allways as 1. 1-connected | 0-disconnected
 
      λ ∈ [0,1]
      A(j): adjancency
      d(i,j) ∈ [0,100]
     */
-
     public static double calculateC(ContextualManagerDataSource dataSource){
+        //double degree;
+        int numEncounters;
+        double avgEncDur;
+        double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
+        double lambda = 0.8; // should be the max of a lambda vector.
 
         //Todo: Calculate C
         //get peer list
@@ -48,10 +52,14 @@ public class ContextualManagerCentrality {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
 
             for (ContextualManagerAP peer : peerList) {
-                centrality += peer.getNumEncounters()*peer.getAvgEncounterDuration();
+                //Todo only if peer is connected (A->1)
+                numEncounters = peer.getNumEncounters();
+                avgEncDur = peer.getAvgEncounterDuration();
+                centrality += numEncounters*avgEncDur/distance;
             }
             Log.d("teste", "Sum = " + centrality);
         }
+        centrality = centrality * (1/lambda);
         return centrality;
     }
 }

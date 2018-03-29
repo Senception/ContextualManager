@@ -56,9 +56,6 @@ public class ContextualManagerAvailability {
      */
     private static ArrayList<Double> sumArrays(ArrayList<Double> usagePerHour1, ArrayList<Integer> usagePerHour2){
 
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY); // hour
-
         ArrayList<Double> res = new ArrayList<>();
         for (int i = 0; i < usagePerHour1.size(); i++) {
             //-1 + -1 = -1
@@ -67,15 +64,15 @@ public class ContextualManagerAvailability {
             }
             //-1+30 = 30 --> 30/currentHour
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add((double) usagePerHour2.get(i) / hour);
+                res.add((double) usagePerHour2.get(i) / System.currentTimeMillis()/1000);
             }
             //30+-1 = 30 --> 30/currentHour
             else if (usagePerHour2.get(i) == -1 && usagePerHour1.get(i) != -1){
-                res.add(usagePerHour1.get(i) / hour);
+                res.add(usagePerHour1.get(i) / System.currentTimeMillis()/1000);
             }
             //30+30 = 60 --> 60/currentHour
             else{
-                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / hour); //todo optimize without divide for the hour in the sumArrays method
+                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / System.currentTimeMillis()/1000); //todo optimize without divide for the hour in the sumArrays method
             }
         }
         return res;
