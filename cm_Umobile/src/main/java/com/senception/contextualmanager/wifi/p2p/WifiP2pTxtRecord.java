@@ -8,6 +8,15 @@ import java.util.Map;
 
 import static android.content.Context.MODE_PRIVATE;
 
+/**
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
+ * @author Miguel Tavares (COPELABS/ULHT)
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file WifiPepTxtRecord, this manages the txtRecords.
+ */
 public abstract class WifiP2pTxtRecord {
 
     /**

@@ -16,10 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This class is responsible to manage the wifi p2p listeners.
- * RegisterResult, unregisterListener and notify them.
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file responsible for managing the wifi p2p listeners.
+ * RegisterResult, unregisterListener and notify them.
  */
 public abstract class WifiP2pListenerManager {
 

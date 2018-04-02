@@ -298,7 +298,10 @@ public class ContextualManagerCaptureService extends Service {
                     Log.d("teste", "A and C saved into the database.");
                 }
                 else {
-                    dataSource.updateWeight(weight);
+                    boolean updated = dataSource.updateWeight(weight);
+                    if(!updated){
+                        dataSource.registerWeight(weight);
+                    }
                     Log.d("teste", "A and C updated on the database.");
                 }
                 backupDB();
@@ -324,7 +327,10 @@ public class ContextualManagerCaptureService extends Service {
 
                 /*Saves the apps usage into the database*/
                 for (ContextualManagerAppUsage app: apps){
-                    dataSource.updateAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+                    boolean updated = dataSource.updateAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+                    if (!updated){
+                        dataSource.registerNewAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+                    }
                 }
                 backupDB();
             }

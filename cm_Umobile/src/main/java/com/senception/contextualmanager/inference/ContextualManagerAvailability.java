@@ -16,12 +16,12 @@ import java.util.Calendar;
  *
  * @file Contains ContextualManagerAvailability. Class that handles the inference of the availability.
  */
-//(A) Usage/Availability
 public class ContextualManagerAvailability {
 
-    //Formulas:
-    // 1) U(i) = Σ r(i) / T
-    // 2) R(i) = B(i) * B(i) * CPU(i) * MEM(i) * STORAGE(i),     r(i) ⊂ [0,1]
+    /*Formulas:
+     * 1) A(i) = Σ r(i) / T
+     * 2) R(i) = B(i) * B(i) * CPU(i) * MEM(i) * STORAGE(i),     r(i) ⊂ [0,1]
+    */
 
     /**
      * Calculates a number that measures if a device is viable to conduct communication with in a given time.

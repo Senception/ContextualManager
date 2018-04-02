@@ -42,7 +42,7 @@ import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
  * Update to Contextual Manager 2017
  * @author Igor dos Santos
  * @author José Soares
- * @version 0.1
+ * @version 0.2
  *
  * @file Contains ContextualManagerDataSource.
  * This class provides methods to insert, update and
@@ -467,7 +467,6 @@ public class ContextualManagerDataSource {
      * @return true, if successful.
      */
     public boolean updateAppUsage(ContextualManagerAppUsage appUsg, String tableName){
-        int rows = 0;
         String identifier = ContextualManagerSQLiteHelper.COLUMN_APP_NAME + "='" + appUsg.getAppName() + "'" +" COLLATE NOCASE ";
         ContentValues values = new ContentValues();
         StringBuilder arrayToDatabase = new StringBuilder();
@@ -477,15 +476,10 @@ public class ContextualManagerDataSource {
                 arrayToDatabase.append(".");
             }
         }
-
         values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
         values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(appUsg.getDayOfTheWeek()));
-
-        //try to update the app, if its not in the db then register it.
-        if ((rows = db.update(tableName, values, identifier, null)) == 0){
-            rows = (int) registerNewAppUsage(appUsg, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
-        }
+        int rows =  db.update(tableName, values, identifier, null);
 
         return rows != 0 ? true : false;
     }
@@ -497,18 +491,13 @@ public class ContextualManagerDataSource {
 	 * @return true, if successful.
 	 */
 	public boolean updateWeight(ContextualManagerWeight weight){
-		int rows;
 		String identifier = ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + "='" + String.valueOf(weight.getDayOfTheWeek()) + "'" +" COLLATE NOCASE ";
 		ContentValues values = new ContentValues();
         values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, weight.getA());
         values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, weight.getC());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(weight.getDayOfTheWeek()));
-
-		//try to update the app, if its not in the db then register it.
-		if ((rows = db.update(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, values, identifier, null)) == 0){
-			rows = (int) registerWeight(weight);
-		}
+		int rows = db.update(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, values, identifier, null);
 
 		return rows != 0 ? true : false;
 	}
@@ -565,22 +554,6 @@ public class ContextualManagerDataSource {
 			pru = cursorResourceUsage(cursor);
 		}
 		return pru;
-	}
-
-	/**
-	 * Function getAppResourceUsage
-	 * Gets from database the app resource usage with the given name.
-	 * @param name name of the app to get from database
-	 * @param tableName the name of the table
-	 * @return app the app resource usage
-	 */
-	public ContextualManagerAppUsage getAppResourceUsage (String name, String tableName){
-		ContextualManagerAppUsage app = null;
-		Cursor cursor = db.query(tableName, allColumnsAppsUsage, ContextualManagerSQLiteHelper.COLUMN_APP_NAME + "='" + name + "'"+ " COLLATE NOCASE ", null, null, null, null);
-		if (cursor.moveToFirst()){
-			app = cursorAppResourceUsage(cursor);
-		}
-		return app;
 	}
 
 	/**
@@ -657,6 +630,7 @@ public class ContextualManagerDataSource {
 	    cursor.close();
 	    return apMap;
 	}
+
 	/**
 	 * Function getDayOrWeekPeers
 	 * Gets the all the Peers recorded by the application on the day or week table.
@@ -678,6 +652,7 @@ public class ContextualManagerDataSource {
 	    cursor.close();
 	    return apMap;
 	}
+
 	/**
 	 * Function getAllAP
 	 * Gets the all the AP recorded by the application on the AP table.
@@ -719,6 +694,7 @@ public class ContextualManagerDataSource {
 	public boolean hasAP (String bssid, String tableName) {
         return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+" COLLATE NOCASE ", null) == 0)? false : true;
 	}
+
 	/**
 	 * Function hasPeer
 	 * Checks if a given Peer has already been registered by the application.
@@ -734,30 +710,6 @@ public class ContextualManagerDataSource {
         return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + " = '" + dayOfTheWeek + "'", null) == 0)? false : true;
     }
 
-	/**
-	 * Function getBestAP
-	 * Checks all the AP registered by the application and return the one with the highest Rank.
-	 * @param tableName name of the table on the database
-	 * @return the best AP registered by the application.
-	 */
-	public ContextualManagerAP getBestAP(String tableName) {
-		Map<String, ContextualManagerAP> aps = getDayOrWeekAP(tableName);
-		if (!aps.isEmpty()) {
-			ContextualManagerAP bestAp = new ContextualManagerAP();
-			double bestRank = -1.0;
-			double rank;
-			for (ContextualManagerAP ap : aps.values()) {
-				rank = getRank(ap);
-				if (rank > bestRank) {
-					bestRank = rank;
-					bestAp = ap;
-				}
-			}
-			return bestAp;
-		} else {
-			return null;
-		}
-	}
 	/**
 	 * Function getBestAP
 	 * Checks the APs registered by the application and available in the List of ScanResult, and the return the one with the highest rank.
@@ -784,55 +736,6 @@ public class ContextualManagerDataSource {
 		}
 	}
 
-	/**
-	 * Function cursorToVisit
-	 * Converts a cursor pointing to a record in the Visit table to a TKiddoAP object.
-	 * @param cursor Cursor pointing to a record of the Visit table.
-	 * @return the ContextualManagerAP object
-	 */
-	private ContextualManagerVisit cursorToVisit(Cursor cursor) {
-		ContextualManagerVisit visit = new ContextualManagerVisit();
-		visit.setSSID(cursor.getString(0));
-		visit.setBSSID(cursor.getString(1));
-		visit.setStartTime(cursor.getLong(2));
-		visit.setEndTime(cursor.getLong(3));
-		visit.setDayOfTheWeek(cursor.getInt(2));
-		visit.setHourOfTheDay(cursor.getInt(3));
-		return visit;
-	}
-
-	/*public long getContactTime(ContextualManagerAP ap){
-		String bssid = ap.getBSSID();
-		long sationaryTime = 0;
-		long count = 0;
-		long startTime = 0;
-		long endTime = 0;
-		Cursor cursor = db.query(ContextualManagerSQLiteHelper., allColumnsVisit, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null, null, null, null);
-
-		if (cursor.moveToFirst()) {
-			while (!cursor.isAfterLast()) {
-				startTime = cursor.getLong(2);
-				endTime = cursor.getLong(3);
-				if ((endTime - startTime) > 0) {
-					sationaryTime = sationaryTime + (endTime - startTime);
-					count++;
-				}
-				cursor.moveToNext();
-			}
-			cursor.close();
-
-			if (count > 0)
-				sationaryTime = sationaryTime/count;
-
-		}
-		else {
-			cursor.close();
-		}
-
-		return sationaryTime/1000;
-
-	}
-*/
 	/**
      * Function getStationaryTime
      * Computes the Stationary Time for a given AP.
@@ -869,43 +772,7 @@ public class ContextualManagerDataSource {
 		
 		return sationaryTime/1000;
 	}
-	/**
-     * Function getStationaryTimeByMoment
-     * Computes the Stationary Time for a given AP, only taking into consideration records for a given Day of the Week.
-     * @param ap The ContextualManagerAP whose Stationary Time is to be computed.
-     * @param dayOfTheWeek Day of the week that will restrict the computation of the stationary time.
-     * @return The stationary time for the given AP.
-     */
-	public long getStationaryTimeByMoment (ContextualManagerAP ap, int dayOfTheWeek) {
-		String bssid = ap.getBSSID();
-		long sationaryTime = 0;
-		long count = 0;
-		long startTime = 0;
-		long endTime = 0;
-		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_VISITS, allColumnsVisit, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "' AND " + ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + "=" + dayOfTheWeek, null, null, null, null);
-		
-		if (cursor.moveToFirst()) {
-			while (!cursor.isAfterLast()) {
-				startTime = cursor.getLong(2);
-				endTime = cursor.getLong(3);
-				if ((endTime - startTime) > 0) {
-					sationaryTime = sationaryTime + (endTime - startTime);
-					count++;
-				}
-				cursor.moveToNext();
-			}
-			cursor.close();
-			
-			if (count > 0)
-				sationaryTime = sationaryTime/count;
-	
-		}
-		else {
-			cursor.close();
-		}
-		
-		return sationaryTime/1000;
-	}
+
 	/**
      * Function countVisits
      * Computes the Number of visits that the node has done to a given AP.
@@ -916,31 +783,15 @@ public class ContextualManagerDataSource {
 		String bssid = ap.getBSSID();
         return DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_VISITS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null);
 	}
+
 	/**
      * Function getRank
      * Computes the Rank of this node towards a given AP. The Rank is computed as
      * @param ap The ContextualManagerAP whose Stationary Time is to be computed.
      * @return The number of visits.
      */
-	public double getRank (ContextualManagerAP ap)
-	{		 
+	public double getRank (ContextualManagerAP ap) {
 		return ap.getAttractiveness() * getStationaryTime(ap) * countVisits(ap);
-	}
-	/**
-     * Function getInstantaneousRank
-     * Test Method to compute the Rank of this node towards a given AP, taking into consideration the current
-     * visit time.
-     * @param ap The ContextualManagerAP whose Stationary Time is to be computed.
-     * @param currentDuration current connection time.
-     * @return The number of visits.
-     */
-	public double getInstantaneousRank(ContextualManagerAP ap, Long currentDuration) {
-		 if (ap == null) {
-			 return currentDuration;
-		 }
-		 else {
-			 return (0.3*getStationaryTime(ap) + 0.7*currentDuration) * (countVisits(ap) + 1) * ap.getAttractiveness();
-		 }
 	}
 	
 	 /**
@@ -976,6 +827,7 @@ public class ContextualManagerDataSource {
 	    
 	    return db.insert(ContextualManagerSQLiteHelper.TABLE_VISITS, null, values);
 	}
+
 	/**
      * Funtion updateVisit
      * Updates an existing visit in the database.
@@ -1031,57 +883,6 @@ public class ContextualManagerDataSource {
 	}
 
 	/**
-     * Function getAllVisits
-     * Get a List with all the visit objects stored in the database.
-     */
-	public List<ContextualManagerVisit> getAllVisits() {
-		List<ContextualManagerVisit> visitList = new LinkedList<ContextualManagerVisit>();
-	
-		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_VISITS,
-			allColumnsVisit, null, null, null, null, null);
-	
-		cursor.moveToFirst();
-		
-		while (!cursor.isAfterLast()) {
-			ContextualManagerVisit visit = cursorToVisit(cursor);
-			visitList.add(visit);
-			cursor.moveToNext();
-		}
-
-	    cursor.close();
-	    return visitList;
-	}
-	/**
-     * Function getAllVisitsString
-	 * Gets the all the visit recorded by the application on the visit table.
-	 * @param ap (table name) name of the table on the database
-	 * @return A map with the AP objects, and the bssid as key.
-	 */ 
-	public List<String> getAllVisitsString(ContextualManagerAP ap) {
-		List<String> visitList = new LinkedList<String>();
-	
-		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_VISITS, allColumnsVisit, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getBSSID() + "'", null, null, null, null);
-	
-		cursor.moveToFirst();
-		
-		while (!cursor.isAfterLast()) {
-			ContextualManagerVisit visit = cursorToVisit(cursor);
-			visitList.add(visit.toString());
-			cursor.moveToNext();
-		}
-
-	    cursor.close();
-	    return visitList;
-	}
-	/**
-     * Function getNumVisits
-     * Get the number of visits registered in the database.
-     */
-	public long getNumVisits(){
-		return DatabaseUtils.queryNumEntries(db, ContextualManagerSQLiteHelper.TABLE_VISITS);
-	}
-
-	/**
 	 * Check if there is in the database a row in the given
 	 * tableName with the given fieldValue, in the given columnName
 	 * @param tableName the name of the table to search on
@@ -1102,6 +903,4 @@ public class ContextualManagerDataSource {
 		cursor.close();
 		return true;
 	}
-
-
 }

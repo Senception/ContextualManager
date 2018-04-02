@@ -11,12 +11,15 @@ import android.util.Log;
 import com.senception.contextualmanager.wifi.p2p.WifiP2p;
 import com.senception.contextualmanager.wifi.regular.WifiRegular;
 
-
 /**
- * This class is responsible for discover wifi p2p devices, services
- * and also text records which are being announced.
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file This class is responsible for discover wifi p2p devices, services
+ * and also text records which are being announced.
  */
 public class Wifi {
 

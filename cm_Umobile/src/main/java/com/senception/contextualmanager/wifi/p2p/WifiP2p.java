@@ -16,10 +16,15 @@ import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACT
 import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION;
 import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION;
 
+
 /**
- * This class is used to instantiate wifi p2p features
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file used to instantiate wifi p2p features
  */
 public class WifiP2p {
 

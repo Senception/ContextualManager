@@ -5,6 +5,7 @@
     <string name="background">Running in background...</string> 
     <string name="getInfo">Getting Info, Please Wait...</string>
     <string name="stopservice">Stop Service</string>
+    <string name="options">Options</string>
     <string name="wifiOff">Wifi turned OFF</string>
     <string name="wifiOn">Wifi turned ON</string>
     <string name="wifiDown">Wifi connection DOWN</string>

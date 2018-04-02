@@ -7,27 +7,8 @@
     <item
         android:id="@+id/action_settings"
         app:showAsAction="always"
-        android:icon="@drawable/menu_icon"
+        android:icon="@drawable/stop"
         android:title="@string/stopservice">
-        <menu>
-            <item
-                android:id="@+id/sendreport"
-                android:orderInCategory="1"
-                app:showAsAction="always"
-                android:icon="@drawable/sendreport"
-                android:title="@string/sendreport">
-
-            </item>
-
-            <item
-                android:id="@+id/stopservice"
-                android:orderInCategory="2"
-                app:showAsAction="always"
-                android:icon="@drawable/stop"
-                android:title="@string/stopservice">
-            </item>
-
-        </menu>
     </item>
 
 </menu>

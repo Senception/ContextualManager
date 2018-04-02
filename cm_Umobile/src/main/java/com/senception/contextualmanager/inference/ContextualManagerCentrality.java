@@ -37,6 +37,14 @@ public class ContextualManagerCentrality {
      A(j): adjancency
      d(i,j) ∈ [0,100]
     */
+
+    /**
+     * Method that calculates the centrality of a device, using
+     * it's peer's average encounter duration and the number of encounters.
+     * (Eigenvector)
+     * @param dataSource
+     * @return centrality - the centrality of the device
+     */
     public static double calculateC(ContextualManagerDataSource dataSource){
         //double degree;
         int numEncounters;

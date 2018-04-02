@@ -21,10 +21,14 @@ import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION;
 import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION;
 
 /**
- * This class is responsible for manage wifi p2p features according the wifi
- * interface status.
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file responsible for managing wifi p2p features according the wifi
+ * interface status.
  */
 public class WifiP2pReceiver extends BroadcastReceiver {
 

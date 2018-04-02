@@ -12,11 +12,14 @@ import android.util.Log;
 import java.util.Random;
 
 /**
- * This class is responsible for schedule the different wifi p2p stages
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file This class is responsible for schedule the different wifi p2p stages
  */
-
 class WifiP2pScheduler implements Runnable {
 
     /** This variable is used to debug WifiP2pScheduler */

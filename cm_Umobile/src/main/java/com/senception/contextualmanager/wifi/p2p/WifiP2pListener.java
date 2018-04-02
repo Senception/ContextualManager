@@ -13,9 +13,13 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import java.util.Map;
 
 /**
- * This interface allows the communication between the wifi p2p features and your class
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file interface that allows the communication between the wifi p2p features and your class
  */
 public interface WifiP2pListener {
 

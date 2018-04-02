@@ -1,7 +1,5 @@
 package com.senception.contextualmanager.aidl;
 
-//import com.senception.cmumobile.inference.MyObject;
-
 /*
  * This aidl file contains all the methods that contextual manager
  * provides to clients.
@@ -13,8 +11,6 @@ interface CManagerInterface {
 
     //ContextualManagerSimilarity
     //int [] getI(TYPE, NODE);
-
-    //    List<MyObject> getAll(in int[] peerList);
 
     //List<String> getAll(in);
     //"A.C"

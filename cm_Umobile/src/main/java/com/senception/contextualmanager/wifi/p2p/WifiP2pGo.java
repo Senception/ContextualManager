@@ -16,9 +16,13 @@ import android.util.Log;
 import java.util.Map;
 
 /**
- * This class is used to manage all features related with wifi p2p GO
+ * 2017 COPELABS/ULHT
+ * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
- * @version 1.0, 2017
+ * @author José Soares (Senception Lda) - jose.soares@senception.com
+ * @version 1.1, 2018
+ *
+ * @file used to manage all features related with wifi p2p GO
  */
 class WifiP2pGo implements WifiP2pManager.ConnectionInfoListener, WifiP2pManager.GroupInfoListener {
 
