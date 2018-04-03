@@ -19,20 +19,16 @@ import android.os.BatteryManager;
  */
 public class ContextualManagerBattery {
 
-
+    /**
+     * Get the energy level of the device.
+     * @param context the context.
+     * @return the energy level of the device in percentage..
+     */
     public static int getEnergyLevel(Context context) {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         Intent batteryStatus = context.registerReceiver(null, intentFilter);
-
         int level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-        //Toast.makeText(context, "LEVEl " + level, Toast.LENGTH_SHORT).show();
-        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-        //Toast.makeText(context, "SCALE " + scale, Toast.LENGTH_SHORT).show();
-
-        int batteryPct = level / scale;
-        //Toast.makeText(context, "NIVEL DA BATERIA " + batteryPct, Toast.LENGTH_SHORT).show();
-
         return level;
     }
 }

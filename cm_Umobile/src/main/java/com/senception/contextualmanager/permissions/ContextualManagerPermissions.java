@@ -24,11 +24,14 @@ import static android.app.AppOpsManager.OPSTR_GET_USAGE_STATS;
  * to get both of usage stats and location permissions.
  *
  */
-
 public class ContextualManagerPermissions {
 
-    //@TargetApi(19)
-    //@SuppressLint("NewApi")
+    /**
+     * Function usageStatsPermission.
+     * Checks if usage stats service is enabled.
+     * @param context the context.
+     * @return true if there is permission to use usage stats, false otherwise.
+     */
     public static boolean usageStatsPermission(Context context){
         AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
         int mode = 0;
@@ -36,7 +39,7 @@ public class ContextualManagerPermissions {
             mode = appOps.checkOpNoThrow(OPSTR_GET_USAGE_STATS, Process.myUid(), context.getPackageName());
         }
         else
-            Toast.makeText(context, "This android sistem doesn't allow to get usage stats.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "This android system doesn't allow to get usage stats.", Toast.LENGTH_SHORT).show();
         return mode == MODE_ALLOWED;
     }
 

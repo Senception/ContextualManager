@@ -21,7 +21,7 @@ import java.io.InputStreamReader;
 public class ContextualManagerCPU {
 
     /**
-     *
+     * Get the cpu usage of this device.
      * @return integer Array with 4 elements: user, system, idle and other cpu
      * usage in percentage.
      */
@@ -46,16 +46,18 @@ public class ContextualManagerCPU {
             cpuUsageAsInt[i] = Integer.parseInt(myString[i]);
         }
 
-        double averageUsageDouble = 0;
         int totalUsage = 0;
         for (int i : cpuUsageAsInt){
-            //Log.d("RESOURCE", ""+i);
             totalUsage += Double.valueOf(i);
         }
 
         return totalUsage;
     }
 
+    /**
+     * Get top process.
+     * @return the top process.
+     */
     private static String executeTop() {
         java.lang.Process p = null;
         BufferedReader in = null;
@@ -78,7 +80,6 @@ public class ContextualManagerCPU {
                 e.printStackTrace();
             }
         }
-        //Log.d("RESOURCE", returnString);
         return returnString;
     }
 }

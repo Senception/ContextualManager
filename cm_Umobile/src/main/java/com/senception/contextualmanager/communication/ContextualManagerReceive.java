@@ -21,7 +21,7 @@ import java.util.Map;
  * Update to Contextual Manager 2017
  * @author Igor dos Santos - degomosIgor@sen-ception.com
  * @author José Soares - jose.soares@senception.com
- * @version 0.2
+ * @version 0.1
  *
  * @file Contains ContextualManagerReceive. This class is used
  * to receive information from contextual managers (A,C)

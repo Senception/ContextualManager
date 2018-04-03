@@ -19,7 +19,7 @@ import java.util.TimerTask;
  * Update to Contextual Manager 2017
  * @author Igor dos Santos - degomosIgor@sen-ception.com
  * @author José Soares - jose.soares@senception.com
- * @version 0.2
+ * @version 0.1
  *
  * @file Contains ContextualManagerSend. This class is used
  * to send information to other contextual managers (A,C)

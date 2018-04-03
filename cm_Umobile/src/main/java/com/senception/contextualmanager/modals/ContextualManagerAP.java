@@ -33,7 +33,7 @@ public class ContextualManagerAP {
     /*The gets and sets for an ap */
 
     /**
-     *PerSense AP Constructor
+     * Contextual Manager AP Constructor
      */
     public ContextualManagerAP(){
         super();
@@ -200,8 +200,6 @@ public class ContextualManagerAP {
         Centrality = centrality;
     }
 
-    //TODO finish the javadoc
-
     /**
      * Get the number of encounters of this peer.
      * @return the numEncounters
@@ -219,64 +217,64 @@ public class ContextualManagerAP {
     }
 
     /**
-     *
-     * @return
+     * Get the start encounter of this peer.
+     * @return the startEncounter
      */
     public int getStartEncounter() {
         return startEncounter;
     }
 
     /**
-     *
-     * @param startTime
+     * Set the start encounter of this peer.
+     * @param startEncounter the startEncounter to set.
      */
-    public void setStartEncounter(int startTime) {
-        this.startEncounter = startTime;
+    public void setStartEncounter(int startEncounter) {
+        this.startEncounter = startEncounter;
     }
 
     /**
-     *
-     * @return
+     * Get the end encounter of this peer.
+     * @return the endEncounter.
      */
     public int getEndEncounter() {
         return endEncounter;
     }
 
     /**
-     *
-     * @param endTime
+     * Set the end encounter of this peer.
+     * @param endEncounter the endEncounter to set.
      */
-    public void setEndEncounter(int endTime) {
-        this.endEncounter = endTime;
+    public void setEndEncounter(int endEncounter) {
+        this.endEncounter = endEncounter;
     }
 
     /**
-     *
-     * @return
+     * Get the average encounter duration of this peer.
+     * @return the avgEncounterDuration.
      */
     public double getAvgEncounterDuration() {
         return avgEncounterDuration;
     }
 
     /**
-     *
-     * @param avgEncounterDuration
+     * Set the average encounter duration of this peer.
+     * @param avgEncounterDuration the avgEncounterDuration to set.
      */
     public void setAvgEncounterDuration(double avgEncounterDuration) {
         this.avgEncounterDuration = avgEncounterDuration;
     }
 
     /**
-     *
-     * @return
+     * Get the variable that indicates if this peer is connected or not.
+     * @return isConnected
      */
     public int getIsConnected() {
         return isConnected;
     }
 
     /**
-     *
-     * @param isConnected
+     * Set the variable that indicates if this peer is connected or not.
+     * @param isConnected the value of the variable that's going to be set.
      */
     public void setIsConnected(int isConnected) {
         this.isConnected = isConnected;

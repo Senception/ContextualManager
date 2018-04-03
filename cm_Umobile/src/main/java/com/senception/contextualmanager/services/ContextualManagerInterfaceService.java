@@ -63,12 +63,12 @@ public class ContextualManagerInterfaceService extends Service {
                 //peerList[i] == peerId
                 if(dataSource.hasPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"));
-                    centrality[i] = peer.getAvailability();
+                    centrality[i] = peer.getCentrality();
                 }
                 else
-                    centrality[i] = -1; //if the peer id given was not found on the db then we can't provide it's availability
+                    centrality[i] = -1; //if the peer id given was not found on the db then we can't provide it's centrality
             }
-            return new double[0];
+            return centrality;
         }
     };
 

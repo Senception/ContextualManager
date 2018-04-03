@@ -72,14 +72,13 @@ import java.util.Map;
 public class ContextualManagerCaptureService extends Service {
 
     private int NOTIFICATION_ID = 1338;
-    private static final String TAG = "RESOURCE USAGE SERVICE";
+    private static final String TAG = ContextualManagerCaptureService.class.getSimpleName();
     private static ContextualManagerPhysicalUsage energy;
     private static ContextualManagerPhysicalUsage cpu;
     private static ContextualManagerPhysicalUsage memory;
     private static ContextualManagerPhysicalUsage storage;
     private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
-    private static ArrayList<Double> A = new ArrayList<>();
-    private static double C;
+    private static ArrayList<Double> availability = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<ContextualManagerAppUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
@@ -89,7 +88,6 @@ public class ContextualManagerCaptureService extends Service {
     private static AlarmReceiver alarmReceiverHourly;
     private static AlarmReceiver alarmReceiverDaily;
     private static ContextualManagerDataSource dataSource;
-    private static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm:ss");
 
     @SuppressLint("NewApi")
     @Override
@@ -137,13 +135,6 @@ public class ContextualManagerCaptureService extends Service {
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
 
         setAlarm();
-
-        /*ContextualManagerPhysicalUsage teste = dataSource.getResourceUsage(ContextualManagerPhysicalResourceType.ENERGY.toString(), ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
-        Log.d(TAG, teste.toString());
-        ContextualManagerAppUsage app = dataSource.getAppResourceUsage("com.google.android.youtube", ContextualManagerSQLiteHelper.TABLE_APPS_USAGE );
-        Log.d(TAG, app.toString());*/
-
-        backupDB();
     }
 
     @Override
@@ -152,6 +143,9 @@ public class ContextualManagerCaptureService extends Service {
         return START_STICKY;
     }
 
+    /**
+     * Makes the service run in the foreground
+     */
     public void runAsForeground(){
         Intent notificationIntent = new Intent(this, ContextualManagerMainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -165,39 +159,41 @@ public class ContextualManagerCaptureService extends Service {
 
     }
 
+    /**
+     * Stops the service from running in the foreground.
+     */
     public void stopForeGround(){
         stopForeground(true);
     }
 
     /**
-     * Checks if the given app is already in the apps usage table, if not, then adds it.
-     * @param app
+     * Checks if the given app is already in the apps usage table, if not, adds it.
+     * @param app the app to initialize.
      */
     private void initializeAppsTable(ContextualManagerAppUsage app) {
         if (!dataSource.rowExists(ContextualManagerSQLiteHelper.TABLE_APPS_USAGE, app.getAppName(), ContextualManagerSQLiteHelper.COLUMN_APP_NAME)) {
-            Log.d(TAG, "INICIALIZOU APPS");
             dataSource.registerNewAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
         }
     }
 
     /**
-     * Checks if the given pru is already in the resource usage table, if not, then adds it.
-     * @param pru
+     * Checks if the given physical resource usage (pru) is already in the resource usage table, if not, adds it.
+     * @param pru the physical resource usage to initialize.
      */
     private void initializeResourceTable(ContextualManagerPhysicalUsage pru) {
         if (!dataSource.rowExists(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, pru.getResourceType().toString(), ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE)) {
-            Log.d(TAG, "INICIALIZOU RESOURCE_USAGE");
             dataSource.registerNewResourceUsage(pru, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
         }
     }
 
-
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
+    /**
+     * To bind locally
+     */
     public class LocalBinder extends Binder {
         public ContextualManagerCaptureService getService(){
             return ContextualManagerCaptureService.this;
@@ -211,34 +207,37 @@ public class ContextualManagerCaptureService extends Service {
         unregisterReceiver(alarmReceiverHourly);
         unregisterReceiver(alarmReceiverDaily);
         dataSource.closeDB();
-        //super.onDestroy();
     }
 
     /**
-     * Sets the alarm to trigger hourly and to trigger daily, each with diferent intents
+     * Sets the alarm to trigger hourly and to trigger daily, each with different intents
      */
     public void setAlarm(){
         //To start at the current time.
         Long timeStartHourly = System.currentTimeMillis();
-        //To start at midnight
+        //To start at midnight todo it can start earlier
         Calendar midnight = Calendar.getInstance();
         midnight.set(Calendar.MILLISECOND, 0);
         midnight.set(Calendar.SECOND, 0);
         midnight.set(Calendar.MINUTE, 0);
         midnight.set(Calendar.HOUR_OF_DAY, 0);
-        /*To use after tests: (to start allways at midnight)*/
-        //midnight.add(Calendar.DAY_OF_MONTH, 1);
+
+        /*
+         * Todo
+         * To use after tests: (to start allways at midnight)
+         * midnight.add(Calendar.DAY_OF_MONTH, 1);
+        */
 
         Long timeStartDaily = midnight.getTimeInMillis();
 
         pendingIntentHourly = PendingIntent.getBroadcast(this, 0, new Intent("com.example.resource_usage_hourly"), 0);
         pendingIntentDaily = PendingIntent.getBroadcast(this, 0, new Intent("com.example.resource_usage_daily"), 0);
 
-        // Schedule the alarms!
+        // Schedule the alarms
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        //set alarm to start immediately, and repeating for each hour (for tests: every min)
+        //set alarm to start immediately, and repeating for each hour (for tests: every min) todo change to hourly
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStartHourly, 60*1000/*AlarmManager.INTERVAL_HOUR*/, pendingIntentHourly);
-        //set alarm to start at midnight, and repeating for each day (for tests: every 2 min)
+        //set alarm to start at midnight, and repeating for each day (for tests: every 2 min) todo change to daily
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeStartDaily, 2*60*1000/*AlarmManager.INTERVAL_DAY*/, pendingIntentDaily);
     }
 
@@ -256,11 +255,9 @@ public class ContextualManagerCaptureService extends Service {
             int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
 
             //Captures the usage
-            if(intent.getAction().equals("com.example.resource_usage_hourly")) {
+            if(intent.getAction().equals("com.example.resource_usage_hourly")) { //If hourly: Captures usage
                 //get current time
                 Calendar currentTime = Calendar.getInstance();
-                printCalendar(currentTime);
-                Log.d(TAG, "A CADA MINUTO CAPTURA"); //mudar para de hora em hora
 
                 /* Captures the 4 physical resource usage */
                 capturePhysicalUsage(energy);
@@ -268,52 +265,42 @@ public class ContextualManagerCaptureService extends Service {
                 capturePhysicalUsage(memory);
                 capturePhysicalUsage(storage);
 
-                /*ContextualManagerAvailability Calculation:*/
-                // Captures de R (b*b*cpu*mem*storage) every hour
+                /*Availability Calculation:*/
+                // Captures de R (b*b*cpu*mem*storage) every hour (for tests: min)
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
-                // Calculates the A availability (sum of all Rs) every hour (for tests: min)
-                A = ContextualManagerAvailability.calculateA(rList);
-                Log.d("teste", "A: " + A.toString());
+                // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
+                availability = ContextualManagerAvailability.calculateA(rList);
 
-                /*ContextualManagerCentrality Calculation:*/
-                // Calculates the C centrality every hour
-                // 1) get peers number of connections/encounters (list.length)
-                // 2) get those encounter durations
-                // 3) calculate avg duration
-                C = ContextualManagerCentrality.calculateC(dataSource);
+                /*Centrality Calculation:*/
+                double C = ContextualManagerCentrality.calculateC(dataSource);
 
                 /* Saves A and C into the database */
-                String dateTime = dateFormat.format(System.currentTimeMillis());
-                //int currentSecond = currentTime.get(Calendar.SECOND);
-                int currentMinute = currentTime.get(Calendar.MINUTE);
-                //Log.d("resource", "currentMinute:" + currentMinute);
-                ContextualManagerWeight weight = new ContextualManagerWeight(dateTime);
-                double t = A.get(currentMinute);
-                weight.setA(t);
+                int dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
+                int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
+
+                ContextualManagerWeight weight = new ContextualManagerWeight(dayOfTheWeek);
+                double A = availability.get(currentMinute);
+                weight.setA(A);
                 weight.setC(C);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
+                //todo check functionality of weight table
                 if (!dataSource.hasWeight(newDayOfTheWeek)){
                     dataSource.registerWeight(weight);
-                    Log.d("teste", "A and C saved into the database.");
                 }
                 else {
-                    boolean updated = dataSource.updateWeight(weight);
-                    if(!updated){
+                    //boolean updated =
+                    dataSource.updateWeight(weight);
+                    /*if(!updated){
                         dataSource.registerWeight(weight);
-                    }
-                    Log.d("teste", "A and C updated on the database.");
+                    }*/
                 }
-                backupDB();
 
                 /* Captures the apps usage */
                 captureAppsUsage();
 
             }
-            //Saves the usage percentage into the database
-            else{ // if daily
-                //printCalendar(day);
-                Log.d(TAG, "A CADA 2 MIN MANDA PARA BD"); //mudar para diariamente à meia noite
+            else{ // if daily: Saves the usage percentage into the database
 
                 /*Saves the 4 physical resource usage into the database*/
                 energy.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
@@ -332,7 +319,6 @@ public class ContextualManagerCaptureService extends Service {
                         dataSource.registerNewAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
                     }
                 }
-                backupDB();
             }
         }
     }
@@ -343,40 +329,26 @@ public class ContextualManagerCaptureService extends Service {
      */
     public void capturePhysicalUsage(ContextualManagerPhysicalUsage pru) {
 
-        //get current time
         Calendar currentTime = Calendar.getInstance();
-
-        //get current hour
-        //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-        //int currentSecond = currentTime.get(Calendar.SECOND);
+        //todo int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
         int currentMinute = currentTime.get(Calendar.MINUTE);
-        //Log.d("resource", "currentMinute: " + currentMinute);
-        //printCalendar(currentTime);
 
         switch(pru.getResourceType()){
             case ENERGY:
                 int level = ContextualManagerBattery.getEnergyLevel(this);
-                //Log.d(TAG, "BATTERY: " + String.valueOf(level) + "%");
                 pru.getUsagePerHour().set(currentMinute, level);
-                //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case CPU:
                 int cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
-                //Log.d(TAG, "CPU: " + String.valueOf(cpuUsage) + "%");
                 pru.getUsagePerHour().set(currentMinute, cpuUsage);
-                //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case MEMORY:
                 int mem = ContextualManagerMemory.getCurrentRam(this);
-                //Log.d(TAG, "MEMORY: " + String.valueOf(mem) + "%");
                 pru.getUsagePerHour().set(currentMinute, mem);
-                //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             case STORAGE:
-                int storageUsg = ContextualManagerStorage.getCurrentStorage(this);
-                //Log.d(TAG, "STORAGE: " + String.valueOf(storageUsg) + "%");
+                int storageUsg = ContextualManagerStorage.getCurrentStorage();
                 pru.getUsagePerHour().set(currentMinute, storageUsg);
-                //Log.d(TAG, pru.getResourceType().toString() + pru.getUsagePerHour().toString());
                 break;
             default:
                 Log.d(TAG, "THAT RESOURCE ISN'T RECOGNIZED.");
@@ -385,7 +357,7 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
-     * Captures the usage of the five more used apps on the device
+     * Captures the usage of all the used apps on the device
      */
     @SuppressLint("NewApi")
     private static void captureAppsUsage() {
@@ -395,21 +367,15 @@ public class ContextualManagerCaptureService extends Service {
             totalTimeSpent += ustat.getTotalTimeInForeground(); //time in miliseconds
         }
 
-        //Log.d("resource", "totaltime:" + totalTimeSpent);
-
-        //get current time
         Calendar currentTime = Calendar.getInstance();
-        //int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-        //int currentSecond = currentTime.get(Calendar.SECOND);
+        //todo int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
         int currentMinute = currentTime.get(Calendar.MINUTE);
 
         for (int i = 0; i < ustats.size(); i++){
             long usage = ustats.get(i).getTotalTimeInForeground();
-            //Log.d("resource",ustats.get(i).getPackageName() + " used : " + usage);
             int percentage = 0;
             if (usage != 0){
                 percentage = (int) ((usage/ (double) totalTimeSpent * 100.0) + 0.5);
-                //Log.d("resource", ustats.get(i).getPackageName() + " percentage : " + percentage);
             }
             apps.get(i).getUsagePerHour().set(currentMinute, percentage);
         }
@@ -461,10 +427,9 @@ public class ContextualManagerCaptureService extends Service {
                     FileChannel src = new FileInputStream(currentDB).getChannel();
                     FileChannel dst = new FileOutputStream(backupDB).getChannel();
                     dst.transferFrom(src, 0, src.size());
-                    //Log.d(TAG, "Backup Done");
                     src.close();
                     dst.close();
-                    Log.d(TAG, "FEZ BACKUP");
+                    Log.d(TAG, "BACKUP DONE");
                 }
             }
         } catch (IOException e) {
@@ -473,16 +438,7 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
-     * Logs the calender in a specific format
-     * @param calendar the calendar to log
-     */
-    public static void printCalendar(Calendar calendar){
-        SimpleDateFormat format = new SimpleDateFormat("EEEE, d'/'MM'/'yyyy 'at' h:mm:s a");
-        String currentDate = format.format(calendar.getTime());
-        Log.d(TAG, currentDate);
-    }
-
-    /**
+     * TODO
      * Updates the category of each app in the apps list if there is internet connection
      * and the respective app has a category affiliated in google play store -- To-complete
      * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android
@@ -501,7 +457,7 @@ public class ContextualManagerCaptureService extends Service {
                             String category = doc.select("span[itemprop=genre]").first().text();
                             app.setAppCategory(category);
                         } catch (IOException e) {
-                            Log.d(TAG, app.getAppName() + " doesn't have a category a affiliated with goolgle play store.");
+                            Log.d(TAG, app.getAppName() + " doesn't have a category a affiliated with google play store.");
                             //e.printStackTrace();
                         }
                     }
@@ -519,84 +475,9 @@ public class ContextualManagerCaptureService extends Service {
     public boolean isNetworkAvailable() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
-        // if no network is available networkInfo will be null
-        // otherwise check if we are connected
         if (networkInfo != null && networkInfo.isConnected()) {
             return true;
         }
         return false;
     }
-
-    /**
-     * Checks for the 5 more used apps in the given list of apps, in the current time
-     * @param stats list of UsageStats
-     * @return mostUsed ArrayList with 5 elements that are the most used apps from the given list
-     */
-    @SuppressLint("NewApi")
-    public static ArrayList<UsageStats> getMostUsedApps(List<UsageStats> stats) {
-        ArrayList<UsageStats> mostUsed = new ArrayList<>(4); //gets the 5 more used from the given list
-        Map<UsageStats, Long> usageAppsMap = new HashMap<UsageStats, Long>();
-
-        for (UsageStats stat : stats) {
-            long totalTimeInForeground = stat.getTotalTimeInForeground() / 1000 / 60; //time in minutes
-            usageAppsMap.put(stat, totalTimeInForeground);
-        }
-
-        Map<UsageStats, Long> sortedMap = sortByValue(usageAppsMap);
-
-        int id = 0;
-        for (UsageStats usageStat : sortedMap.keySet()) {
-
-            if (id < 5) {
-                mostUsed.add(usageStat);
-            }
-            String key = usageStat.getPackageName();
-            String value = usageAppsMap.get(usageStat).toString();
-            //Log.d(TAG, id + " - " + key + " " + value);
-            id++;
-        }
-        return mostUsed;
-    }
-
-    /**
-     * Return date in specified format.
-     * @param milliSeconds Date in milliseconds
-     * @param dateFormat Date format
-     * @return String representing date in specified format
-     */
-    public static String getDate(long milliSeconds, String dateFormat) {
-        // Create a DateFormatter object for displaying date in specified format.
-        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
-
-        // Create a calendar object that will convert the date and time value in milliseconds to date.
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
-    }
-
-    /**
-     * Sorts the given map by its values in a descendent way
-     * @param map map to sort
-     * @param <K> data type of the keys
-     * @param <V> data type of the values
-     * @return result map with the entrys sorted by its values
-     */
-    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
-        List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
-        Collections.sort( list, new Comparator<Map.Entry<K, V>>() {
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return (o1.getValue()).compareTo(o2.getValue());
-            }
-        });
-
-        Collections.reverse(list);
-
-        Map<K, V> result = new LinkedHashMap<>();
-        for (Map.Entry<K, V> entry : list) {
-            result.put(entry.getKey(), entry.getValue());
-        }
-        return result;
-    }
-
 }

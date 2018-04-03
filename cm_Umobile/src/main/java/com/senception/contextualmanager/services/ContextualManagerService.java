@@ -1,18 +1,3 @@
-/**
- * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
- * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
- * @author Igor dos Santos
- * @author José Soares
- * @version 0.1
- *
- * @file Contains ContextualManagerService. This class contains the core functionalities of the application.
- * The ContextualManagerService will run in background, getting WI-FI parameters and storing the
- * required information in the database.
- *
- */
-
 package com.senception.contextualmanager.services;
 
 import java.io.DataOutputStream;
@@ -28,7 +13,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
 import com.opencsv.CSVWriter;
 import com.senception.contextualmanager.communication.ContextualManagerReceive;
 import com.senception.contextualmanager.activities.ContextualManagerMainActivity;
@@ -45,8 +29,6 @@ import com.senception.contextualmanager.interfaces.ContextualManagerWifiP2PChang
 import com.senception.contextualmanager.pipelines.ContextualManagerWifiP2P;
 import com.senception.contextualmanager.wifi.Wifi;
 import com.senception.contextualmanager.security.MacSecurity;
-
-import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -71,16 +53,28 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
-//import android.util.Log;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-@SuppressLint("SimpleDateFormat")
+/**
+ * Copyright (C) 2016 Senception Lda
+ * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * 			  José Soares - jose.soares@senception.com
+ * Update to Contextual Manager 2017
+ * @author Igor dos Santos
+ * @author José Soares
+ * @version 0.1
+ *
+ * @file Contains ContextualManagerService. This class contains the core functionalities of the application.
+ * The ContextualManagerService will run in background, getting WI-FI parameters and storing the
+ * required information in the database.
+ *
+ */
 public class ContextualManagerService extends Service{
 
-	private static final String TAG ="SERVICE --->";
+	private static final String TAG = ContextualManagerService.class.getSimpleName();
 	private int NOTIFICATION_ID = 1338;
 	private WifiP2pManager manager;
 	private Channel channel;
@@ -103,15 +97,16 @@ public class ContextualManagerService extends Service{
 	SharedPreferences sharedPreferences;
 	SharedPreferences.Editor editor;
 	String str_preferences = "";
-
 	private Wifi wifi;
-
 	AlarmReceiver mReceiver = new AlarmReceiver();
 	static ContextualManagerDataSource dataSource;
 	private ArrayList<ContextualManagerDataBaseChangeListener> listeners = new ArrayList<ContextualManagerDataBaseChangeListener>();
 	private ArrayList<ContextualManagerWifiP2PChangeListener> listenersWifiP2p = new ArrayList<ContextualManagerWifiP2PChangeListener>();
 	private final IBinder mBinder = new LocalBinder();
 
+    /**
+     * To bind locally
+     */
 	public class LocalBinder extends Binder{
 		public ContextualManagerService getService(){
 			return ContextualManagerService.this;
@@ -125,7 +120,6 @@ public class ContextualManagerService extends Service{
 
 	@Override
 	public void onCreate(){
-		Log.d("Resource", "ENTROU NO UMSERVICE");
 		super.onCreate();
 
 		new ContextualManagerReceive(this);
@@ -186,9 +180,12 @@ public class ContextualManagerService extends Service{
 		return START_STICKY;
 	}
 
+    /**
+     * Makes the service run in the foreground
+     */
 	public void runAsForeground(){
 		Intent notificationIntent = new Intent(this, ContextualManagerMainActivity.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);//there was Intent.FLAG_ACTIVITY_NEW_TASK); instead of flag 0 (last one)
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 		Notification notification = new NotificationCompat.Builder(this)
 				.setSmallIcon(R.drawable.cmumobilelight)
 				.setContentText(getString(R.string.app_name))
@@ -198,6 +195,9 @@ public class ContextualManagerService extends Service{
 
 	}
 
+    /**
+     * Stops the service from running in the foreground.
+     */
 	public void stopForeGround(){
 		stopForeground(true);
 	}
@@ -214,19 +214,17 @@ public class ContextualManagerService extends Service{
 
             ArrayList<ContextualManagerAP> allPeersOnDB = new ArrayList<>();
 
-            //GET A LIST WITH ALL THE PEERS ON THE DATABASE*/
+            //Get a list with all the peers in the data base*/
             if(!dataSource.isTableEmpty(checkWeek("peers"))) {
                 allPeersOnDB = dataSource.getAllPeers(checkWeek("peers"));
             }
 
-            /*CHECKS IF WE LOST CONNECTION WITH ANY PEER*/
+            /*Checks if we lost a connection with any peer*/
             //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
             //todo optimize this function (find the symmetric difference list)
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
-                //Log.d("teste", "Peer na bd: " + peerOnDB.getSSID());
-
                 for (int j = 0; j < cmPeerList.size(); j++) {
                     if(peerOnDB.getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
                         connectionLost = false;
@@ -238,18 +236,16 @@ public class ContextualManagerService extends Service{
                 }
                 //We lost connection of a peer
                 if( connectionLost &&  allPeersOnDB.get(i).getIsConnected() == 1 ) {
-                    //Log.d("teste", "peerConnection was lost, endEncounter from " + peerOnDB.getSSID() + " updated on db");
                     peerOnDB.setEndEncounter((int)(System.currentTimeMillis() / 1000));
                     peerOnDB.setIsConnected(0);
                     dataSource.updatePeer(peerOnDB, checkWeek("peers"));
                 }
             }
 
-			for(ContextualManagerAP item: cmPeerList){ // the peer found is new
-
-                /*CHECKS IF ANY PEER IS ON THE DB*/
+			for(ContextualManagerAP item: cmPeerList){
                 String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
 				ContextualManagerAP ap = new ContextualManagerAP();
+                //if its the 1st time wee see the peer
 				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
 					ap.setSSID(item.getSSID());
 					ap.setBSSID(hashBSSID);
@@ -262,18 +258,12 @@ public class ContextualManagerService extends Service{
                     ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
                     ap.setAvgEncounterDuration(0);
                     ap.setIsConnected(1);
-                    /*AVG ENCOUNTER CALCULATION*/
+                    /*Average encounter calculation*/
                     double peerAvgEncDur = ap.getAvgEncounterDuration();
                     int peerEndEnc = ap.getEndEncounter();
                     int peerStartEnc = ap.getStartEncounter();
-                    double avgEncDur = (peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000);
-
-                    //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
-                    //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    //Log.d("teste", "avgduration: " + avgEncDur);
                     ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
-                    //Log.d("teste", "SAVED " + ap.getSSID() + "ON DB (1st time): " + item.getSSID());
 				}
 				else{ //the peer found was already on the database
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
@@ -283,8 +273,8 @@ public class ContextualManagerService extends Service{
 					peer.setLongitude(longitude);
 					peer.setNumEncounters(peer.getNumEncounters()+1);
                     peer.setEndEncounter((int)(System.currentTimeMillis()/1000));
-                    if(peer.getIsConnected() == 0) {
-                        peer.setIsConnected(1); // if a peer was disconnected, and reconnected
+                    if(peer.getIsConnected() == 0) { //if the peer was disconnected, and we found it again, we reconnect it. todo change isconnected to boolean.
+                        peer.setIsConnected(1);
                         peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
                     }
 
@@ -292,14 +282,8 @@ public class ContextualManagerService extends Service{
                     double peerAvgEncDur = peer.getAvgEncounterDuration();
                     int peerEndEnc = peer.getEndEncounter();
                     int peerStartEnc = peer.getStartEncounter();
-                    double avgEncDur = (peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000);
-
-                    //Log.d("teste", "sum: " + (peerAvgEncDur + (peerEndEnc-peerStartEnc)));
-                    //Log.d("teste", "tempoactual: " + System.currentTimeMillis());
-                    //Log.d("teste", "avgduration: " + avgEncDur);
                     peer.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.updatePeer(peer, checkWeek("peers"));
-                    //Log.d("teste", "UPDATED " + peer.getSSID() + " ON DB: " + item.getSSID());
 				}
             }
 		}

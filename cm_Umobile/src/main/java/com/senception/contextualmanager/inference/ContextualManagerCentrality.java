@@ -52,7 +52,6 @@ public class ContextualManagerCentrality {
         double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
         double lambda = 0.8; // should be the max of a lambda vector.
 
-        //Todo: Calculate C
         //get peer list
         ArrayList<ContextualManagerAP> peerList;
         double centrality = 0;
@@ -65,7 +64,6 @@ public class ContextualManagerCentrality {
                 avgEncDur = peer.getAvgEncounterDuration();
                 centrality += numEncounters*avgEncDur/distance;
             }
-            Log.d("teste", "Sum = " + centrality);
         }
         centrality = centrality * (1/lambda);
         return centrality;

@@ -42,7 +42,7 @@ import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
  * Update to Contextual Manager 2017
  * @author Igor dos Santos
  * @author José Soares
- * @version 0.2
+ * @version 0.1
  *
  * @file Contains ContextualManagerDataSource.
  * This class provides methods to insert, update and

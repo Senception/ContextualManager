@@ -18,7 +18,7 @@ import java.util.Calendar;
  */
 public class ContextualManagerAppUsage {
 
-    private final int HOURLY = 23;
+    //Todo private final int HOURLY = 23;
     private final int SECONDLY = 59;
 
     private String appName;
@@ -26,8 +26,16 @@ public class ContextualManagerAppUsage {
     private ArrayList<Integer> usagePerHour = new ArrayList<>();
     private int dayOfTheWeek;
 
+    /**
+     * Contextual Manager App Usage Constructor.
+     */
     public ContextualManagerAppUsage(){super();}
 
+    /**
+     * Contextual Manager App Usage Constructor.
+     * @param appName the name of the app
+     * @param appCategory the app's category -> Todo category of an app.
+     */
     public ContextualManagerAppUsage(String appName, String appCategory) {
 
         this.appName = appName;
@@ -37,32 +45,54 @@ public class ContextualManagerAppUsage {
             usagePerHour.add(i, -1);
         }
 
-        //Log.d("Resource", usagePerHour.toString());
-
         Calendar day = Calendar.getInstance();
         dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
     }
 
+    /**
+     * Gets the name of this app
+     * @return the name
+     */
     public String getAppName(){
         return this.appName;
     }
 
+    /**
+     * Set the name of this app
+     * @param appName the name to set.
+     */
     public void setAppName(String appName) {
         this.appName = appName;
     }
 
+    /**
+     * Get the category of this app.
+     * @return the category
+     */
     public String getAppCategory() {
         return this.appCategory;
     }
 
+    /**
+     * Set the category of this app.
+     * @param appCategory the category to set.
+     */
     public void setAppCategory(String appCategory) {
         this.appCategory = appCategory;
     }
 
+    /**
+     * Get the usage per hour of this app
+     * @return the usgPerHour
+     */
     public ArrayList<Integer> getUsagePerHour() {
         return this.usagePerHour;
     }
 
+    /**
+     * Set the usage per hour of this app.
+     * @param usagePerHour the usagePerHour to set.
+     */
     public void setUsagePerHour(String usagePerHour) {
         String [] items = usagePerHour.split("\\.");
         for (String s : items ) {
@@ -70,10 +100,18 @@ public class ContextualManagerAppUsage {
         }
     }
 
+    /**
+     * Get the day of the week this app was built
+     * @return the day of the week.
+     */
     public int getDayOfTheWeek() {
         return dayOfTheWeek;
     }
 
+    /**
+     * Set the day of the week.
+     * @param dayOfTheWeek the day to set.
+     */
     public void setDayOfTheWeek(String dayOfTheWeek) {
         this.dayOfTheWeek = Integer.parseInt(dayOfTheWeek);
     }
