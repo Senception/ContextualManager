@@ -36,18 +36,18 @@ import com.senception.contextualmanager.wifi.p2p.WifiP2pListenerManager;
 @SuppressLint("NewApi")
 public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP2pListener.TxtRecordAvailable {
 
-	//public static final String TAG = "WIFIP2P ---->";
+	public static final String TAG = ContextualManagerWifiP2P.class.getSimpleName();
 	private static WifiP2pManager manager;
 	private static Channel channel;
 	private ContextualManagerService service;
 	ArrayList<ContextualManagerAP> peersList = new ArrayList<ContextualManagerAP>();
-	ArrayList<ContextualManagerAP> arrayPersence = new ArrayList<ContextualManagerAP>();
-	public String peerName;
-	//WifiDataExchangeRead wifiDataExchange;
-
 	static Context mContext = null;
 	@SuppressWarnings("static-access")
-	public ContextualManagerWifiP2P(WifiP2pManager manager, Channel channel,
+
+    /**
+     * Constructor
+     */
+    public ContextualManagerWifiP2P(WifiP2pManager manager, Channel channel,
 									final ContextualManagerService service) {
 		super();
 		this.manager = manager;
@@ -67,16 +67,7 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 			// asynchronous call and the calling activity is notified with a
 			// callback on PeerListListener.onPeersAvailable()
 
-            /*if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
-                int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
-                if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                    //TODO
-                } else {
-                    //TODO
-                }
-                //Log.d(TAG, "P2P state changed - " + state);
-            } else */if (manager != null) {
-                Log.d("teste", "making a scan");
+            if (manager != null) {
 				manager.requestPeers(channel, new WifiP2pManager.PeerListListener() {
 
 					@Override
@@ -85,7 +76,6 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 						for(WifiP2pDevice dev : peers.getDeviceList()){
 							ContextualManagerAP peerfound = new ContextualManagerAP();
 							peerfound.setSSID(dev.deviceName);
-                            Log.d("teste", "peerfound: " + dev.deviceName);
 
 							peerfound.setBSSID(dev.deviceAddress);
 
@@ -95,17 +85,9 @@ public class ContextualManagerWifiP2P extends BroadcastReceiver implements WifiP
 						//wifiDataExchange = new WifiDataExchangeRead(mContext, peersList);
 						service.notifyOnPeersFound(peersList);
 						service.discoveredPeers(peersList);
-
-						//Log.d(TAG,String.format("PeerListListener: %d peers available, updating device list", peers.getDeviceList().size()));
 					}
 				});
 			}
-
-			//Log.d(TAG, "P2P peers changed");
-		} else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {		
-
-		} else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
-
 		}
 	}
 	/**

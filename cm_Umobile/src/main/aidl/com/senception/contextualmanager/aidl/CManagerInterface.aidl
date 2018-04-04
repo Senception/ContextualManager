@@ -10,8 +10,8 @@ interface CManagerInterface {
     double [] getCentrality(in String [] peerList);
 
     //ContextualManagerSimilarity
-    //int [] getI(TYPE, NODE);
+    //double [] getI(TYPE, NODE);
 
     //List<String> getAll(in);
-    //"A.C"
+    //"A.C.I"
 }

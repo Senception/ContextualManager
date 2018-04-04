@@ -42,7 +42,7 @@ public class ContextualManagerAvailability {
                 A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
             }
         }
-        Log.d("teste", "A calculated: " + A.toString());
+        Log.d("teste", "A calculated: " + A.toString()); // todo delete log
         return A;
     }
 

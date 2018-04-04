@@ -59,7 +59,7 @@ public class ContextualManagerCentrality {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
 
             for (ContextualManagerAP peer : peerList) {
-                //Todo only if peer is connected (A->1)
+                //Todo only if peer is connected (future)
                 numEncounters = peer.getNumEncounters();
                 avgEncDur = peer.getAvgEncounterDuration();
                 centrality += numEncounters*avgEncDur/distance;

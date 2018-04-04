@@ -35,6 +35,7 @@ import java.util.Date;
  */
 public class ContextualManagerInterfaceService extends Service {
 
+    private static final String TAG = ContextualManagerInterfaceService.class.getSimpleName();
     private static ContextualManagerDataSource dataSource;
 
     final CManagerInterface.Stub mBinder = new CManagerInterface.Stub(){
@@ -44,7 +45,7 @@ public class ContextualManagerInterfaceService extends Service {
             double [] availability = new double [peerList.length];
 
             for (int i = 0; i < peerList.length; i++){
-                //peerList[i] == peerId
+
                 if(dataSource.hasPeer(peerList[i], ContextualManagerService.checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(peerList[i], ContextualManagerService.checkWeek("peers"));
                     availability[i] = peer.getAvailability();
@@ -72,13 +73,6 @@ public class ContextualManagerInterfaceService extends Service {
         }
     };
 
-
-    public class LocalBinder extends Binder {
-        public ContextualManagerInterfaceService getService(){
-            return ContextualManagerInterfaceService.this;
-        }
-    }
-
     @Override
     public void onCreate() {
 
@@ -92,10 +86,6 @@ public class ContextualManagerInterfaceService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
-    }
-
-    public void stopForeGround(){
-        stopForeground(true);
     }
 
     @Override

@@ -325,10 +325,9 @@ public class ContextualManagerDataSource {
 	 * Function registerNewResourceUsage
 	 * Register a new Resource Usage in the application. It creates a new record on the ResourceUsage table, with the information passed as PhysicalResourceUSage.
 	 * @param resUsg resource usage
-	 * @param tableName name of the table on the database
 	 * @return the row ID of the newly inserted row, or -1 if an error occurred.
 	 */
-	public long registerNewResourceUsage(ContextualManagerPhysicalUsage resUsg, String tableName) {
+	public long registerNewResourceUsage(ContextualManagerPhysicalUsage resUsg) {
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE, resUsg.getResourceType().toString());
         StringBuilder arrayToDatabase = new StringBuilder();
@@ -340,17 +339,16 @@ public class ContextualManagerDataSource {
 		}
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(resUsg.getDayOfTheWeek()));
-		return db.insert(tableName, null, values);
+		return db.insert(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, null, values);
 	}
 
 	/**
 	 * Function registerNewAppsUsage
 	 * Register a new Apps Usage in the application. It creates a new record on the AppsUsage table, with the information passed as ContextualManagerAppUsage.
 	 * @param appUsg resource usage
-	 * @param tableName name of the table on the database
 	 * @return the row ID of the newly inserted row, or -1 if an error occurred.
 	 */
-	public long registerNewAppUsage(ContextualManagerAppUsage appUsg, String tableName){
+	public long registerNewAppUsage(ContextualManagerAppUsage appUsg){
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_APP_NAME, appUsg.getAppName());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
@@ -363,7 +361,7 @@ public class ContextualManagerDataSource {
 		}
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
         values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, appUsg.getDayOfTheWeek());
-		return db.insertOrThrow(tableName, null, values);
+		return db.insertOrThrow(ContextualManagerSQLiteHelper.TABLE_APPS_USAGE, null, values);
 	}
 
 	/**
@@ -436,10 +434,9 @@ public class ContextualManagerDataSource {
 	 * Update a resource usage already registered by the application.
 	 * This modifies the corresponding averageUsage and day of the week in the resource usage table.
 	 * @param pru physical resource usage.
-	 * @param tableName name of the table on the database
 	 * @return true, if successful.
 	 */
-	public boolean updateResourceUsage(ContextualManagerPhysicalUsage pru, String tableName){
+	public boolean updateResourceUsage(ContextualManagerPhysicalUsage pru){
 		String identifier = ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE + "='" + pru.getResourceType() + "'" +" COLLATE NOCASE ";
 		ContentValues values = new ContentValues();
 		StringBuilder arrayToDatabase = new StringBuilder();
@@ -453,20 +450,18 @@ public class ContextualManagerDataSource {
        	values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(pru.getDayOfTheWeek()));
 
-		int rows = db.update(tableName, values, identifier, null);
+		int rows = db.update(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, values, identifier, null);
 
 		return rows != 0 ? true : false;
 	}
 
     /**
-     * TODO get the parameter "tablename" out -> unnecessary
      * Function updateAppUsage
      * Update an app usage already registered by the application.
      * @param appUsg resource usage.
-     * @param tableName name of the table on the database
      * @return true, if successful.
      */
-    public boolean updateAppUsage(ContextualManagerAppUsage appUsg, String tableName){
+    public boolean updateAppUsage(ContextualManagerAppUsage appUsg){
         String identifier = ContextualManagerSQLiteHelper.COLUMN_APP_NAME + "='" + appUsg.getAppName() + "'" +" COLLATE NOCASE ";
         ContentValues values = new ContentValues();
         StringBuilder arrayToDatabase = new StringBuilder();
@@ -479,7 +474,7 @@ public class ContextualManagerDataSource {
         values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_APP_CATEGORY, appUsg.getAppCategory());
         values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(appUsg.getDayOfTheWeek()));
-        int rows =  db.update(tableName, values, identifier, null);
+        int rows =  db.update(ContextualManagerSQLiteHelper.TABLE_APPS_USAGE, values, identifier, null);
 
         return rows != 0 ? true : false;
     }
@@ -547,9 +542,9 @@ public class ContextualManagerDataSource {
 	 * @param tableName the name of the table
 	 * @return pru the physical resource usage
 	 */
-	public ContextualManagerPhysicalUsage getResourceUsage(String type, String tableName){
+	public ContextualManagerPhysicalUsage getResourceUsage(String type){
 		ContextualManagerPhysicalUsage pru = null;
-		Cursor cursor = db.query(tableName, allColumnsResourceUsage, ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE + "='" + type + "'"+ " COLLATE NOCASE ", null, null, null, null);
+		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, allColumnsResourceUsage, ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE + "='" + type + "'"+ " COLLATE NOCASE ", null, null, null, null);
 		if (cursor.moveToFirst()){
 			pru = cursorResourceUsage(cursor);
 		}
@@ -562,7 +557,6 @@ public class ContextualManagerDataSource {
 	 */
 	public ContextualManagerWeight getWeight (){
 		ContextualManagerWeight weight = null;
-		//Cursor cursor = db.query(tableName, allColumnsWeight, ContextualManagerSQLiteHelper.COLUMN_DATETIME + "='" + dateTime + "'"+ " COLLATE NOCASE ", null, null, null, null);
 		// query to get last row of the weight's table
 		String selectQuery = "SELECT * FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " ORDER BY " + ContextualManagerSQLiteHelper.COLUMN_DATETIME + " DESC LIMIT 1";
 		Cursor cursor = db.rawQuery(selectQuery, null);
@@ -705,10 +699,6 @@ public class ContextualManagerDataSource {
 	public boolean hasPeer(String bssid, String tableName) {
         return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+ " COLLATE NOCASE ", null) == 0)? false : true;
 	}
-
-    public boolean hasWeight(int dayOfTheWeek) {
-        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + " = '" + dayOfTheWeek + "'", null) == 0)? false : true;
-    }
 
 	/**
 	 * Function getBestAP
@@ -894,7 +884,6 @@ public class ContextualManagerDataSource {
 		String query = "Select * from " + tableName + " where " + columnName + " = '" + fieldValue + "'";
 
         Cursor cursor = db.rawQuery(query, null);
-		//Log.d("RESOURCE", "" + cursor.getCount());
 
 		if(cursor.getCount() <= 0){
 			cursor.close();

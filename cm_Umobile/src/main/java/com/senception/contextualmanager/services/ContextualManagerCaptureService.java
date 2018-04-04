@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -26,6 +28,7 @@ import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.inference.ContextualManagerCentrality;
 import com.senception.contextualmanager.inference.ContextualManagerAvailability;
+import com.senception.contextualmanager.modals.ContextualManagerAP;
 import com.senception.contextualmanager.modals.ContextualManagerWeight;
 import com.senception.contextualmanager.modals.ContextualManagerAppUsage;
 import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
@@ -34,6 +37,7 @@ import com.senception.contextualmanager.physical_usage.ContextualManagerCPU;
 import com.senception.contextualmanager.physical_usage.ContextualManagerMemory;
 import com.senception.contextualmanager.physical_usage.ContextualManagerPhysicalResourceType;
 import com.senception.contextualmanager.physical_usage.ContextualManagerStorage;
+import com.senception.contextualmanager.security.MacSecurity;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -43,6 +47,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.security.Security;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -172,7 +177,7 @@ public class ContextualManagerCaptureService extends Service {
      */
     private void initializeAppsTable(ContextualManagerAppUsage app) {
         if (!dataSource.rowExists(ContextualManagerSQLiteHelper.TABLE_APPS_USAGE, app.getAppName(), ContextualManagerSQLiteHelper.COLUMN_APP_NAME)) {
-            dataSource.registerNewAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+            dataSource.registerNewAppUsage(app);
         }
     }
 
@@ -182,7 +187,7 @@ public class ContextualManagerCaptureService extends Service {
      */
     private void initializeResourceTable(ContextualManagerPhysicalUsage pru) {
         if (!dataSource.rowExists(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, pru.getResourceType().toString(), ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE)) {
-            dataSource.registerNewResourceUsage(pru, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
+            dataSource.registerNewResourceUsage(pru);
         }
     }
 
@@ -223,7 +228,7 @@ public class ContextualManagerCaptureService extends Service {
         midnight.set(Calendar.HOUR_OF_DAY, 0);
 
         /*
-         * Todo
+         * Todo to start at midnight
          * To use after tests: (to start allways at midnight)
          * midnight.add(Calendar.DAY_OF_MONTH, 1);
         */
@@ -270,31 +275,38 @@ public class ContextualManagerCaptureService extends Service {
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
                 availability = ContextualManagerAvailability.calculateA(rList);
+                int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
+                double A = availability.get(currentMinute);
 
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
 
                 /* Saves A and C into the database */
-                int dayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
-                int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
+                ContextualManagerAP mySelf = new ContextualManagerAP();
+                mySelf.setSSID("self");
+                mySelf.setBSSID(MacSecurity.MD5hash("self"));
+                mySelf.setAvailability(A);
+                mySelf.setCentrality(C);
+                if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {
+                    dataSource.registerNewPeers(mySelf, ContextualManagerService.checkWeek("peers"));
+                }
+                else {
+                    dataSource.updatePeer(mySelf, ContextualManagerService.checkWeek("peers"));
+                }
 
+                /*
                 ContextualManagerWeight weight = new ContextualManagerWeight(dayOfTheWeek);
                 double A = availability.get(currentMinute);
                 weight.setA(A);
                 weight.setC(C);
                 weight.updateDateTime();
                 weight.setDayOfTheWeek(newDayOfTheWeek);
-                //todo check functionality of weight table
-                if (!dataSource.hasWeight(newDayOfTheWeek)){
+                if (dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)){
                     dataSource.registerWeight(weight);
                 }
                 else {
-                    //boolean updated =
                     dataSource.updateWeight(weight);
-                    /*if(!updated){
-                        dataSource.registerWeight(weight);
-                    }*/
-                }
+                }*/
 
                 /* Captures the apps usage */
                 captureAppsUsage();
@@ -304,19 +316,19 @@ public class ContextualManagerCaptureService extends Service {
 
                 /*Saves the 4 physical resource usage into the database*/
                 energy.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
-                dataSource.updateResourceUsage(energy, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
+                dataSource.updateResourceUsage(energy);
                 cpu.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
-                dataSource.updateResourceUsage(cpu, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
+                dataSource.updateResourceUsage(cpu);
                 memory.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
-                dataSource.updateResourceUsage(memory, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
+                dataSource.updateResourceUsage(memory);
                 storage.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
-                dataSource.updateResourceUsage(storage, ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
+                dataSource.updateResourceUsage(storage);
 
                 /*Saves the apps usage into the database*/
                 for (ContextualManagerAppUsage app: apps){
-                    boolean updated = dataSource.updateAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+                    boolean updated = dataSource.updateAppUsage(app);
                     if (!updated){
-                        dataSource.registerNewAppUsage(app, ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
+                        dataSource.registerNewAppUsage(app);
                     }
                 }
             }
@@ -438,7 +450,7 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
-     * TODO
+     * TODO category
      * Updates the category of each app in the apps list if there is internet connection
      * and the respective app has a category affiliated in google play store -- To-complete
      * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android

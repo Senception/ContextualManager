@@ -48,9 +48,11 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
     @Override
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
 
+        Log.d("teste", "Trying to receive");
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
             double A = Double.parseDouble(txtRecordMap.get(Identity.AVAILABILITY));
             double C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
+            Log.d("teste", "received A : " + A + "and C: " + C);
             String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
 
             //if it's the first time we see this peer we save it

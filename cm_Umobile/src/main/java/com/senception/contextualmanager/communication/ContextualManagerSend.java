@@ -5,7 +5,10 @@ import android.util.Log;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
+import com.senception.contextualmanager.modals.ContextualManagerAP;
 import com.senception.contextualmanager.modals.ContextualManagerWeight;
+import com.senception.contextualmanager.security.MacSecurity;
+import com.senception.contextualmanager.services.ContextualManagerService;
 import com.senception.contextualmanager.wifi.p2p.Identity;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pTxtRecord;
 
@@ -44,23 +47,25 @@ public class ContextualManagerSend {
             public void run() {
                 double A;
                 double C;
-
+                Log.d("teste", "trying to send");
                 ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
                 dataSource.openDB(true);
-                if (!dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)) {
+                if (dataSource.hasPeer(MacSecurity.MD5hash("self"), ContextualManagerService.checkWeek("peers"))) {
 
-                    ContextualManagerWeight weight = dataSource.getWeight();
-                    A = weight.getA();
-                    C = weight.getC();
+                    ContextualManagerAP self = dataSource.getPeer(MacSecurity.MD5hash("self"), ContextualManagerService.checkWeek("peers"));
+                    A = self.getAvailability();
+                    C = self.getCentrality();
 
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
+
+                    Log.d("teste", "sent A " + A + " and C " + C);
                     //Todo WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "0");
                 }
                 else{
                     Log.d(TAG, "Table is still empty so we can't send the availability and centrality.");
                 }
             }
-        }, 0, 1*60*1000); //5 em 5 min
+        }, 0, 1*60*1000); //todo every 5 min
     }
 }
