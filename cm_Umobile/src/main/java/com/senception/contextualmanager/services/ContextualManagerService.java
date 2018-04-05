@@ -226,7 +226,7 @@ public class ContextualManagerService extends Service{
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
                 for (int j = 0; j < cmPeerList.size(); j++) {
-                    if(peerOnDB.getBSSID().equals(MacSecurity.MD5hash(cmPeerList.get(j).getBSSID()))){
+                    if(peerOnDB.getBSSID().equals(MacSecurity.md5Hash(cmPeerList.get(j).getBSSID()))){
                         connectionLost = false;
                         break;
                     }
@@ -243,7 +243,7 @@ public class ContextualManagerService extends Service{
             }
 
 			for(ContextualManagerAP item: cmPeerList){
-                String hashBSSID = MacSecurity.MD5hash(item.getBSSID());
+                String hashBSSID = MacSecurity.md5Hash(item.getBSSID());
 				ContextualManagerAP ap = new ContextualManagerAP();
                 //if its the 1st time wee see the peer
 				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
@@ -312,9 +312,9 @@ public class ContextualManagerService extends Service{
 				if(!dataSource.hasAP(scan.BSSID, checkWeek("ap"))){
 					ContextualManagerAP ap = new ContextualManagerAP();
 					if(latitude != 0.0 && longitude != 0.0 ){
-						//String hashSSID = MD5hash(scan.SSID);
+						//String hashSSID = md5Hash(scan.SSID);
 						ap.setSSID(scan.SSID);
-                        String hashBSSID = MacSecurity.MD5hash(scan.BSSID);
+                        String hashBSSID = MacSecurity.md5Hash(scan.BSSID);
                         //ap.setBSSID(scan.BSSID);
                         ap.setBSSID(hashBSSID);
 						ap.setDayOfWeek(sdf.format(date));
@@ -333,7 +333,7 @@ public class ContextualManagerService extends Service{
 				}
 				else{
 					if(latitude != 0.0 && longitude != 0.0){
-						String hashSSID = MacSecurity.MD5hash(scan.SSID);
+						String hashSSID = MacSecurity.md5Hash(scan.SSID);
 						ContextualManagerAP ap = dataSource.getAP(scan.BSSID, checkWeek("ap"));
 						ap.setBSSID(scan.BSSID);
 						ap.setDayOfWeek(sdf.format(date));

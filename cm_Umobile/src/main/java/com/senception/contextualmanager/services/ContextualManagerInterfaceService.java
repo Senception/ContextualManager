@@ -19,6 +19,9 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -40,7 +43,7 @@ public class ContextualManagerInterfaceService extends Service {
 
     final CManagerInterface.Stub mBinder = new CManagerInterface.Stub(){
 
-        @Override
+        /*@Override
         public double[] getAvailability(String[] peerList) throws RemoteException {
             double [] availability = new double [peerList.length];
 
@@ -70,6 +73,52 @@ public class ContextualManagerInterfaceService extends Service {
                     centrality[i] = -1; //if the peer id given was not found on the db then we can't provide it's centrality
             }
             return centrality;
+        }
+
+        @Override
+        public Map getA(String [] peerList){
+            HashMap<String, Double> hashMapAvailability = new HashMap<>();
+            for (int i = 0; i < peerList.length; i++){
+
+                if(dataSource.hasPeer(peerList[i], ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(peerList[i], ContextualManagerService.checkWeek("peers"));
+                    hashMapAvailability.put(peerList[i], peer.getAvailability());
+                }
+                else
+                    hashMapAvailability.put(peerList[i], null); //if the peer id given was not found on the db then we can't provide it's availability
+            }
+            return hashMapAvailability;
+        }*/
+
+        @Override
+        public Map getAvailability(List<String> peerList){
+            HashMap<String, Double> hashMapAvailability = new HashMap<>();
+            for (int i = 0; i < peerList.size(); i++){
+
+                if(dataSource.hasPeer(peerList.get(i), ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), ContextualManagerService.checkWeek("peers"));
+                    hashMapAvailability.put(peerList.get(i), peer.getAvailability());
+                }
+                else
+                    hashMapAvailability.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's availability
+            }
+            return hashMapAvailability;
+        }
+
+        @Override
+        public Map getCentrality(List<String> peerList){
+            HashMap<String, Double> hashMapCentrality = new HashMap<>();
+
+            for (int i = 0; i < peerList.size(); i++){
+                //peerList[i] == peerId
+                if(dataSource.hasPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"));
+                    hashMapCentrality.put(peerList.get(i), peer.getCentrality());
+                }
+                else
+                    hashMapCentrality.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's centrality
+            }
+            return hashMapCentrality;
         }
     };
 

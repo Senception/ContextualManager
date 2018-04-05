@@ -11,7 +11,7 @@ public class MacSecurity {
      * @param strToHash
      * @return hashed string
      */
-    public static String MD5hash(String strToHash) {
+    public static String md5Hash(String strToHash) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(strToHash.getBytes());

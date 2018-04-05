@@ -13,12 +13,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -29,7 +26,6 @@ import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.inference.ContextualManagerCentrality;
 import com.senception.contextualmanager.inference.ContextualManagerAvailability;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
-import com.senception.contextualmanager.modals.ContextualManagerWeight;
 import com.senception.contextualmanager.modals.ContextualManagerAppUsage;
 import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
 import com.senception.contextualmanager.physical_usage.ContextualManagerBattery;
@@ -47,18 +43,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.security.Security;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -284,7 +271,7 @@ public class ContextualManagerCaptureService extends Service {
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
                 mySelf.setSSID("self");
-                mySelf.setBSSID(MacSecurity.MD5hash("self"));
+                mySelf.setBSSID(MacSecurity.md5Hash("self"));
                 mySelf.setAvailability(A);
                 mySelf.setCentrality(C);
                 if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {

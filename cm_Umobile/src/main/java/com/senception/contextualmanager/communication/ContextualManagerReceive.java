@@ -4,15 +4,13 @@ import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.util.Log;
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
-import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
 import com.senception.contextualmanager.security.MacSecurity;
 import com.senception.contextualmanager.services.ContextualManagerService;
 import com.senception.contextualmanager.wifi.p2p.Identity;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListener;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pListenerManager;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 import java.util.Map;
 
 
@@ -48,12 +46,10 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
     @Override
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
 
-        Log.d("teste", "Trying to receive");
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
             double A = Double.parseDouble(txtRecordMap.get(Identity.AVAILABILITY));
             double C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
-            Log.d("teste", "received A : " + A + "and C: " + C);
-            String hashSrcDeviceBSSID = MacSecurity.MD5hash(srcDevice.deviceAddress);
+            String hashSrcDeviceBSSID = MacSecurity.md5Hash(srcDevice.deviceAddress);
 
             //if it's the first time we see this peer we save it
             if (!dataSource.hasPeer(hashSrcDeviceBSSID, ContextualManagerService.checkWeek("peers"))) {

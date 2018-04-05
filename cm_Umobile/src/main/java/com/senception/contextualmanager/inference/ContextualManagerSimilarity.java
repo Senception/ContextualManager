@@ -12,7 +12,7 @@ package com.senception.contextualmanager.inference;
  * @file Contains ContextualManagerSimilarity. Class that handles the inference of the similarity.
  *
  */
-// TODO
+// TODO I: similarity
 public class ContextualManagerSimilarity {
-
+    //I = numEnc*AvgDuration
 }

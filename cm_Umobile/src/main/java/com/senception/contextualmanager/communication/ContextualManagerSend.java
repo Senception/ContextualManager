@@ -4,16 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
-import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
-import com.senception.contextualmanager.modals.ContextualManagerWeight;
 import com.senception.contextualmanager.security.MacSecurity;
 import com.senception.contextualmanager.services.ContextualManagerService;
 import com.senception.contextualmanager.wifi.p2p.Identity;
 import com.senception.contextualmanager.wifi.p2p.WifiP2pTxtRecord;
 
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,19 +43,17 @@ public class ContextualManagerSend {
             public void run() {
                 double A;
                 double C;
-                Log.d("teste", "trying to send");
                 ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
                 dataSource.openDB(true);
-                if (dataSource.hasPeer(MacSecurity.MD5hash("self"), ContextualManagerService.checkWeek("peers"))) {
+                if (dataSource.hasPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"))) {
 
-                    ContextualManagerAP self = dataSource.getPeer(MacSecurity.MD5hash("self"), ContextualManagerService.checkWeek("peers"));
+                    ContextualManagerAP self = dataSource.getPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"));
                     A = self.getAvailability();
                     C = self.getCentrality();
 
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
 
-                    Log.d("teste", "sent A " + A + " and C " + C);
                     //Todo WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "0");
                 }
                 else{
