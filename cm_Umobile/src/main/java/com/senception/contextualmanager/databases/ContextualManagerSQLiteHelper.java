@@ -89,8 +89,9 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_APP_CATEGORY = "appcategory";
 
 	//WEIGHTS
-	public static final String COLUMN_AVAILABILITY = "a"; //Affinity network level of a node (measures node's centrality/popularity).
-	public static final String COLUMN_CENTRALITY = "c"; // Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_AVAILABILITY = "a"; // Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_CENTRALITY = "c"; // Affinity network level of a node (measures node's centrality/popularity).
+	public static final String COLUMN_SIMILARITY = "i"; // Similarity of a node (measures the node's similarity).
 
 	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
 	   For instance, I can provide a measure of battery similarity over time between nodes.
@@ -190,6 +191,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -206,6 +208,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -222,6 +225,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
             + COLUMN_AVAILABILITY + " text, "
             + COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -238,6 +242,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -254,6 +259,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -270,6 +276,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "
@@ -286,6 +293,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_LONGITUDE + " integer, "
 			+ COLUMN_AVAILABILITY + " text, "
 			+ COLUMN_CENTRALITY + " text, "
+            + COLUMN_SIMILARITY + " text, "
             + COLUMN_NUM_ENCOUNTERS + " integer, "
             + COLUMN_START_ENCOUNTER + " integer, "
             + COLUMN_END_ENCOUNTER + " integer, "

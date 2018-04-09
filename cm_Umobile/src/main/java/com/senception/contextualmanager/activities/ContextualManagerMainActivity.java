@@ -101,8 +101,6 @@ public class ContextualManagerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
-        backupDB();
-
 		FragmentManager manager = getFragmentManager();
 
 		//Asks user for permission to get usage stats
@@ -213,7 +211,7 @@ public class ContextualManagerMainActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-        backupDB(); //todo eliminate the backup function
+        backupDB(this); //todo eliminate the backup function
 		super.onDestroy();
 	}
 
@@ -222,13 +220,13 @@ public class ContextualManagerMainActivity extends Activity {
      * database tables this method creates a backup in a place that the database is visible.
      * (main folder of the android device)
      */
-    private void backupDB() {
+    public static void backupDB(Context context) {
 
         try {
             File sd = Environment.getExternalStorageDirectory();
 
             if (sd.canWrite()) {
-                String DB_PATH = this.getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
+                String DB_PATH = context.getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
                 String currentDBPath = "contextualmanager.db";
                 String backupDBPath = "contextualmanagerbackup.db";
                 File currentDB = new File(DB_PATH, currentDBPath);

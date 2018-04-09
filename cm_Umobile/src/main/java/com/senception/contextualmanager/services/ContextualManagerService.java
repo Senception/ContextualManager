@@ -253,6 +253,7 @@ public class ContextualManagerService extends Service{
 					ap.setLongitude(longitude);
                     ap.setAvailability(0.0);
                     ap.setCentrality(0.0);
+                    ap.setSimilarity(0.0);
                     ap.setNumEncounters(1);
                     ap.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                     ap.setEndEncounter((int)(System.currentTimeMillis()/1000));

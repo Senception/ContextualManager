@@ -140,6 +140,7 @@ public class ContextualManagerDataSource {
 			ContextualManagerSQLiteHelper.COLUMN_LONGITUDE,
             ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY,
             ContextualManagerSQLiteHelper.COLUMN_CENTRALITY,
+            ContextualManagerSQLiteHelper.COLUMN_SIMILARITY,
             ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS,
             ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER,
             ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER,
@@ -225,12 +226,12 @@ public class ContextualManagerDataSource {
 		ap.setLongitude(cursor.getDouble(4)); // longitude
         ap.setAvailability(cursor.getDouble(5)); // a
         ap.setCentrality(cursor.getDouble(6)); // c
-        ap.setNumEncounters(cursor.getInt(7)); // num enc
-        ap.setStartEncounter(cursor.getInt(8)); // start enc
-        ap.setEndEncounter(cursor.getInt(9)); // end enc
-        ap.setAvgEncounterDuration(cursor.getDouble(10)); // avg encounter duration
-        ap.setIsConnected(cursor.getInt(11)); // is connected
-
+        ap.setSimilarity(cursor.getDouble(7)); // i
+        ap.setNumEncounters(cursor.getInt(8)); // num enc
+        ap.setStartEncounter(cursor.getInt(9)); // start enc
+        ap.setEndEncounter(cursor.getInt(10)); // end enc
+        ap.setAvgEncounterDuration(cursor.getDouble(11)); // avg encounter duration
+        ap.setIsConnected(cursor.getInt(12)); // is connected
 		return ap;
 	}
 
@@ -312,6 +313,7 @@ public class ContextualManagerDataSource {
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_SIMILARITY, ap.getSimilarity());
         values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
         values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
         values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
@@ -419,6 +421,7 @@ public class ContextualManagerDataSource {
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, ap.getCentrality());
+        values.put(ContextualManagerSQLiteHelper.COLUMN_SIMILARITY, ap.getSimilarity());
         values.put(ContextualManagerSQLiteHelper.COLUMN_NUM_ENCOUNTERS, ap.getNumEncounters());
         values.put(ContextualManagerSQLiteHelper.COLUMN_START_ENCOUNTER, ap.getStartEncounter());
         values.put(ContextualManagerSQLiteHelper.COLUMN_END_ENCOUNTER, ap.getEndEncounter());
@@ -539,7 +542,6 @@ public class ContextualManagerDataSource {
 	 * Function getResourceUsage
 	 * Gets a ContextualManagerPhysicalUsage saved in the database.
 	 * @param type the physical resource usage type
-	 * @param tableName the name of the table
 	 * @return pru the physical resource usage
 	 */
 	public ContextualManagerPhysicalUsage getResourceUsage(String type){

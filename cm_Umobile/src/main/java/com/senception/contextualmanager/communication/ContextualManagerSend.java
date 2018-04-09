@@ -41,25 +41,30 @@ public class ContextualManagerSend {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                double A;
-                double C;
                 ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
                 dataSource.openDB(true);
                 if (dataSource.hasPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"))) {
 
                     ContextualManagerAP self = dataSource.getPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"));
-                    A = self.getAvailability();
-                    C = self.getCentrality();
+                    double A = self.getAvailability();
+                    double C = self.getCentrality();
+                    Log.d("teste", "A: " + A + "    C: " + C);
+                    //double I = self.getSimilarity();
 
-                    WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, String.valueOf(A));
-                    WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, String.valueOf(C));
+                    String AToSend = String.valueOf(A);
+                    String CToSend = String.valueOf(C);
+                    Log.d("teste", "AToSend :" + AToSend + "CToSend: " + CToSend );
+                    //String IToSend = String.valueOf(I); //Todo: Find bug - Find out when can A,C or I be null
+                    WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, AToSend);
+                    WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, CToSend);
+                    //WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, IToSend);
+                    Log.d(TAG, "Sent A, C and I.");
 
-                    //Todo WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, "0");
                 }
                 else{
                     Log.d(TAG, "Table is still empty so we can't send the availability and centrality.");
                 }
             }
-        }, 0, 1*60*1000); //todo every 5 min
+        }, 0, 10*1000); //todo every 5 min
     }
 }

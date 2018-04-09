@@ -24,6 +24,7 @@ public class ContextualManagerAP {
 	private double longitude;
 	private double Availability;
 	private double Centrality;
+    private double Similarity;
     private int startEncounter;
     private int endEncounter;
     private int numEncounters;
@@ -198,6 +199,20 @@ public class ContextualManagerAP {
      */
     public void setCentrality(double centrality) {
         Centrality = centrality;
+    }
+
+    /**
+     * Gets the similarity of this peer.
+     * @return the similarity
+     */
+    public double getSimilarity(){return this.Similarity;}
+
+    /**
+     * Set the similarity of this peer.
+     * @rparam similarity the similarity to set.
+     */
+    public void setSimilarity(double similarity){
+        this.Similarity = similarity;
     }
 
     /**

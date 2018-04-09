@@ -12,6 +12,7 @@ interface CManagerInterface {
     //Map getC(in String [] peerList); //String [] to ArrayList<String>
     Map getAvailability(in List<String> peerList);
     Map getCentrality(in List<String> peerList);
+    Map getSimilarity(in List<String> peerList);
 
     //ContextualManagerSimilarity
     //double [] getI(TYPE, NODE);

@@ -120,6 +120,22 @@ public class ContextualManagerInterfaceService extends Service {
             }
             return hashMapCentrality;
         }
+
+        @Override
+        public Map getSimilarity(List<String> peerList){
+            HashMap<String, Double> hashMapSimilarity = new HashMap<>();
+
+            for (int i = 0; i < peerList.size(); i++){
+                //peerList[i] == peerId
+                if(dataSource.hasPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"));
+                    hashMapSimilarity.put(peerList.get(i), peer.getSimilarity());
+                }
+                else
+                    hashMapSimilarity.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's centrality
+            }
+            return hashMapSimilarity;
+        }
     };
 
     @Override

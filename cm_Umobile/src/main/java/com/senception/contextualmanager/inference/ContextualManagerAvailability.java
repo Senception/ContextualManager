@@ -42,7 +42,7 @@ public class ContextualManagerAvailability {
                 A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
             }
         }
-        Log.d("teste", "A calculated: " + A.toString()); // todo delete log
+
         return A;
     }
 
@@ -72,7 +72,7 @@ public class ContextualManagerAvailability {
             }
             //30+30 = 60 --> 60/currentHour
             else{
-                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / System.currentTimeMillis()/1000); //todo optimize without divide for the hour in the sumArrays method
+                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / System.currentTimeMillis()/1000); //todo optimize without dividing for the hour in the sumArrays method
             }
         }
         return res;
@@ -92,7 +92,6 @@ public class ContextualManagerAvailability {
         ArrayList<Integer> e2 = multiplyArrays(e, e); // e square
         ArrayList<Integer> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
         ArrayList<Integer> memStor = multiplyArrays(mem, storage); // mem * storage
-
         ArrayList<Integer> r = multiplyArrays(e2Cpu, memStor);
         return r;
     }

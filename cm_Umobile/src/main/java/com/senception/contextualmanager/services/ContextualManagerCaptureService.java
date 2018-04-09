@@ -25,6 +25,7 @@ import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.inference.ContextualManagerCentrality;
 import com.senception.contextualmanager.inference.ContextualManagerAvailability;
+import com.senception.contextualmanager.inference.ContextualManagerSimilarity;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
 import com.senception.contextualmanager.modals.ContextualManagerAppUsage;
 import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
@@ -87,7 +88,7 @@ public class ContextualManagerCaptureService extends Service {
         super.onCreate();
         dataSource = new ContextualManagerDataSource(this);
         dataSource.openDB(true);
-        backupDB();
+        ContextualManagerMainActivity.backupDB(this);
 
         /*
         * Initializes the physical resource usage table in the DB
@@ -268,12 +269,16 @@ public class ContextualManagerCaptureService extends Service {
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
 
+                /*Similarity Calculation*/
+                double I = ContextualManagerSimilarity.calculateI(dataSource);
+
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
                 mySelf.setSSID("self");
                 mySelf.setBSSID(MacSecurity.md5Hash("self"));
                 mySelf.setAvailability(A);
                 mySelf.setCentrality(C);
+                mySelf.setSimilarity(I);
                 if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {
                     dataSource.registerNewPeers(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
@@ -297,7 +302,7 @@ public class ContextualManagerCaptureService extends Service {
 
                 /* Captures the apps usage */
                 captureAppsUsage();
-
+                ContextualManagerMainActivity.backupDB(context);
             }
             else{ // if daily: Saves the usage percentage into the database
 
@@ -402,38 +407,6 @@ public class ContextualManagerCaptureService extends Service {
         long end = endDate.getTimeInMillis();
 
         return usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY, start, end);
-    }
-
-    /**
-     * Since the database on the device is only visible through root, to check the
-     * database tables this method creates a backup in a place that the database is visible.
-     * (main folder of the android device)
-     */
-    private void backupDB() {
-
-        try {
-            File sd = Environment.getExternalStorageDirectory();
-
-            if (sd.canWrite()) {
-                String DB_PATH = this.getFilesDir().getAbsolutePath().replace("files", "databases") + File.separator;
-                //String currentDBPath = "cmumobile.db";
-                String currentDBPath = "contextualmanager.db";
-                String backupDBPath = "contextualmanagerbackup.db";
-                File currentDB = new File(DB_PATH, currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
-
-                if (currentDB.exists()) {
-                    FileChannel src = new FileInputStream(currentDB).getChannel();
-                    FileChannel dst = new FileOutputStream(backupDB).getChannel();
-                    dst.transferFrom(src, 0, src.size());
-                    src.close();
-                    dst.close();
-                    Log.d(TAG, "BACKUP DONE");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**

@@ -5,6 +5,7 @@
     <string name="background">A correr em background...</string>
     <string name="getInfo">A Obter Informação, Por Favor Aguarde...</string>
     <string name="stopservice">Parar o Serviço</string>
+    <string name="options">Options</string>
     <string name="wifiOff">Wifi Desligado</string>
     <string name="wifiOn">Wifi Ligado</string>
     <string name="wifiDown">Falha na conexão Wifi</string>
