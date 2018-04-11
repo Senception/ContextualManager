@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +26,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.*;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.senception.contextualmanager.modals.ContextualManagerAP;
-import com.senception.contextualmanager.modals.ContextualManagerVisit;
-import com.senception.contextualmanager.modals.ContextualManagerWeight;
 import com.senception.contextualmanager.modals.ContextualManagerAppUsage;
 import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
 
@@ -104,7 +100,6 @@ public class ContextualManagerDataSource {
 		db.execSQL("DELETE FROM "+ ContextualManagerSQLiteHelper.TABLE_SUNDAY_PEERS);
 		db.execSQL("DELETE FROM "+ ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE);
 		db.execSQL("DELETE FROM "+ ContextualManagerSQLiteHelper.TABLE_APPS_USAGE);
-		db.execSQL("DELETE FROM "+ ContextualManagerSQLiteHelper.TABLE_WEIGHTS);
 	}
 	
 	/**
@@ -265,21 +260,6 @@ public class ContextualManagerDataSource {
 	}
 
 	/**
-	 * Function cursorWeight
-	 * Converts a cursor pointing to a record in the Weights table to a Contextual Manager object.
-	 * @param cursor Cursor pointing to a record of the Weight table.
-	 * @return the Contextual Manager object
-	 */
-	private ContextualManagerWeight cursorWeight(Cursor cursor){
-		ContextualManagerWeight weight = new ContextualManagerWeight();
-		weight.setDateTime(cursor.getString(1));
-		weight.setA(cursor.getString(2));
-		weight.setC(cursor.getString(3));
-		weight.setDayOfTheWeek(cursor.getString(4));
-		return weight;
-	}
-
-	/**
 	 * Function registerNewAP
 	 * Register a new AP in the application. It creates a new record on the AP table, with the information passed as ContextualManagerAP.
 	 * @param ap AP information.
@@ -364,22 +344,6 @@ public class ContextualManagerDataSource {
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVERAGE_USAGE_HOUR, arrayToDatabase.toString());
         values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, appUsg.getDayOfTheWeek());
 		return db.insertOrThrow(ContextualManagerSQLiteHelper.TABLE_APPS_USAGE, null, values);
-	}
-
-	/**
-	 * Method that registers a new wheight on the wheight table
-     * this table will save the wheight of the device (A,C and I)
-	 * @param weight - the wheight to be stored
-	 * @return the row ID of the newly inserted row, or -1 if an error occurred
-	 */
-	public long registerWeight(ContextualManagerWeight weight){
-		ContentValues values = new ContentValues();
-		values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, weight.getA());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, weight.getC());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, weight.getDayOfTheWeek());
-
-		return db.insertOrThrow(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, null, values);
 	}
 
 	/**
@@ -483,24 +447,6 @@ public class ContextualManagerDataSource {
     }
 
 	/**
-	 * Function that updates the Weights table
-	 * Update a weight already registered by the application.
-	 * @param weight the weight
-	 * @return true, if successful.
-	 */
-	public boolean updateWeight(ContextualManagerWeight weight){
-		String identifier = ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK + "='" + String.valueOf(weight.getDayOfTheWeek()) + "'" +" COLLATE NOCASE ";
-		ContentValues values = new ContentValues();
-        values.put(ContextualManagerSQLiteHelper.COLUMN_DATETIME, weight.getDateTime());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, weight.getA());
-        values.put(ContextualManagerSQLiteHelper.COLUMN_CENTRALITY, weight.getC());
-		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, String.valueOf(weight.getDayOfTheWeek()));
-		int rows = db.update(ContextualManagerSQLiteHelper.TABLE_WEIGHTS, values, identifier, null);
-
-		return rows != 0 ? true : false;
-	}
-
-	/**
 	 * Function getAP
 	 * Gets an AP already registered by the application. 
 	 * @param bssid The ssid of the AP which information should be returned
@@ -551,21 +497,6 @@ public class ContextualManagerDataSource {
 			pru = cursorResourceUsage(cursor);
 		}
 		return pru;
-	}
-
-	/**
-	 * Method to get the device's weight
-	 * @return weight the weight of the device (A,C,I)
-	 */
-	public ContextualManagerWeight getWeight (){
-		ContextualManagerWeight weight = null;
-		// query to get last row of the weight's table
-		String selectQuery = "SELECT * FROM " + ContextualManagerSQLiteHelper.TABLE_WEIGHTS + " ORDER BY " + ContextualManagerSQLiteHelper.COLUMN_DATETIME + " DESC LIMIT 1";
-		Cursor cursor = db.rawQuery(selectQuery, null);
-		if (cursor.moveToFirst() && cursor.getCount()>0) {
-            weight = cursorWeight(cursor);
-        }
-		return weight;
 	}
 
     /**

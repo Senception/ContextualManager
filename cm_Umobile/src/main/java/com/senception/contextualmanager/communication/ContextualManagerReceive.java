@@ -47,23 +47,22 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
 
     @Override
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
-
+        //TODO resolve error: getting txtrecord with a and c null
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
             Log.d("teste", "txtRecord: " + txtRecordMap.toString());
+            Log.d("teste", "received from" + srcDevice.deviceName);
             String a = txtRecordMap.get(Identity.AVAILABILITY);
             String c = txtRecordMap.get(Identity.CENTRALITY);
-            Log.d("teste", "a: " + a + "     c : " + c);
-            double A = 0;
-            double C = 0;
+            Log.d("teste", "Received a: " + a + "\t c : " + c);
 
-            //if(a != null && c != null ) {
-            A = Double.parseDouble(a);
-            C = Double.parseDouble(txtRecordMap.get(Identity.CENTRALITY));
+            //double A = 0;
+            //double C = 0;
 
-            //else{
-            Log.d("teste", "Device Name: " + srcDevice.deviceName);
+            //todo add if(a != null && c != null ) {
+            double A = Double.parseDouble(a);
+            double C = Double.parseDouble(c);
+            //}
 
-            //double I = Double.parseDouble(txtRecordMap.get(Identity.SIMILARITY));
             String hashSrcDeviceBSSID = MacSecurity.md5Hash(srcDevice.deviceAddress);
 
             //if it's the first time we see this peer we save it
@@ -75,7 +74,6 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 //TODO peer.setLongitude(longitude);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
-                //peer.setSimilarity(I);
                 peer.setNumEncounters(1);
                 peer.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                 dataSource.registerNewPeers(peer, ContextualManagerService.checkWeek("peers"));
@@ -85,7 +83,6 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 peer.setBSSID(hashSrcDeviceBSSID);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
-                //peer.setSimilarity(I);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
                 dataSource.updatePeer(peer, ContextualManagerService.checkWeek("peers"));

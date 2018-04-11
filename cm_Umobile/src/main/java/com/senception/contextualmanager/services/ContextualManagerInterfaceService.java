@@ -1,27 +1,16 @@
 package com.senception.contextualmanager.services;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.os.Binder;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.util.Log;
-
 import com.senception.contextualmanager.aidl.CManagerInterface;
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
-import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
-
-import android.net.wifi.p2p.WifiP2pManager.Channel;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -43,64 +32,18 @@ public class ContextualManagerInterfaceService extends Service {
 
     final CManagerInterface.Stub mBinder = new CManagerInterface.Stub(){
 
-        /*@Override
-        public double[] getAvailability(String[] peerList) throws RemoteException {
-            double [] availability = new double [peerList.length];
-
-            for (int i = 0; i < peerList.length; i++){
-
-                if(dataSource.hasPeer(peerList[i], ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(peerList[i], ContextualManagerService.checkWeek("peers"));
-                    availability[i] = peer.getAvailability();
-                }
-                else
-                    availability[i] = -1; //if the peer id given was not found on the db then we can't provide it's availability
-            }
-            return availability;
-        }
-
-        @Override
-        public double[] getCentrality(String[] peerList) throws RemoteException {
-            double [] centrality = new double [peerList.length];
-
-            for (int i = 0; i < peerList.length; i++){
-                //peerList[i] == peerId
-                if(dataSource.hasPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList[i]), ContextualManagerService.checkWeek("peers"));
-                    centrality[i] = peer.getCentrality();
-                }
-                else
-                    centrality[i] = -1; //if the peer id given was not found on the db then we can't provide it's centrality
-            }
-            return centrality;
-        }
-
-        @Override
-        public Map getA(String [] peerList){
-            HashMap<String, Double> hashMapAvailability = new HashMap<>();
-            for (int i = 0; i < peerList.length; i++){
-
-                if(dataSource.hasPeer(peerList[i], ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(peerList[i], ContextualManagerService.checkWeek("peers"));
-                    hashMapAvailability.put(peerList[i], peer.getAvailability());
-                }
-                else
-                    hashMapAvailability.put(peerList[i], null); //if the peer id given was not found on the db then we can't provide it's availability
-            }
-            return hashMapAvailability;
-        }*/
-
         @Override
         public Map getAvailability(List<String> peerList){
             HashMap<String, Double> hashMapAvailability = new HashMap<>();
             for (int i = 0; i < peerList.size(); i++){
 
-                if(dataSource.hasPeer(peerList.get(i), ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), ContextualManagerService.checkWeek("peers"));
+                if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), checkWeek("peers"));
                     hashMapAvailability.put(peerList.get(i), peer.getAvailability());
                 }
-                else
+                else {
                     hashMapAvailability.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's availability
+                }
             }
             return hashMapAvailability;
         }
@@ -111,8 +54,8 @@ public class ContextualManagerInterfaceService extends Service {
 
             for (int i = 0; i < peerList.size(); i++){
                 //peerList[i] == peerId
-                if(dataSource.hasPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"));
+                if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), checkWeek("peers"));
                     hashMapCentrality.put(peerList.get(i), peer.getCentrality());
                 }
                 else
@@ -127,8 +70,8 @@ public class ContextualManagerInterfaceService extends Service {
 
             for (int i = 0; i < peerList.size(); i++){
                 //peerList[i] == peerId
-                if(dataSource.hasPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"))){
-                    ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), ContextualManagerService.checkWeek("peers"));
+                if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
+                    ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), checkWeek("peers"));
                     hashMapSimilarity.put(peerList.get(i), peer.getSimilarity());
                 }
                 else
@@ -140,12 +83,9 @@ public class ContextualManagerInterfaceService extends Service {
 
     @Override
     public void onCreate() {
-
         dataSource = new ContextualManagerDataSource(this);
         dataSource.openDB(true);
-
-        Log.d("Resource", "AIDL SERVICE ENTROU NO ONCREATE");
-
+        Log.d(TAG, "Aidl service called");
     }
 
     @Override

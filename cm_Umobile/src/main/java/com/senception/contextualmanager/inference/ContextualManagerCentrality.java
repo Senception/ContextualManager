@@ -1,14 +1,8 @@
 package com.senception.contextualmanager.inference;
 
-import android.util.Log;
-
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
-import com.senception.contextualmanager.modals.ContextualManagerWeight;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-
 import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
@@ -45,8 +39,9 @@ public class ContextualManagerCentrality {
      * @param dataSource
      * @return centrality - the centrality of the device
      */
+    //NOTE: In the beggining the calculated C will present often as 0.0
     public static double calculateC(ContextualManagerDataSource dataSource){
-        //double degree;
+        //double degree; --> to use later
         int numEncounters;
         double avgEncDur;
         double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
@@ -59,7 +54,7 @@ public class ContextualManagerCentrality {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
 
             for (ContextualManagerAP peer : peerList) {
-                //Todo only if peer is connected (future)
+                //if peer is connected (future) --> to use later
                 numEncounters = peer.getNumEncounters();
                 avgEncDur = peer.getAvgEncounterDuration();
                 centrality += numEncounters*avgEncDur/distance;

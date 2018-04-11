@@ -53,7 +53,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	public static final String TABLE_SUNDAY_PEERS = "sundaypeers";
     public static final String TABLE_RESOURCE_USAGE = "resourceusage";
 	public static final String TABLE_APPS_USAGE = "appsusage";
-	public static final String TABLE_WEIGHTS = "weights";
 
 	// IDENTIFICATION
 	public static final String COLUMN_ID = "_id";
@@ -68,12 +67,16 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
 
-    //PEERS
+    //1)PEERS
     public static final String COLUMN_START_ENCOUNTER = "startencounter";
     public static final String COLUMN_END_ENCOUNTER = "endencounter";
 	public static final String COLUMN_NUM_ENCOUNTERS = "encounters";
     public static final String COLUMN_AVG_ENCOUNTER_DURATION = "avgduration";
     public static final String COLUMN_IS_CONNECTED = "connected";
+	public static final String COLUMN_SIMILARITY = "i"; // Similarity of a node (measures the node's similarity).
+	//2)PEER (SELF)
+	public static final String COLUMN_AVAILABILITY = "a"; // Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_CENTRALITY = "c"; // Affinity network level of a node (measures node's centrality/popularity).
 
 	// VISITS
 	public static final String COLUMN_TIMEON = "timeon";
@@ -87,11 +90,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	//APPS USAGE
 	public static final String COLUMN_APP_NAME = "appname";
 	public static final String COLUMN_APP_CATEGORY = "appcategory";
-
-	//WEIGHTS
-	public static final String COLUMN_AVAILABILITY = "a"; // Internal Usage weight of a node (measures the availability of the node)
-	public static final String COLUMN_CENTRALITY = "c"; // Affinity network level of a node (measures node's centrality/popularity).
-	public static final String COLUMN_SIMILARITY = "i"; // Similarity of a node (measures the node's similarity).
 
 	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
 	   For instance, I can provide a measure of battery similarity over time between nodes.
@@ -329,15 +327,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_DAYOFTHEWEEK + " integer "
 			+ ");";
 
-	private static final String CREATE_WEIGHTS_TABLE = "create table "
-			+ TABLE_WEIGHTS + "("
-			+ COLUMN_ID + " integer primary key autoincrement, "
-			+ COLUMN_DATETIME + " text, "
-			+ COLUMN_AVAILABILITY + " text not null, "
-			+ COLUMN_CENTRALITY + " text not null, "
-			+ COLUMN_DAYOFTHEWEEK + " integer "
-			+ ");";
-	
 	public ContextualManagerSQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -362,7 +351,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL(CREATE_SUNDAY_PEERS_TABLE);
         dataBase.execSQL(CREATE_RESOURCE_USAGE_TABLE);
 		dataBase.execSQL(CREATE_APPS_USAGE_TABLE);
-		dataBase.execSQL(CREATE_WEIGHTS_TABLE);
 	}
 
 	@Override
@@ -385,7 +373,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_SUNDAY_PEERS);
         dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_RESOURCE_USAGE);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_APPS_USAGE);
-		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_WEIGHTS);
 		onCreate(dataBase);
 	}
 

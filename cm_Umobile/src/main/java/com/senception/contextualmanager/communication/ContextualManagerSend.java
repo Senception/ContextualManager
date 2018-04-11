@@ -36,6 +36,7 @@ public class ContextualManagerSend {
      * @param context
      */
     public ContextualManagerSend(Context context) {
+        //TODO resolve error: getting txtrecord with a and c null
         mContext = context;
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -44,22 +45,16 @@ public class ContextualManagerSend {
                 ContextualManagerDataSource dataSource = new ContextualManagerDataSource(mContext);
                 dataSource.openDB(true);
                 if (dataSource.hasPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"))) {
-
                     ContextualManagerAP self = dataSource.getPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"));
                     double A = self.getAvailability();
                     double C = self.getCentrality();
-                    Log.d("teste", "A: " + A + "    C: " + C);
-                    //double I = self.getSimilarity();
-
+                    Log.d("teste", "Sending A: " + A + "\t C: " + C);
                     String AToSend = String.valueOf(A);
                     String CToSend = String.valueOf(C);
-                    Log.d("teste", "AToSend :" + AToSend + "CToSend: " + CToSend );
-                    //String IToSend = String.valueOf(I); //Todo: Find bug - Find out when can A,C or I be null
+                    Log.d("teste", "AToSend :" + AToSend + "\t CToSend: " + CToSend);//Todo: Find bug - Find out when can A or C null
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, AToSend);
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, CToSend);
-                    //WifiP2pTxtRecord.setRecord(mContext, Identity.SIMILARITY, IToSend);
-                    Log.d(TAG, "Sent A, C and I.");
-
+                    Log.d("teste", "Sent A and C");
                 }
                 else{
                     Log.d(TAG, "Table is still empty so we can't send the availability and centrality.");

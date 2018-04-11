@@ -1,9 +1,6 @@
 package com.senception.contextualmanager.inference;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Copyright (C) 2016 Senception Lda

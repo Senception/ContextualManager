@@ -6,10 +6,6 @@ package com.senception.contextualmanager.aidl;
  * */
 interface CManagerInterface {
 
-    //double [] getAvailability(in String [] peerList);
-    //double [] getCentrality(in String [] peerList);
-    //Map getA(in String [] peerList); //String [] to ArrayList<String>
-    //Map getC(in String [] peerList); //String [] to ArrayList<String>
     Map getAvailability(in List<String> peerList);
     Map getCentrality(in List<String> peerList);
     Map getSimilarity(in List<String> peerList);

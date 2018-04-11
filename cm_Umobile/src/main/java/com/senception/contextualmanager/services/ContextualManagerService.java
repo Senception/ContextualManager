@@ -155,9 +155,9 @@ public class ContextualManagerService extends Service{
 		editor = sharedPreferences.edit();
 		str_preferences = sharedPreferences.getString("shared", "");
 
-		if(str_preferences.equalsIgnoreCase("")){
+		/*if(str_preferences.equalsIgnoreCase("")){
 			openTimePickerDialog(false);
-		}
+		}*/
 
 		cdt = new CountDownTimer(20000, 20000) {
 
@@ -274,7 +274,7 @@ public class ContextualManagerService extends Service{
 					peer.setLongitude(longitude);
 					peer.setNumEncounters(peer.getNumEncounters()+1);
                     peer.setEndEncounter((int)(System.currentTimeMillis()/1000));
-                    if(peer.getIsConnected() == 0) { //if the peer was disconnected, and we found it again, we reconnect it. todo change isconnected to boolean.
+                    if(peer.getIsConnected() == 0) { //if the peer was disconnected, and we found it again, we reconnect it.
                         peer.setIsConnected(1);
                         peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
                     }
@@ -570,7 +570,7 @@ public class ContextualManagerService extends Service{
 
 		wifi.close();
 
-		alarmManager.cancel(pendingIntent);
+		//alarmManager.cancel(pendingIntent);
 		unregisterReceiver(receiver);
 		unregisterReceiver(mReceiver);
 

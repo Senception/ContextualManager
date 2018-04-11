@@ -25,7 +25,6 @@ import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.databases.ContextualManagerSQLiteHelper;
 import com.senception.contextualmanager.inference.ContextualManagerCentrality;
 import com.senception.contextualmanager.inference.ContextualManagerAvailability;
-import com.senception.contextualmanager.inference.ContextualManagerSimilarity;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
 import com.senception.contextualmanager.modals.ContextualManagerAppUsage;
 import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
@@ -35,18 +34,13 @@ import com.senception.contextualmanager.physical_usage.ContextualManagerMemory;
 import com.senception.contextualmanager.physical_usage.ContextualManagerPhysicalResourceType;
 import com.senception.contextualmanager.physical_usage.ContextualManagerStorage;
 import com.senception.contextualmanager.security.MacSecurity;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -269,16 +263,12 @@ public class ContextualManagerCaptureService extends Service {
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
 
-                /*Similarity Calculation*/
-                double I = ContextualManagerSimilarity.calculateI(dataSource);
-
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
                 mySelf.setSSID("self");
                 mySelf.setBSSID(MacSecurity.md5Hash("self"));
                 mySelf.setAvailability(A);
                 mySelf.setCentrality(C);
-                mySelf.setSimilarity(I);
                 if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {
                     dataSource.registerNewPeers(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
@@ -286,19 +276,20 @@ public class ContextualManagerCaptureService extends Service {
                     dataSource.updatePeer(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
 
-                /*
-                ContextualManagerWeight weight = new ContextualManagerWeight(dayOfTheWeek);
-                double A = availability.get(currentMinute);
-                weight.setA(A);
-                weight.setC(C);
-                weight.updateDateTime();
-                weight.setDayOfTheWeek(newDayOfTheWeek);
-                if (dataSource.isTableEmpty(ContextualManagerSQLiteHelper.TABLE_WEIGHTS)){
-                    dataSource.registerWeight(weight);
+                /*Similarity Calculation*/
+                //get peer list, and foreach one updates its similarity
+                ArrayList<ContextualManagerAP> peerList;
+                if(!dataSource.isTableEmpty(checkWeek("peers"))) {
+                    peerList = dataSource.getAllPeers(checkWeek("peers"));
+
+                    for (ContextualManagerAP peer : peerList) {
+                        double numEncounters = peer.getNumEncounters();
+                        double avgEncDur = peer.getAvgEncounterDuration();
+                        double similarity = numEncounters*avgEncDur;
+                        peer.setSimilarity(similarity);
+                        dataSource.updatePeer(peer, checkWeek("peers"));
+                    }
                 }
-                else {
-                    dataSource.updateWeight(weight);
-                }*/
 
                 /* Captures the apps usage */
                 captureAppsUsage();
