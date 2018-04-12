@@ -18,6 +18,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.senception.contextualmanager.services.ContextualManagerCaptureService;
+
 /**
  * Copyright (C) 2016 Senception Lda
  * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
@@ -34,6 +36,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 
 	private static final String DATABASE_NAME = "contextualmanager.db";
 	private static final int DATABASE_VERSION = 1;
+    private static final String TAG = ContextualManagerSQLiteHelper.class.getSimpleName();
 
     //TABLES
 	public static final String TABLE_VISITS = "visits";
@@ -333,7 +336,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase dataBase) {
-		Log.d("RESOURCE", "ON CREATE");
+		Log.d(TAG, "Entered in onCreate");
 		dataBase.execSQL(CREATE_VISITS_TABLE);
 		dataBase.execSQL(CREATE_MONDAY_TABLE);
 		dataBase.execSQL(CREATE_TUESDAY_TABLE);
@@ -355,7 +358,7 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase dataBase, int oldVersion, int newVersion) {
-		Log.d("RESOURCE", "ON UPDATE");
+		Log.d(TAG, "Entered in onUpgrade");
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_VISITS);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_MONDAY);
 		dataBase.execSQL("DROP TABLE IF EXISTS " + TABLE_TUESDAY);
@@ -378,8 +381,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onOpen(SQLiteDatabase database){
-		Log.d("RESOURCE", "ON OPEN");
-		//I use this to "clear" the resource usage table
-		//onUpgrade(database, 1, 1);
+		Log.d(TAG, "ON OPEN");
 	}
 }

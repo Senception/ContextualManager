@@ -47,7 +47,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
 
     @Override
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
-        //TODO resolve error: getting txtrecord with a and c null
+        //TODO resolve error: getting txtrecord with a and c null ---> Cannot reproduce error.
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
             Log.d("teste", "txtRecord: " + txtRecordMap.toString());
             Log.d("teste", "received from" + srcDevice.deviceName);
@@ -55,13 +55,13 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
             String c = txtRecordMap.get(Identity.CENTRALITY);
             Log.d("teste", "Received a: " + a + "\t c : " + c);
 
-            //double A = 0;
-            //double C = 0;
+            double A = 0;
+            double C = 0;
 
-            //todo add if(a != null && c != null ) {
-            double A = Double.parseDouble(a);
-            double C = Double.parseDouble(c);
-            //}
+            if(a != null && c != null ) {
+                A = Double.parseDouble(a);
+                C = Double.parseDouble(c);
+            }
 
             String hashSrcDeviceBSSID = MacSecurity.md5Hash(srcDevice.deviceAddress);
 

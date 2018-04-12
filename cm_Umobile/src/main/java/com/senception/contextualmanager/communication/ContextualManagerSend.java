@@ -36,7 +36,7 @@ public class ContextualManagerSend {
      * @param context
      */
     public ContextualManagerSend(Context context) {
-        //TODO resolve error: getting txtrecord with a and c null
+        //TODO resolve error: getting txtrecord with a and c null ---> Cannot reproduce error.
         mContext = context;
 
         new Timer().scheduleAtFixedRate(new TimerTask() {

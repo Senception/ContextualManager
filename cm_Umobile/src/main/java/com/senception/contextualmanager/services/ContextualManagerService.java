@@ -208,6 +208,7 @@ public class ContextualManagerService extends Service{
 	 * @param cmPeerList arraylist of all discovered wifi p2p devices
 	 */
 	public void discoveredPeers(ArrayList<ContextualManagerAP> cmPeerList){
+        Log.d(TAG, "Peers found");
         if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
@@ -221,7 +222,7 @@ public class ContextualManagerService extends Service{
 
             /*Checks if we lost a connection with any peer*/
             //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
-            //todo optimize this function (find the symmetric difference list)
+            //with time: optimize this function (find the symmetric difference list)
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
@@ -265,6 +266,7 @@ public class ContextualManagerService extends Service{
                     int peerStartEnc = ap.getStartEncounter();
                     ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
+                    Log.d(TAG, "The peer " + ap.getSSID() + " was found and saved into the DB");
 				}
 				else{ //the peer found was already on the database
 					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
@@ -285,6 +287,7 @@ public class ContextualManagerService extends Service{
                     int peerStartEnc = peer.getStartEncounter();
                     peer.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
 					dataSource.updatePeer(peer, checkWeek("peers"));
+                    Log.d(TAG, "The peer " + ap.getSSID() + " was found and updated into the DB");
 				}
             }
 		}

@@ -14,11 +14,9 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
 import com.senception.contextualmanager.R;
 import com.senception.contextualmanager.activities.ContextualManagerMainActivity;
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
@@ -82,7 +80,6 @@ public class ContextualManagerCaptureService extends Service {
         super.onCreate();
         dataSource = new ContextualManagerDataSource(this);
         dataSource.openDB(true);
-        ContextualManagerMainActivity.backupDB(this);
 
         /*
         * Initializes the physical resource usage table in the DB
@@ -106,6 +103,8 @@ public class ContextualManagerCaptureService extends Service {
             initializeAppsTable(app);
         }
 
+        Log.d(TAG, "All the apps used by the device were initialized if they weren't already on the DB");
+
         /*
         * TODO implement category of an app
         * Creates a thread where the categories of all apps in the device will be determined
@@ -122,6 +121,8 @@ public class ContextualManagerCaptureService extends Service {
         registerReceiver(alarmReceiverDaily, new IntentFilter("com.example.resource_usage_daily"));
 
         setAlarm();
+
+        Log.d(TAG, "Alarms setted to hourly and daily");
     }
 
     @Override
@@ -170,6 +171,7 @@ public class ContextualManagerCaptureService extends Service {
     private void initializeResourceTable(ContextualManagerPhysicalUsage pru) {
         if (!dataSource.rowExists(ContextualManagerSQLiteHelper.TABLE_RESOURCE_USAGE, pru.getResourceType().toString(), ContextualManagerSQLiteHelper.COLUMN_TYPE_OF_RESOURCE)) {
             dataSource.registerNewResourceUsage(pru);
+            Log.d(TAG, "Physical resource usage with type " + pru.getResourceType() + " initialized.");
         }
     }
 
@@ -252,16 +254,20 @@ public class ContextualManagerCaptureService extends Service {
                 capturePhysicalUsage(memory);
                 capturePhysicalUsage(storage);
 
+                Log.d(TAG, "Captured all the physical resources.");
+
                 /*Availability Calculation:*/
-                // Captures de R (b*b*cpu*mem*storage) every hour (for tests: min)
+                // Captures the R (b*b*cpu*mem*storage) every hour (for tests: min)
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
                 availability = ContextualManagerAvailability.calculateA(rList);
                 int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
                 double A = availability.get(currentMinute);
+                Log.d(TAG, "Calculated A: " + A);
 
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
+                Log.d(TAG, "Calculated C: " + C);
 
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
@@ -276,11 +282,12 @@ public class ContextualManagerCaptureService extends Service {
                     dataSource.updatePeer(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
 
+                Log.d(TAG, "A and C saved into the DB on the correspondent peer table of the current day of the week as the peer 'self'");
+
                 /*Similarity Calculation*/
                 //get peer list, and foreach one updates its similarity
-                ArrayList<ContextualManagerAP> peerList;
                 if(!dataSource.isTableEmpty(checkWeek("peers"))) {
-                    peerList = dataSource.getAllPeers(checkWeek("peers"));
+                    ArrayList<ContextualManagerAP> peerList = dataSource.getAllPeers(checkWeek("peers"));
 
                     for (ContextualManagerAP peer : peerList) {
                         double numEncounters = peer.getNumEncounters();
@@ -288,12 +295,15 @@ public class ContextualManagerCaptureService extends Service {
                         double similarity = numEncounters*avgEncDur;
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
+                        Log.d(TAG, "Calculated I: " + similarity + "And saved it on the DB");
                     }
                 }
 
                 /* Captures the apps usage */
                 captureAppsUsage();
-                ContextualManagerMainActivity.backupDB(context);
+                Log.d(TAG, "Captured the apps usage");
+
+                ContextualManagerMainActivity.backupDB(context); //todo eliminate
             }
             else{ // if daily: Saves the usage percentage into the database
 
@@ -314,6 +324,8 @@ public class ContextualManagerCaptureService extends Service {
                         dataSource.registerNewAppUsage(app);
                     }
                 }
+
+                Log.d(TAG, "Saved the physical resources and the apps usage on the DB");
             }
         }
     }
@@ -331,18 +343,22 @@ public class ContextualManagerCaptureService extends Service {
         switch(pru.getResourceType()){
             case ENERGY:
                 int level = ContextualManagerBattery.getEnergyLevel(this);
+                Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + level);
                 pru.getUsagePerHour().set(currentMinute, level);
                 break;
             case CPU:
                 int cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
+                Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + cpuUsage);
                 pru.getUsagePerHour().set(currentMinute, cpuUsage);
                 break;
             case MEMORY:
                 int mem = ContextualManagerMemory.getCurrentRam(this);
+                Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + mem);
                 pru.getUsagePerHour().set(currentMinute, mem);
                 break;
             case STORAGE:
                 int storageUsg = ContextualManagerStorage.getCurrentStorage();
+                Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + storageUsg);
                 pru.getUsagePerHour().set(currentMinute, storageUsg);
                 break;
             default:

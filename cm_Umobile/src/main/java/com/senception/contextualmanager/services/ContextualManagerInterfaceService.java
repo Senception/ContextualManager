@@ -40,9 +40,11 @@ public class ContextualManagerInterfaceService extends Service {
                 if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), checkWeek("peers"));
                     hashMapAvailability.put(peerList.get(i), peer.getAvailability());
+                    Log.d(TAG, "Calculated the availability of the peer " + peerList.get(i) + "with A = " + peer.getAvailability());
                 }
                 else {
                     hashMapAvailability.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's availability
+                    Log.d(TAG, "The peer " + peerList.get(i) + "was not found" );
                 }
             }
             return hashMapAvailability;
@@ -57,9 +59,12 @@ public class ContextualManagerInterfaceService extends Service {
                 if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(String.valueOf(peerList.get(i)), checkWeek("peers"));
                     hashMapCentrality.put(peerList.get(i), peer.getCentrality());
+                    Log.d(TAG, "Calculated the centrality of the peer " + peerList.get(i) + "with C = " + peer.getCentrality());
                 }
-                else
+                else {
                     hashMapCentrality.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's centrality
+                    Log.d(TAG, "The peer " + peerList.get(i) + "was not found" );
+                }
             }
             return hashMapCentrality;
         }
@@ -73,9 +78,12 @@ public class ContextualManagerInterfaceService extends Service {
                 if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), checkWeek("peers"));
                     hashMapSimilarity.put(peerList.get(i), peer.getSimilarity());
+                    Log.d(TAG, "Calculated the similarity of the peer " + peerList.get(i) + "with I = " + peer.getSimilarity());
                 }
-                else
+                else {
                     hashMapSimilarity.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's centrality
+                    Log.d(TAG, "The peer " + peerList.get(i) + "was not found" );
+                }
             }
             return hashMapSimilarity;
         }

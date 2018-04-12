@@ -79,6 +79,7 @@ public class ContextualManagerAP {
     public String getSSID() {
         return SSID;
     }
+
     /**
      *Set the ssid of this AP
      *@param sSID the ssid to set

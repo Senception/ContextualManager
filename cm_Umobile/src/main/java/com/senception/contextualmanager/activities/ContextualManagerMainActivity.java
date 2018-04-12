@@ -112,6 +112,8 @@ public class ContextualManagerMainActivity extends Activity {
 		startService(new Intent(ContextualManagerMainActivity.this, ContextualManagerCaptureService.class));
 		doBindResourceService();
 
+		Log.d(TAG, "ContextualManagerCaptureService started.");
+
 		//Asks user for permission to get device location
 		if(!ContextualManagerPermissions.isLocationEnabled(getApplicationContext())){
 			ContextualManagerLocationDialogF locationDialog = ContextualManagerLocationDialogF.newInstance(getString(R.string.location), getString(R.string.location_msg));
@@ -120,6 +122,8 @@ public class ContextualManagerMainActivity extends Activity {
 
 		startService(new Intent (ContextualManagerMainActivity.this, ContextualManagerService.class));
 		doBindReportService();
+
+		Log.d(TAG, "ContextualManagerService started.");
 
 	}
 
