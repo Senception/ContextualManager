@@ -239,7 +239,7 @@ public class ContextualManagerCaptureService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
+            ContextualManagerMainActivity.backupDB(context);
             Calendar day = Calendar.getInstance();
             int newDayOfTheWeek = day.get(Calendar.DAY_OF_WEEK);
 
@@ -295,7 +295,7 @@ public class ContextualManagerCaptureService extends Service {
                         double similarity = numEncounters*avgEncDur;
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
-                        Log.d(TAG, "Calculated I: " + similarity + "And saved it on the DB");
+                        Log.d(TAG, "Calculated I: " + similarity + " and saved it on the DB" + "for peer: " + peer.getSSID());
                     }
                 }
 
@@ -324,9 +324,9 @@ public class ContextualManagerCaptureService extends Service {
                         dataSource.registerNewAppUsage(app);
                     }
                 }
-
                 Log.d(TAG, "Saved the physical resources and the apps usage on the DB");
             }
+            ContextualManagerMainActivity.backupDB(context);
         }
     }
 

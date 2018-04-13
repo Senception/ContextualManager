@@ -101,7 +101,7 @@ public class ContextualManagerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
-		FragmentManager manager = getFragmentManager();
+        FragmentManager manager = getFragmentManager();
 
 		//Asks user for permission to get usage stats
 		if(!ContextualManagerPermissions.usageStatsPermission(getApplicationContext())) {
@@ -124,7 +124,6 @@ public class ContextualManagerMainActivity extends Activity {
 		doBindReportService();
 
 		Log.d(TAG, "ContextualManagerService started.");
-
 	}
 
 	@Override

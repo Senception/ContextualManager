@@ -9,26 +9,36 @@
         android:id="@+id/rev_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
-       
-	 <ImageView
-        android:id="@+id/tkiddo_logo"
-        android:contentDescription="@string/app_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/cmumobilelight"
-        />
-	  <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-		android:layout_below="@+id/tkiddo_logo"
-		android:layout_centerHorizontal="true"
-        android:text="@string/background"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#808080"
-        android:textSize="22sp" />
-	   
+        android:layout_centerHorizontal="true">
+
+        <ImageView
+            android:id="@+id/tkiddo_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/cmumobilelight" />
+
+        <ImageView
+            android:id="@+id/company_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/text"
+            android:contentDescription="@string/company"
+            android:elevation="0dp"
+            android:src="@drawable/senception_logo" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tkiddo_logo"
+            android:layout_centerHorizontal="true"
+            android:text="@string/background"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#808080"
+            android:textSize="22sp" />
+
+
     </RelativeLayout>
   
     <android.support.v4.widget.DrawerLayout

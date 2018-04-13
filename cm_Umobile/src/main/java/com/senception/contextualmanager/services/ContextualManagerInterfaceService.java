@@ -78,7 +78,7 @@ public class ContextualManagerInterfaceService extends Service {
                 if(dataSource.hasPeer(peerList.get(i), checkWeek("peers"))){
                     ContextualManagerAP peer = dataSource.getPeer(peerList.get(i), checkWeek("peers"));
                     hashMapSimilarity.put(peerList.get(i), peer.getSimilarity());
-                    Log.d(TAG, "Calculated the similarity of the peer " + peerList.get(i) + "with I = " + peer.getSimilarity());
+                    Log.d(TAG, "Calculated the similarity of the peer " + peerList.get(i) + " with I = " + peer.getSimilarity());
                 }
                 else {
                     hashMapSimilarity.put(peerList.get(i), null); //if the peer id given was not found on the db then we can't provide it's centrality

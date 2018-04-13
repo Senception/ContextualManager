@@ -27,5 +27,7 @@
     <string name="location_msg">Vefique se o Serviço de Localizaçao esta Activo</string>
     <string name="project_name_report">Contextual_Manager_Relatorio</string>
     <string name="projname_report">cm_relatorio-</string>
+    <string name="company_logo">Senception_Logo</string>
+    <string name="company">Senception</string>
   
 </resources>

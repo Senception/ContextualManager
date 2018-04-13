@@ -221,8 +221,9 @@ public class ContextualManagerService extends Service{
             }
 
             /*Checks if we lost a connection with any peer*/
-            //if any peer on the db is not on the peers list found in this scan, then the peer was disconnected
-            //with time: optimize this function (find the symmetric difference list)
+            // we assume that the peer was disconnected if any peer on the db is not on the peers list found in this scan
+            //with time: its possible to optimize this function (find the symmetric difference list)
+            //idea to optimize: disconnect all peers and only connect those who were found on the scan
             boolean connectionLost = false;
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
@@ -238,6 +239,7 @@ public class ContextualManagerService extends Service{
                 //We lost connection of a peer
                 if( connectionLost &&  allPeersOnDB.get(i).getIsConnected() == 1 ) {
                     peerOnDB.setEndEncounter((int)(System.currentTimeMillis() / 1000));
+                    Log.d(TAG, "ENDENCOUNTER: " + peerOnDB.getEndEncounter());
                     peerOnDB.setIsConnected(0);
                     dataSource.updatePeer(peerOnDB, checkWeek("peers"));
                 }
@@ -257,8 +259,11 @@ public class ContextualManagerService extends Service{
                     ap.setSimilarity(0.0);
                     ap.setNumEncounters(1);
                     ap.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
+                    Log.d(TAG, "StartEncounter: " + ap.getStartEncounter());
                     ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
+                    Log.d(TAG, "EndEncounter: " + ap.getEndEncounter());
                     ap.setAvgEncounterDuration(0);
+                    Log.d(TAG, "AvgDuration: " + ap.getAvgEncounterDuration());
                     ap.setIsConnected(1);
                     /*Average encounter calculation*/
                     double peerAvgEncDur = ap.getAvgEncounterDuration();
@@ -280,12 +285,18 @@ public class ContextualManagerService extends Service{
                         peer.setIsConnected(1);
                         peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
                     }
+                    Log.d(TAG, "ENDENCOUNTER: " + peer.getEndEncounter());
 
-                    /*AVG ENCOUNTER CALCULATION*/
+                    /*AVG ENCOUNTER DURATION CALCULATION*/
                     double peerAvgEncDur = peer.getAvgEncounterDuration();
                     int peerEndEnc = peer.getEndEncounter();
+                    Log.d(TAG, "endEnc = " + peerEndEnc);
                     int peerStartEnc = peer.getStartEncounter();
-                    peer.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
+                    Log.d(TAG, "startEnc = " + peerStartEnc);
+                    int duration = (peerEndEnc-peerStartEnc);
+                    Log.d(TAG, "duration = " + duration);
+                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) (System.currentTimeMillis() / 1000));
+                    Log.d(TAG, "The avgEncounterDuration of the peer " + peer.getSSID() + " is " + peer.getAvgEncounterDuration());
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and updated into the DB");
 				}
