@@ -73,6 +73,7 @@ public class ContextualManagerCaptureService extends Service {
     private static AlarmReceiver alarmReceiverHourly;
     private static AlarmReceiver alarmReceiverDaily;
     private static ContextualManagerDataSource dataSource;
+    public static final long TIMESTAMP = System.currentTimeMillis();
 
     @SuppressLint("NewApi")
     @Override
@@ -260,6 +261,7 @@ public class ContextualManagerCaptureService extends Service {
                 /*Availability Calculation:*/
                 // Captures the R (b*b*cpu*mem*storage) every hour (for tests: min)
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
+                //Log.d(TAG, "RList: " + rList);
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
                 availability = ContextualManagerAvailability.calculateA(rList);
                 Log.d(TAG, availability.toString());
@@ -348,20 +350,20 @@ public class ContextualManagerCaptureService extends Service {
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + level);
                 pru.getUsagePerHour().set(currentMinute, level);
                 break;
-            case CPU:
+            case CPU: //100d - because we want not the used but the available
                 double cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + cpuUsage);
-                pru.getUsagePerHour().set(currentMinute, cpuUsage);
+                pru.getUsagePerHour().set(currentMinute, 100d - cpuUsage);
                 break;
             case MEMORY:
                 double mem = ContextualManagerMemory.getCurrentRam(this);
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + mem);
-                pru.getUsagePerHour().set(currentMinute, mem);
+                pru.getUsagePerHour().set(currentMinute, 100d - mem);
                 break;
             case STORAGE:
                 double storageUsg = ContextualManagerStorage.getCurrentStorage();
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + storageUsg);
-                pru.getUsagePerHour().set(currentMinute, storageUsg);
+                pru.getUsagePerHour().set(currentMinute, 100d - storageUsg);
                 break;
             default:
                 Log.d(TAG, "THAT RESOURCE ISN'T RECOGNIZED.");
@@ -461,4 +463,5 @@ public class ContextualManagerCaptureService extends Service {
         }
         return false;
     }
+
 }

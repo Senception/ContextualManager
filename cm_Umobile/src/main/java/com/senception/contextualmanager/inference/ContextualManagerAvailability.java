@@ -1,5 +1,8 @@
 package com.senception.contextualmanager.inference;
 
+import com.senception.contextualmanager.activities.ContextualManagerMainActivity;
+import com.senception.contextualmanager.services.ContextualManagerCaptureService;
+
 import java.util.ArrayList;
 
 /**
@@ -63,15 +66,15 @@ public class ContextualManagerAvailability {
             }
             //-1+30 = 30 --> 30/currentHour
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add(usagePerHour2.get(i) / System.currentTimeMillis()/1000);
+                res.add(usagePerHour2.get(i) / (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000);
             }
             //30+-1 = 30 --> 30/currentHour
             else if (usagePerHour2.get(i) == -1 && usagePerHour1.get(i) != -1){
-                res.add(usagePerHour1.get(i) / System.currentTimeMillis()/1000);
+                res.add(usagePerHour1.get(i) / (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000);
             }
             //30+30 = 60 --> 60/currentHour
-            else{
-                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / System.currentTimeMillis()/1000); //todo optimize without dividing for the hour in the sumArrays method
+            else{ // Maybe we should use the time in hours instead of minutes
+                res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / ( (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000)); //todo optimize without dividing for the hour in the sumArrays method
             }
         }
         return res;

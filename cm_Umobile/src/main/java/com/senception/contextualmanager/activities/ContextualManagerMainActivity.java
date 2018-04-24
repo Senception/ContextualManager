@@ -46,6 +46,7 @@ import com.senception.contextualmanager.services.ContextualManagerInterfaceServi
  */
 public class ContextualManagerMainActivity extends Activity {
 
+    public final long TIMESTAMP = System.currentTimeMillis();
 	private static final String TAG = ContextualManagerMainActivity.class.getSimpleName();
 	int backButtonCount = 0;
 	private ContextualManagerService reportBoundService;
