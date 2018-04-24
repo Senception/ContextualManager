@@ -25,21 +25,23 @@ public class ContextualManagerAvailability {
      * @param rList list of all R's calculated so far.
      * @return U the array
      */
-    public static ArrayList<Double> calculateA(ArrayList<ArrayList<Integer>> rList){
+    public static ArrayList<Double> calculateA(ArrayList<ArrayList<Double>> rList){
         ArrayList<Double> A = new ArrayList<>();
 
+        //in the beggining the A is equal to the first R in the list
         for (int j = 0; j < rList.get(0).size(); j++) {
-            A.add((double)rList.get(0).get(j)); //if there's only 1 R -> A = that R converted to double
+            A.add(rList.get(0).get(j)); //if there's only 1 R -> A = that R converted to double
         }
+
+        //if there's only one R in the list, then A is completed.
         if( rList.size() == 1){
             return A;
         }
-        else { //if there's more then 1 R -> A = A + R1 + R2...RN
+        else { //if there's more then one R -> A = A + R1 + R2...RN
             for (int i = 1; i < rList.size(); i++) {
                 A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
             }
         }
-
         return A;
     }
 
@@ -51,7 +53,7 @@ public class ContextualManagerAvailability {
      * @param usagePerHour2 list of usage 2 (list2)
      * @return the resulting list with the sum's result in each index.
      */
-    private static ArrayList<Double> sumArrays(ArrayList<Double> usagePerHour1, ArrayList<Integer> usagePerHour2){
+    private static ArrayList<Double> sumArrays(ArrayList<Double> usagePerHour1, ArrayList<Double> usagePerHour2){
 
         ArrayList<Double> res = new ArrayList<>();
         for (int i = 0; i < usagePerHour1.size(); i++) {
@@ -61,7 +63,7 @@ public class ContextualManagerAvailability {
             }
             //-1+30 = 30 --> 30/currentHour
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add((double) usagePerHour2.get(i) / System.currentTimeMillis()/1000);
+                res.add(usagePerHour2.get(i) / System.currentTimeMillis()/1000);
             }
             //30+-1 = 30 --> 30/currentHour
             else if (usagePerHour2.get(i) == -1 && usagePerHour1.get(i) != -1){
@@ -84,12 +86,12 @@ public class ContextualManagerAvailability {
      * @param storage the physical resource usage storage
      * @return e * e * cpu * mem * storage (e*e to give more value to the batery status)
      */
-    public static ArrayList<Integer> calculateR(ArrayList<Integer> e, ArrayList<Integer>
-            cpu, ArrayList<Integer> mem, ArrayList<Integer> storage){
-        ArrayList<Integer> e2 = multiplyArrays(e, e); // e square
-        ArrayList<Integer> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
-        ArrayList<Integer> memStor = multiplyArrays(mem, storage); // mem * storage
-        ArrayList<Integer> r = multiplyArrays(e2Cpu, memStor);
+    public static ArrayList<Double> calculateR(ArrayList<Double> e, ArrayList<Double>
+            cpu, ArrayList<Double> mem, ArrayList<Double> storage){
+        ArrayList<Double> e2 = multiplyArrays(e, e); // e square
+        ArrayList<Double> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
+        ArrayList<Double> memStor = multiplyArrays(mem, storage); // mem * storage
+        ArrayList<Double> r = multiplyArrays(e2Cpu, memStor);
         return r;
     }
 
@@ -100,8 +102,8 @@ public class ContextualManagerAvailability {
      * @param usagePerHour2 list of usage (list2)
      * @return the resulting list with the multiplication's result in each index.
      */
-    private static ArrayList<Integer> multiplyArrays(ArrayList<Integer> usagePerHour1, ArrayList<Integer> usagePerHour2){
-        ArrayList<Integer> res = new ArrayList<>();
+    private static ArrayList<Double> multiplyArrays(ArrayList<Double> usagePerHour1, ArrayList<Double> usagePerHour2){
+        ArrayList<Double> res = new ArrayList<>();
         for (int i = 0; i < usagePerHour1.size(); i++) {
             //-1 * -1 = -1
             if(usagePerHour1.get(i) == -1 && usagePerHour2.get(i) == -1){
@@ -109,15 +111,15 @@ public class ContextualManagerAvailability {
             }
             //-1*30 = 30
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add(usagePerHour2.get(i));
+                res.add((usagePerHour2.get(i))/100);
             }
             //30*-1 = 30
             else if (usagePerHour1.get(i) != -1 && usagePerHour2.get(i) == -1 ){
-                res.add(usagePerHour1.get(i));
+                res.add(( usagePerHour1.get(i))/100);
             }
             //30*30 = 900
             else {
-                res.add(usagePerHour1.get(i) * usagePerHour2.get(i));
+                res.add(( usagePerHour1.get(i)/100) * (usagePerHour2.get(i)/100));
             }
         }
         return res;

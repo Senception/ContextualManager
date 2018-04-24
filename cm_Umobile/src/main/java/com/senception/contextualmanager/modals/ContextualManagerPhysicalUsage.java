@@ -24,7 +24,7 @@ public class ContextualManagerPhysicalUsage {
     private final int SECONDLY = 59;
 
     private ContextualManagerPhysicalResourceType resourceType;
-    private ArrayList<Integer> usagePerHour = new ArrayList<>();
+    private ArrayList<Double> usagePerHour = new ArrayList<>();
     private int dayOfTheWeek;
 
     /**
@@ -44,7 +44,7 @@ public class ContextualManagerPhysicalUsage {
 
         this.usagePerHour = new ArrayList<>(SECONDLY);
         for (int i = 0; i <= SECONDLY; i++){
-            usagePerHour.add(i, -1);
+            usagePerHour.add(i, -1d);
         }
 
         Calendar day = Calendar.getInstance();
@@ -72,7 +72,7 @@ public class ContextualManagerPhysicalUsage {
      * Get the usage per hour of this resource.
      * @return the usage per hour.
      */
-    public ArrayList<Integer> getUsagePerHour() {
+    public ArrayList<Double> getUsagePerHour() {
         return usagePerHour;
     }
 
@@ -83,7 +83,7 @@ public class ContextualManagerPhysicalUsage {
     public void setUsagePerHour(String usagePerHour) {
         String [] items = usagePerHour.split("\\.");
         for (String s : items ) {
-            this.usagePerHour.add(Integer.parseInt(s));
+            this.usagePerHour.add(Double.parseDouble(s));
         }
     }
 

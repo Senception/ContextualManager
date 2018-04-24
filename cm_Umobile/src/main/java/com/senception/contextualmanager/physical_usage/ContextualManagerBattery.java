@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.util.Log;
 
 /**
  * Copyright (C) 2016 Senception Lda
@@ -18,6 +19,8 @@ import android.os.BatteryManager;
  *
  */
 public class ContextualManagerBattery {
+
+    public final String TAG = "";
 
     /**
      * Get the energy level of the device.

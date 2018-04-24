@@ -101,6 +101,8 @@ public class ContextualManagerMainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.cmumobile_ma_layout);
 
+		backupDB(this);
+
         FragmentManager manager = getFragmentManager();
 
 		//Asks user for permission to get usage stats

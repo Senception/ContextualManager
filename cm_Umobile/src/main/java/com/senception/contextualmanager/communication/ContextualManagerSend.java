@@ -48,13 +48,13 @@ public class ContextualManagerSend {
                     ContextualManagerAP self = dataSource.getPeer(MacSecurity.md5Hash("self"), ContextualManagerService.checkWeek("peers"));
                     double A = self.getAvailability();
                     double C = self.getCentrality();
-                    Log.d("teste", "Sending A: " + A + "\t C: " + C);
+                    Log.d(TAG, "Sending A: " + A + "\t C: " + C);
                     String AToSend = String.valueOf(A);
                     String CToSend = String.valueOf(C);
-                    Log.d("teste", "AToSend :" + AToSend + "\t CToSend: " + CToSend);//Todo: Find bug - Find out when can A or C null
+                    //Log.d("teste", "AToSend :" + AToSend + "\t CToSend: " + CToSend);//Todo: Find bug - Find out when can A or C null
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, AToSend);
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, CToSend);
-                    Log.d("teste", "Sent A and C");
+                    //Log.d(TAG, "Sent A and C");
                 }
                 else{
                     Log.d(TAG, "Table is still empty so we can't send the availability and centrality.");

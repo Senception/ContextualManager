@@ -49,8 +49,8 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
         //TODO resolve error: getting txtrecord with a and c null ---> Cannot reproduce error.
         if(txtRecordMap != null && txtRecordMap.size() != 0) {
-            Log.d("teste", "txtRecord: " + txtRecordMap.toString());
-            Log.d("teste", "received from" + srcDevice.deviceName);
+            //Log.d(TAG, "txtRecord: " + txtRecordMap.toString());
+            Log.d(TAG, "received from" + srcDevice.deviceName);
             String a = txtRecordMap.get(Identity.AVAILABILITY);
             String c = txtRecordMap.get(Identity.CENTRALITY);
             Log.d("teste", "Received a: " + a + "\t c : " + c);

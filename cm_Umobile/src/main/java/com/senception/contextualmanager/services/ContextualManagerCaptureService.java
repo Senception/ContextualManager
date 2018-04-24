@@ -62,7 +62,7 @@ public class ContextualManagerCaptureService extends Service {
     private static ContextualManagerPhysicalUsage cpu;
     private static ContextualManagerPhysicalUsage memory;
     private static ContextualManagerPhysicalUsage storage;
-    private static ArrayList<ArrayList<Integer>> rList = new ArrayList();
+    private static ArrayList<ArrayList<Double>> rList = new ArrayList();
     private static ArrayList<Double> availability = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<ContextualManagerAppUsage> apps = new ArrayList<>();
@@ -245,6 +245,7 @@ public class ContextualManagerCaptureService extends Service {
 
             //Captures the usage
             if(intent.getAction().equals("com.example.resource_usage_hourly")) { //If hourly: Captures usage
+                Log.d(TAG, "Alarm triggered after 1min");
                 //get current time
                 Calendar currentTime = Calendar.getInstance();
 
@@ -261,6 +262,7 @@ public class ContextualManagerCaptureService extends Service {
                 rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
                 availability = ContextualManagerAvailability.calculateA(rList);
+                Log.d(TAG, availability.toString());
                 int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
                 double A = availability.get(currentMinute);
                 Log.d(TAG, "Calculated A: " + A);
@@ -306,7 +308,7 @@ public class ContextualManagerCaptureService extends Service {
                 ContextualManagerMainActivity.backupDB(context); //todo eliminate
             }
             else{ // if daily: Saves the usage percentage into the database
-
+                Log.d(TAG, "Alarm triggered after 2min");
                 /*Saves the 4 physical resource usage into the database*/
                 energy.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
                 dataSource.updateResourceUsage(energy);
@@ -342,22 +344,22 @@ public class ContextualManagerCaptureService extends Service {
 
         switch(pru.getResourceType()){
             case ENERGY:
-                int level = ContextualManagerBattery.getEnergyLevel(this);
+                double level = ContextualManagerBattery.getEnergyLevel(this);
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + level);
                 pru.getUsagePerHour().set(currentMinute, level);
                 break;
             case CPU:
-                int cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
+                double cpuUsage = ContextualManagerCPU.getCpuUsageStatistic();
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + cpuUsage);
                 pru.getUsagePerHour().set(currentMinute, cpuUsage);
                 break;
             case MEMORY:
-                int mem = ContextualManagerMemory.getCurrentRam(this);
+                double mem = ContextualManagerMemory.getCurrentRam(this);
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + mem);
                 pru.getUsagePerHour().set(currentMinute, mem);
                 break;
             case STORAGE:
-                int storageUsg = ContextualManagerStorage.getCurrentStorage();
+                double storageUsg = ContextualManagerStorage.getCurrentStorage();
                 Log.d(TAG, "Captured the physical resource usage " + pru.getResourceType() + "with usage: " + storageUsg);
                 pru.getUsagePerHour().set(currentMinute, storageUsg);
                 break;
