@@ -42,11 +42,12 @@ import static com.senception.contextualmanager.services.ContextualManagerService
 
 /**
  * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
  * Update to Contextual Manager 2017
  * @author Igor dos Santos
  * @author José Soares
+ * @author Rute Sofia
  * @version 0.1
  *
  * @file Contains ContextualManagerCaptureService. This service runs in the
@@ -308,7 +309,7 @@ public class ContextualManagerCaptureService extends Service {
                         double similarity = (similarityA+similarityC)/2;
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
-                        Log.d(TAG, "Similarity with peer: " + peer.getSSID() + "is: "+similarity);
+                        Log.d(TAG, "Similarity with peer: " + peer.getSSID() + " is: "+similarity);
                     }
                 }
 

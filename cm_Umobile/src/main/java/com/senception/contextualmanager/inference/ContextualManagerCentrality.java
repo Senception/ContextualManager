@@ -2,19 +2,22 @@ package com.senception.contextualmanager.inference;
 
 import com.senception.contextualmanager.databases.ContextualManagerDataSource;
 import com.senception.contextualmanager.modals.ContextualManagerAP;
+import com.senception.contextualmanager.services.ContextualManagerCaptureService;
+
 import java.util.ArrayList;
 import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
  * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
  * Update to Contextual Manager 2017
  * @author Igor dos Santos
  * @author José Soares
+ * @author Rute Sofia
  * @version 0.1
  *
- * @file Contains ContextualManagerCentrality. Class that handles the inference of the centrality.
+ * @file Contains ContextualManagerCentrality. Class that handles the centrality computation.
  */
 public class ContextualManagerCentrality {
 
@@ -24,43 +27,57 @@ public class ContextualManagerCentrality {
      p(j)= (encounter * average_encounter_duration)/ (d(i,j) + 1)
      encounter: encounter between a pair
      average_encounter_duration: avg duration of an encounter between a pair
-     d(i,j):
-     A(j) = adjacency's matrix (vector of 1s e 0s) -- considered allways as 1. 1-connected | 0-disconnected
+     d(i,j): distance in meters between nodes
+     A(j) = adjacency's matrix  1-connected | 0-disconnected
 
      λ ∈ [0,1]
-     A(j): adjancency
+     A(j): adjacency
      d(i,j) ∈ [0,100]
     */
 
     /**
-     * Method that calculates the centrality of a device, using
-     * it's peer's average encounter duration and the number of encounters.
-     * (Eigenvector)
+     * Method that calculates the centrality of a device, based on an adaptation
+     * of Eigenvalue centrality.
+     * Formula considers, for node i and neighbors j, the numEncounters(i,j) and the
+     * avgEncounterDuration(i,j)
+     * it splits the numEncounters*avgEncounterDuration per d, which is the distance in meters
+     * @todo use the Haversine formula to compute the distance between the two nodes
+     * Currently, we have set distance to always be one.
      * @param dataSource
      * @return centrality - the centrality of the device
      */
     //NOTE: In the beginning the calculated C will present often as 0.0
     public static double calculateC(ContextualManagerDataSource dataSource){
-        //double degree; --> to use later
-        int numEncounters;
-        double avgEncDur;
-        double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
-        double lambda = 0.8; // should be the max of a lambda vector.
 
-        //get peer list
+        int numEncounters=0;
+        double avgEncDur=0;
+        double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
+        double lambda = 1;
+        double i=0;
+        /* work on peer list
+         * and compute centrality
+         */
         ArrayList<ContextualManagerAP> peerList;
         double centrality = 0;
         if(!dataSource.isTableEmpty(checkWeek("peers"))) {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
-
+            i=0;
             for (ContextualManagerAP peer : peerList) {
-                //if peer is connected (future) --> to use later
-                numEncounters = peer.getNumEncounters();
-                avgEncDur = peer.getAvgEncounterDuration();
-                centrality += numEncounters*avgEncDur/distance;
+                if (peer.getIsConnected() == 1) {
+                    // @todo distance based on Haversive formula
+                    centrality = centrality+(peer.getNumEncounters()*peer.getAvgEncounterDuration())/distance;
+                ++i;
+                }
+
             }
+        /* simplification of lambda, just the ratio of connected peers against all peers
+        * the more connected peers, the higher the centrality
+        */
+        lambda = i/peerList.size();
         }
-        centrality = centrality * (1/lambda);
+
+        centrality = centrality * 1/lambda;
+       // centrality = centrality/(System.currentTimeMillis()- ContextualManagerCaptureService.TIMESTAMP)/60000;
         return centrality;
     }
 }
