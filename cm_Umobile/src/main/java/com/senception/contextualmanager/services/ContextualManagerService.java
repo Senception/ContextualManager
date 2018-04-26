@@ -256,13 +256,13 @@ public class ContextualManagerService extends Service{
 					ap.setLongitude(longitude);
                     ap.setAvailability(0.0);
                     ap.setCentrality(0.0);
-                    ap.setSimilarity(0.0);
                     ap.setNumEncounters(1);
                     ap.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                     Log.d(TAG, "StartEncounter: " + ap.getStartEncounter());
                     ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
                     Log.d(TAG, "EndEncounter: " + ap.getEndEncounter());
-                    ap.setAvgEncounterDuration(0);
+                    ap.setAvgEncounterDuration(ap.getEndEncounter()-ap.getStartEncounter());
+                    ap.setSimilarity(ap.getNumEncounters()*ap.getAvgEncounterDuration());
                     Log.d(TAG, "AvgDuration: " + ap.getAvgEncounterDuration());
                     ap.setIsConnected(1);
                     /*Average encounter calculation*/
@@ -295,7 +295,7 @@ public class ContextualManagerService extends Service{
                     Log.d(TAG, "startEnc = " + peerStartEnc);
                     int duration = (peerEndEnc-peerStartEnc);
                     Log.d(TAG, "duration = " + duration);
-                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) (System.currentTimeMillis() / 1000));
+                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) ((System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/ 60*1000));
                     Log.d(TAG, "The avgEncounterDuration of the peer " + peer.getSSID() + " is " + peer.getAvgEncounterDuration());
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and updated into the DB");

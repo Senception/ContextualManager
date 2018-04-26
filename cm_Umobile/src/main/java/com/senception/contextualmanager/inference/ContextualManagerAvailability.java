@@ -1,5 +1,7 @@
 package com.senception.contextualmanager.inference;
 
+import android.util.Log;
+
 import com.senception.contextualmanager.activities.ContextualManagerMainActivity;
 import com.senception.contextualmanager.services.ContextualManagerCaptureService;
 
@@ -28,12 +30,41 @@ public class ContextualManagerAvailability {
      * @param rList list of all R's calculated so far.
      * @return U the array
      */
-    public static ArrayList<Double> calculateA(ArrayList<ArrayList<Double>> rList){
-        ArrayList<Double> A = new ArrayList<>();
+    public static ArrayList<Double> calculateA(ArrayList<Double> rList) {
 
+        ArrayList<Double> A = new ArrayList<>(rList.size());
+        Log.d("teste", "A size = " + A.size());
+        // initializes A to 0
+        for (int i = 0; i < rList.size(); i++) {
+            A.add(0d);
+        }
+        // starts to run over A positions, a is the index
+        for (int a = 0; a < A.size(); a++) {
+            // first position, equal to r only, while the others are a sum of all previous r values
+            if (a == 0) {
+                if (rList.get(0) != -1) {
+                    A.set(a, rList.get(0));
+                }
+            } else {
+                // runs over rList to sum all prior values
+                for (int j = 0; j <= a; j++) {
+                    if (rList.get(j) != -1) {
+                        //A.set(a, (A.get(a) + rList.get(j)/(ContextualManagerCaptureService.TIMESTAMP - System.currentTimeMillis()/60*1000)));
+                        A.set(a, A.get(a) + rList.get(j));
+                        Log.d("teste", "A calculado: " + A.toString());
+                    }
+                }
+            }
+        }
+        return A;
+    }
+/*
         //in the beggining the A is equal to the first R in the list
-        for (int j = 0; j < rList.get(0).size(); j++) {
+        for (int j = 0; j < rList.size(); j++) {
             A.add(rList.get(0).get(j)); //if there's only 1 R -> A = that R converted to double
+            if(rList.get(0).get(j) != -1) {
+                Log.d("teste", "r[0] = " + rList.get(0).get(j));
+            }
         }
 
         //if there's only one R in the list, then A is completed.
@@ -42,12 +73,13 @@ public class ContextualManagerAvailability {
         }
         else { //if there's more then one R -> A = A + R1 + R2...RN
             for (int i = 1; i < rList.size(); i++) {
+                Log.d("teste", "ri = " + rList.get(i).toString());
                 A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
             }
         }
         return A;
     }
-
+*/
     /**
      * This method is an auxiliar method that sums array lists and for each sum,
      * divides the result for the instant time.
@@ -91,10 +123,21 @@ public class ContextualManagerAvailability {
      */
     public static ArrayList<Double> calculateR(ArrayList<Double> e, ArrayList<Double>
             cpu, ArrayList<Double> mem, ArrayList<Double> storage){
+        Log.d("teste", "e = " + e.toString());
+        Log.d("teste", "cpu = " + cpu.toString());
+        Log.d("teste", "mem = " + mem.toString());
+        Log.d("teste", "s = " + storage.toString());
         ArrayList<Double> e2 = multiplyArrays(e, e); // e square
         ArrayList<Double> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
         ArrayList<Double> memStor = multiplyArrays(mem, storage); // mem * storage
         ArrayList<Double> r = multiplyArrays(e2Cpu, memStor);
+        //todo resources between [0..100], but we need r between [0..1]
+        double d = Math.pow(100,5);
+        for (int i = 0; i < r.size(); i++) {
+            if(r.get(i) != -1){
+                r.set(i, r.get(i) / d);
+            }
+        }
         return r;
     }
 
@@ -114,15 +157,15 @@ public class ContextualManagerAvailability {
             }
             //-1*30 = 30
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
-                res.add((usagePerHour2.get(i))/100);
+                res.add(usagePerHour2.get(i));
             }
             //30*-1 = 30
             else if (usagePerHour1.get(i) != -1 && usagePerHour2.get(i) == -1 ){
-                res.add(( usagePerHour1.get(i))/100);
+                res.add(usagePerHour1.get(i));
             }
             //30*30 = 900
             else {
-                res.add(( usagePerHour1.get(i)/100) * (usagePerHour2.get(i)/100));
+                res.add(usagePerHour1.get(i) * usagePerHour2.get(i));
             }
         }
         return res;

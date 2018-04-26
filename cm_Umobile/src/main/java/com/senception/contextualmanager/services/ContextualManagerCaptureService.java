@@ -260,10 +260,10 @@ public class ContextualManagerCaptureService extends Service {
 
                 /*Availability Calculation:*/
                 // Captures the R (b*b*cpu*mem*storage) every hour (for tests: min)
-                rList.add(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
+                //rList.add();
                 //Log.d(TAG, "RList: " + rList);
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
-                availability = ContextualManagerAvailability.calculateA(rList);
+                availability = ContextualManagerAvailability.calculateA(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 Log.d(TAG, availability.toString());
                 int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
                 double A = availability.get(currentMinute);
