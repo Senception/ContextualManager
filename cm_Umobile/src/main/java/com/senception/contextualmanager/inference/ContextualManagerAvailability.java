@@ -9,11 +9,12 @@ import java.util.ArrayList;
 
 /**
  * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
+ * Update to Contextual Manager 2017/2018
  * @author Igor dos Santos
  * @author José Soares
+ * @author Rute Sofia
  * @version 0.1
  *
  * @file Contains ContextualManagerAvailability. Class that handles the inference of the availability.
@@ -21,65 +22,34 @@ import java.util.ArrayList;
 public class ContextualManagerAvailability {
 
     /*Formulas:
-     * 1) A(i) = Σ r(i) / T
+     * 1) A(i) = Σ r(i) / t, A(i) ⊂ [0,1]
      * 2) R(i) = B(i) * B(i) * CPU(i) * MEM(i) * STORAGE(i),     r(i) ⊂ [0,1]
     */
 
     /**
      * Calculates a number that measures if a device is viable to conduct communication with in a given time.
      * @param rList list of all R's calculated so far.
-     * @return U the array
+     * @return A Availability
      */
-    public static ArrayList<Double> calculateA(ArrayList<Double> rList) {
 
-        ArrayList<Double> A = new ArrayList<>(rList.size());
-        Log.d("teste", "A size = " + A.size());
-        // initializes A to 0
-        for (int i = 0; i < rList.size(); i++) {
-            A.add(0d);
-        }
-        // starts to run over A positions, a is the index
-        for (int a = 0; a < A.size(); a++) {
-            // first position, equal to r only, while the others are a sum of all previous r values
-            if (a == 0) {
-                if (rList.get(0) != -1) {
-                    A.set(a, rList.get(0));
-                }
-            } else {
-                // runs over rList to sum all prior values
-                for (int j = 0; j <= a; j++) {
-                    if (rList.get(j) != -1) {
-                        //A.set(a, (A.get(a) + rList.get(j)/(ContextualManagerCaptureService.TIMESTAMP - System.currentTimeMillis()/60*1000)));
-                        A.set(a, A.get(a) + rList.get(j));
-                        Log.d("teste", "A calculado: " + A.toString());
-                    }
-                }
+    public static double calculateA(ArrayList<Double> rList) {
+       double Availability = 0;
+        int t=0;
+        for (int i =0; i < rList.size(); i++) {
+            if (rList.get(i) != -1) {
+                ++t;
+                Availability = Availability + rList.get(i);
             }
         }
-        return A;
+        // Availability is an weighted average of all values of r
+        // @todo improve the average accuracy, by using another type of weighted average
+        Availability = Availability/t;
+        Log.d("teste", "r is:"+rList.toString());
+        Log.d("teste", "t is:"+t);
+        Log.d("teste", "Availability A  = " + Availability);
+     return Availability;
     }
-/*
-        //in the beggining the A is equal to the first R in the list
-        for (int j = 0; j < rList.size(); j++) {
-            A.add(rList.get(0).get(j)); //if there's only 1 R -> A = that R converted to double
-            if(rList.get(0).get(j) != -1) {
-                Log.d("teste", "r[0] = " + rList.get(0).get(j));
-            }
-        }
 
-        //if there's only one R in the list, then A is completed.
-        if( rList.size() == 1){
-            return A;
-        }
-        else { //if there's more then one R -> A = A + R1 + R2...RN
-            for (int i = 1; i < rList.size(); i++) {
-                Log.d("teste", "ri = " + rList.get(i).toString());
-                A = sumArrays(A, rList.get(i)); //A = R0 //A = A + R2 + R3 --> R1+R2
-            }
-        }
-        return A;
-    }
-*/
     /**
      * This method is an auxiliar method that sums array lists and for each sum,
      * divides the result for the instant time.

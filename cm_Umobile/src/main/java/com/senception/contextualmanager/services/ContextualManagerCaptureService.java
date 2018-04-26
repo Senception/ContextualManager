@@ -63,7 +63,7 @@ public class ContextualManagerCaptureService extends Service {
     private static ContextualManagerPhysicalUsage memory;
     private static ContextualManagerPhysicalUsage storage;
     private static ArrayList<ArrayList<Double>> rList = new ArrayList();
-    private static ArrayList<Double> availability = new ArrayList<>();
+    //private static ArrayList<Double> availability = new ArrayList<>();
     private static List<UsageStats> ustats;
     private static List<ContextualManagerAppUsage> apps = new ArrayList<>();
     private final IBinder mBinder = new LocalBinder();
@@ -263,21 +263,20 @@ public class ContextualManagerCaptureService extends Service {
                 //rList.add();
                 //Log.d(TAG, "RList: " + rList);
                 // Calculates the A - availability (sum of all Rs) every hour (for tests: min)
-                availability = ContextualManagerAvailability.calculateA(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
-                Log.d(TAG, availability.toString());
-                int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
-                double A = availability.get(currentMinute);
-                Log.d(TAG, "Calculated A: " + A);
+                double Availability = ContextualManagerAvailability.calculateA(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
+                //int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
+                // double A = availability.get(currentMinute);
+                Log.d(TAG, "In CaptureService Calculated A: " + Availability);
 
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
-                Log.d(TAG, "Calculated C: " + C);
+                Log.d(TAG, "In CaptureService Calculated C: " + C);
 
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
                 mySelf.setSSID("self");
                 mySelf.setBSSID(MacSecurity.md5Hash("self"));
-                mySelf.setAvailability(A);
+                mySelf.setAvailability(Availability);
                 mySelf.setCentrality(C);
                 if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {
                     dataSource.registerNewPeers(mySelf, ContextualManagerService.checkWeek("peers"));
@@ -299,7 +298,7 @@ public class ContextualManagerCaptureService extends Service {
                         double similarity = numEncounters*avgEncDur;
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
-                        Log.d(TAG, "Calculated I: " + similarity + " and saved it on the DB" + "for peer: " + peer.getSSID());
+                        Log.d(TAG, "CaptureService Calculated I: " + similarity + " and saved it on the DB" + "for peer: " + peer.getSSID());
                     }
                 }
 
