@@ -104,10 +104,10 @@ public class ContextualManagerCaptureService extends Service {
             initializeAppsTable(app);
         }
 
-        Log.d(TAG, "All the apps used by the device were initialized if they weren't already on the DB");
+    //    Log.d(TAG, "All the apps used by the device were initialized if they weren't already on the DB");
 
         /*
-        * TODO implement category of an app
+        * @todo implement category of an app
         * Creates a thread where the categories of all apps in the device will be determined
         * by getting it's category in the google apstore, to make this possible, internet
         * connection is necessary, if there is no internet connection, categories will not be available.
@@ -123,7 +123,7 @@ public class ContextualManagerCaptureService extends Service {
 
         setAlarm();
 
-        Log.d(TAG, "Alarms setted to hourly and daily");
+   //     Log.d(TAG, "Alarms setted to hourly and daily");
     }
 
     @Override
@@ -256,7 +256,7 @@ public class ContextualManagerCaptureService extends Service {
                 capturePhysicalUsage(memory);
                 capturePhysicalUsage(storage);
 
-                Log.d(TAG, "Captured all the physical resources.");
+            //    Log.d(TAG, "Captured all the physical resources.");
 
                 /*Availability Calculation:*/
                 // Captures the R (b*b*cpu*mem*storage) every hour (for tests: min)
@@ -266,11 +266,11 @@ public class ContextualManagerCaptureService extends Service {
                 double Availability = ContextualManagerAvailability.calculateA(ContextualManagerAvailability.calculateR(energy.getUsagePerHour(), cpu.getUsagePerHour(), memory.getUsagePerHour(), storage.getUsagePerHour()));
                 //int currentMinute = currentTime.get(Calendar.MINUTE); //todo change to hourly
                 // double A = availability.get(currentMinute);
-                Log.d(TAG, "In CaptureService Calculated A: " + Availability);
+             //   Log.d(TAG, "In CaptureService Calculated A: " + Availability);
 
                 /*Centrality Calculation:*/
                 double C = ContextualManagerCentrality.calculateC(dataSource);
-                Log.d(TAG, "In CaptureService Calculated C: " + C);
+               // Log.d(TAG, "In CaptureService Calculated C: " + C);
 
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
@@ -285,9 +285,9 @@ public class ContextualManagerCaptureService extends Service {
                     dataSource.updatePeer(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
 
-                Log.d(TAG, "A and C saved into the DB on the correspondent peer table of the current day of the week as the peer 'self'");
+                //Log.d(TAG, "A and C saved into the DB on the correspondent peer table of the current day of the week as the peer 'self'");
 
-                /*Similarity Calculation*/
+                /*Similarity computation*/
                 //get peer list, and foreach one updates its similarity
                 if(!dataSource.isTableEmpty(checkWeek("peers"))) {
                     ArrayList<ContextualManagerAP> peerList = dataSource.getAllPeers(checkWeek("peers"));
@@ -295,21 +295,31 @@ public class ContextualManagerCaptureService extends Service {
                     for (ContextualManagerAP peer : peerList) {
                         double numEncounters = peer.getNumEncounters();
                         double avgEncDur = peer.getAvgEncounterDuration();
-                        double similarity = numEncounters*avgEncDur;
+
+                        /* similarity (I) computed as:
+                         * similarity(a,b) = 1 - abs(a-b)/max(a,b)
+                         * a: node's value and b peer value
+                         * @todo cosine similarity, for array values (currently A and C are doubles)
+                         * Similarity then weights similarity between centralities and between availability
+                         */
+
+                        double similarityA = 1-(Math.abs(peer.getAvailability()-mySelf.getAvailability())/Math.max(peer.getAvailability(),mySelf.getAvailability()));
+                        double similarityC = 1-(Math.abs(peer.getCentrality()-mySelf.getCentrality())/Math.max(peer.getCentrality(),mySelf.getCentrality()));
+                        double similarity = (similarityA+similarityC)/2;
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
-                        Log.d(TAG, "CaptureService Calculated I: " + similarity + " and saved it on the DB" + "for peer: " + peer.getSSID());
+                        Log.d(TAG, "Similarity with peer: " + peer.getSSID() + "is: "+similarity);
                     }
                 }
 
                 /* Captures the apps usage */
                 captureAppsUsage();
-                Log.d(TAG, "Captured the apps usage");
+              //  Log.d(TAG, "Captured the apps usage");
 
                 ContextualManagerMainActivity.backupDB(context); //todo eliminate
             }
             else{ // if daily: Saves the usage percentage into the database
-                Log.d(TAG, "Alarm triggered after 2min");
+             //   Log.d(TAG, "Alarm triggered after 2min");
                 /*Saves the 4 physical resource usage into the database*/
                 energy.setDayOfTheWeek(String.valueOf(newDayOfTheWeek));
                 dataSource.updateResourceUsage(energy);
@@ -420,7 +430,7 @@ public class ContextualManagerCaptureService extends Service {
     }
 
     /**
-     * TODO category
+     * @todo category
      * Updates the category of each app in the apps list if there is internet connection
      * and the respective app has a category affiliated in google play store -- To-complete
      * https://stackoverflow.com/questions/10710442/how-to-get-category-for-each-app-on-device-on-android

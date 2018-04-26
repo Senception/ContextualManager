@@ -39,7 +39,7 @@ public class ContextualManagerCentrality {
      * @param dataSource
      * @return centrality - the centrality of the device
      */
-    //NOTE: In the beggining the calculated C will present often as 0.0
+    //NOTE: In the beginning the calculated C will present often as 0.0
     public static double calculateC(ContextualManagerDataSource dataSource){
         //double degree; --> to use later
         int numEncounters;
