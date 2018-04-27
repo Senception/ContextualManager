@@ -30,7 +30,7 @@ public class ContextualManagerCentrality {
      d(i,j): distance in meters between nodes
      A(j) = adjacency's matrix  1-connected | 0-disconnected
 
-     λ ∈ [0,1]
+     λ ∈ [0,1] and is currently equal to the ratio between connected peers and all peers
      A(j): adjacency
      d(i,j) ∈ [0,100]
     */
@@ -61,7 +61,8 @@ public class ContextualManagerCentrality {
         double centrality = 0;
         if(!dataSource.isTableEmpty(checkWeek("peers"))) {
             peerList = dataSource.getAllPeers(checkWeek("peers"));
-            i=0;
+            // i corresponds to the number of peers. Starts at 1 (self)
+            i=1;
             for (ContextualManagerAP peer : peerList) {
                 if (peer.getIsConnected() == 1) {
                     // @todo distance based on Haversive formula

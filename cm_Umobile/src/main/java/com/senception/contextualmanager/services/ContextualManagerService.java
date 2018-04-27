@@ -58,6 +58,8 @@ import android.view.WindowManager;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import static com.senception.contextualmanager.services.ContextualManagerCaptureService.TIMESTAMP;
+
 /**
  * Copyright (C) 2016 Senception Lda
  * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
@@ -259,7 +261,7 @@ public class ContextualManagerService extends Service{
                     ap.setNumEncounters(1);
                     ap.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
                     Log.d(TAG, "StartEncounter: " + ap.getStartEncounter());
-                    ap.setEndEncounter((int)(System.currentTimeMillis()/1000));
+                    ap.setEndEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds
                     Log.d(TAG, "EndEncounter: " + ap.getEndEncounter());
                     ap.setAvgEncounterDuration(ap.getEndEncounter()-ap.getStartEncounter());
                     ap.setSimilarity(ap.getNumEncounters()*ap.getAvgEncounterDuration());
@@ -269,7 +271,9 @@ public class ContextualManagerService extends Service{
                     double peerAvgEncDur = ap.getAvgEncounterDuration();
                     int peerEndEnc = ap.getEndEncounter();
                     int peerStartEnc = ap.getStartEncounter();
-                    ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
+					//computes the average encounter duration based on an EMA, where alpha has been set as 0,3. We give more weight to prior values
+                   // ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
+					ap.setAvgEncounterDuration(((0.7*peerAvgEncDur)+0.3*(peerEndEnc-peerStartEnc))/((System.currentTimeMillis()-TIMESTAMP)/1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and saved into the DB");
 				}
@@ -295,7 +299,7 @@ public class ContextualManagerService extends Service{
                     Log.d(TAG, "startEnc = " + peerStartEnc);
                     int duration = (peerEndEnc-peerStartEnc);
                     Log.d(TAG, "duration = " + duration);
-                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) ((System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/ 60*1000));
+                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) ((System.currentTimeMillis() - TIMESTAMP)/ 60*1000));
                     Log.d(TAG, "The avgEncounterDuration of the peer " + peer.getSSID() + " is " + peer.getAvgEncounterDuration());
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and updated into the DB");

@@ -54,6 +54,7 @@ import static com.senception.contextualmanager.services.ContextualManagerService
  * background, for each hour it gets the 4 resource usages (energy,
  * cpu, memory and storage) and the apps usage, for each day it
  * saves them into the database.
+ * for DEMO, it is sampling per MINUTE - @todo change later for hour
  */
 public class ContextualManagerCaptureService extends Service {
 
@@ -297,16 +298,24 @@ public class ContextualManagerCaptureService extends Service {
                         double numEncounters = peer.getNumEncounters();
                         double avgEncDur = peer.getAvgEncounterDuration();
 
-                        /* similarity (I) computed as:
+                        /* similarity (I) should be computed as:
                          * similarity(a,b) = 1 - abs(a-b)/max(a,b)
                          * a: node's value and b peer value
                          * @todo cosine similarity, for array values (currently A and C are doubles)
-                         * Similarity then weights similarity between centralities and between availability
+                         * for the routing interface, similarity is computed simply based on
+                         * the numEncounters and avgEncounter duration.
+                         * Similarity A weights similarity between  availability
+                         * Similarity C weights similarity between centralities of the node
+                         * @todo improve similarity C and A as well as similarity based on node interests (e.g., apps used)
                          */
 
-                        double similarityA = 1-(Math.abs(peer.getAvailability()-mySelf.getAvailability())/Math.max(peer.getAvailability(),mySelf.getAvailability()));
+
+                      /*  double similarityA = 1-(Math.abs(peer.getAvailability()-mySelf.getAvailability())/Math.max(peer.getAvailability(),mySelf.getAvailability()));
                         double similarityC = 1-(Math.abs(peer.getCentrality()-mySelf.getCentrality())/Math.max(peer.getCentrality(),mySelf.getCentrality()));
                         double similarity = (similarityA+similarityC)/2;
+                        */
+                      // similarity for the routing
+                        double similarity = (numEncounters*avgEncDur);
                         peer.setSimilarity(similarity);
                         dataSource.updatePeer(peer, checkWeek("peers"));
                         Log.d(TAG, "Similarity with peer: " + peer.getSSID() + " is: "+similarity);
