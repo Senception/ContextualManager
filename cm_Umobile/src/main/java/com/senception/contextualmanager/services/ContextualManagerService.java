@@ -273,6 +273,8 @@ public class ContextualManagerService extends Service{
                     int peerStartEnc = ap.getStartEncounter();
 					//computes the average encounter duration based on an EMA, where alpha has been set as 0,3. We give more weight to prior values
                    // ap.setAvgEncounterDuration((peerAvgEncDur + (peerEndEnc-peerStartEnc))/ (double) (System.currentTimeMillis() / 1000));
+					// @todo the time window is not completely accurate as values for avgEncDur are stored since the first time we saw a peer.
+					// @todo store the timestamp for the first time a peer was seen and replace TIMESTAMP CM for that timestamp
 					ap.setAvgEncounterDuration(((0.7*peerAvgEncDur)+0.3*(peerEndEnc-peerStartEnc))/((System.currentTimeMillis()-TIMESTAMP)/1000));
 					dataSource.registerNewPeers(ap, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and saved into the DB");
