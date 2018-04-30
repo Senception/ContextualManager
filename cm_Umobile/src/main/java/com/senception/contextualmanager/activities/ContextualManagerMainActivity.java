@@ -34,9 +34,9 @@ import com.senception.contextualmanager.services.ContextualManagerService;
 import com.senception.contextualmanager.services.ContextualManagerInterfaceService;
 
 /**
- * Copyright (C) 2016 Senception Lda
- * Update to Contextual Manager 2017
- * @author Igor dos Santos - degomosIgor@sen-ception.com
+ * Copyright (C) Senception Lda
+ * Update to Contextual Manager 2017-2018
+ * @author Igor dos Santos - degomosIgor@senception.com
  * @author José Soares - jose.soares@senception.com
  * @version 0.1
  *
@@ -55,7 +55,7 @@ public class ContextualManagerMainActivity extends Activity {
 	private boolean mIsServiceBound = false;
 
 	/**
-	 * The Connection to the PerSense Light service. 
+	 * The Connection to the CM service.
 	 */
 	private ServiceConnection reportConnection = new ServiceConnection() {
 
@@ -106,7 +106,11 @@ public class ContextualManagerMainActivity extends Activity {
 
         FragmentManager manager = getFragmentManager();
 
-		//Asks user for permission to get usage stats
+		/*
+		 * Asks user for permission to get usage stats
+		 * Stats are used only LOCALLY, and to compute weights
+		 */
+
 		if(!ContextualManagerPermissions.usageStatsPermission(getApplicationContext())) {
 			ContextualManagerUsageStatsDialogF usageDialog = ContextualManagerUsageStatsDialogF.newInstance(getString(R.string.usage_stats), getString(R.string.usage_stats_msg));
 			usageDialog.show(manager, "Dialog");
@@ -118,6 +122,7 @@ public class ContextualManagerMainActivity extends Activity {
 		Log.d(TAG, "ContextualManagerCaptureService started.");
 
 		//Asks user for permission to get device location
+
 		if(!ContextualManagerPermissions.isLocationEnabled(getApplicationContext())){
 			ContextualManagerLocationDialogF locationDialog = ContextualManagerLocationDialogF.newInstance(getString(R.string.location), getString(R.string.location_msg));
 			locationDialog.show(manager, "Dialog");

@@ -14,14 +14,16 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Copyright (C) 2016 Senception Lda
+ * Copyright (C) Senception Lda
  * Update to Contextual Manager 2017
- * @author Igor dos Santos - degomosIgor@sen-ception.com
+ * @author Igor dos Santos - degomosIgor@senception.com
  * @author José Soares - jose.soares@senception.com
+ * @author Rute Sofia
  * @version 0.1
  *
  * @file Contains ContextualManagerSend. This class is used
- * to send information to other contextual managers (A,C)
+ * to send information to other contextual managers, namely values A (Availability, C (Centrality) and I (similarity cost to a peer)
+ * Check UMOBILE Deliverable D4.5 for details on the cost computation
  */
 public class ContextualManagerSend {
 
@@ -30,13 +32,13 @@ public class ContextualManagerSend {
 
     /**
      * /**
-     * Constructs a contectualManagerSend that will be attempting to
-     * send the availability and centrality to other peers that are
+     * Constructs a contextualManagerSend that will be attempting to
+     * send the Availability and Centrality to other peers that are
      * also running the Contextual Manager.
+     * This is done directly, via Wi-Fi Direct (or via any other direct connection)
      * @param context
      */
     public ContextualManagerSend(Context context) {
-        //TODO resolve error: getting txtrecord with a and c null ---> Cannot reproduce error.
         mContext = context;
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -51,15 +53,15 @@ public class ContextualManagerSend {
                     Log.d(TAG, "Sending A: " + A + "\t C: " + C);
                     String AToSend = String.valueOf(A);
                     String CToSend = String.valueOf(C);
-                    //Log.d("teste", "AToSend :" + AToSend + "\t CToSend: " + CToSend);//Todo: Find bug - Find out when can A or C null
                     WifiP2pTxtRecord.setRecord(mContext, Identity.AVAILABILITY, AToSend);
                     WifiP2pTxtRecord.setRecord(mContext, Identity.CENTRALITY, CToSend);
-                    //Log.d(TAG, "Sent A and C");
+                    Log.d(TAG, "Sent A and C");
                 }
                 else{
                     Log.d(TAG, "Table is still empty so we can't send the availability and centrality.");
                 }
+                // TODO adjust the time the data is being sent. Currently it is being sent every 10 seconds for demo purpose only.
             }
-        }, 0, 10*1000); //todo every 5 min
+        }, 0, 10*1000);
     }
 }

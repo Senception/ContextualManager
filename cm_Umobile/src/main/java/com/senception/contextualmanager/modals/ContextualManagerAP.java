@@ -1,22 +1,22 @@
 package com.senception.contextualmanager.modals;
 
 /**
- * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Copyright (C) Senception Lda
+ * Author(s): Igor dos Santos - degomosIgor@senception.com
  * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
+ * Update to Contextual Manager 2017/2018
  * @author Igor dos Santos
  * @author José Soares
  * @version 0.1
  *
- * @file Contains ContextualManagerAP. This class represents objects that PerSense Light considers
+ * @file Contains ContextualManagerAP. This class holds a generic object for a device stored by the CM
  *
  */
 public class ContextualManagerAP {
 
 	private int id;
-	private String SSID; //Name of the WAP
-    private String BSSID; //Mac address of the WAP (wireless access point)
+	private String SSID; //Name of the Device.
+    private String HashedMac; //MAC address of the device
 	private double attractiveness; //TODO since it's not used in this vertion, delete.
 	private  String dateTime;
 	private String DayOfWeek;
@@ -57,19 +57,19 @@ public class ContextualManagerAP {
     }
 
     /**
-     *Get the bssid of this AP
-     *@return the bssid
+     *Get the HashedMac of this AP
+     *@return the HashedMac
      */
-    public String getBSSID() {
-        return BSSID;
+    public String getHashedMac() {
+        return HashedMac;
     }
 
     /**
-     *Set the bssid of this AP
-     *@param bSSID the bssid to set
+     *Set the HashedMac of this AP
+     *@param HashedMAC the HashedMac to set
      */
-    public void setBSSID(String bSSID) {
-        BSSID = bSSID;
+    public void setHashedMac(String HashedMAC) {
+        HashedMac = HashedMAC;
     }
 
     /**

@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import static com.senception.contextualmanager.services.ContextualManagerService.checkWeek;
 
 /**
- * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@senception.com *
- * 			  José Soares - jose.soares@senception.com
+ * Copyright (C)  Senception Lda
+ * Author(s): Igor dos Santos - degomosIgor@senception.com
+ * José Soares - jose.soares@senception.com
  * Update to Contextual Manager 2017
  * @author Igor dos Santos
  * @author José Soares
@@ -21,7 +21,7 @@ import static com.senception.contextualmanager.services.ContextualManagerService
  */
 public class ContextualManagerCentrality {
 
-    //Formula: C(i) = 1/λ Σj A(j) * p(j)
+    //Formula: C(i) = 1/λ Σj A(j) * p(j), see deliverable D4.5 from H2020 UMOBILE
 
     /*
      p(j)= (encounter * average_encounter_duration)/ (d(i,j) + 1)
@@ -41,17 +41,18 @@ public class ContextualManagerCentrality {
      * Formula considers, for node i and neighbors j, the numEncounters(i,j) and the
      * avgEncounterDuration(i,j)
      * it splits the numEncounters*avgEncounterDuration per d, which is the distance in meters
-     * @todo use the Haversine formula to compute the distance between the two nodes
+     * TODO use the Haversine formula to compute the distance between the two nodes
      * Currently, we have set distance to always be one.
      * @param dataSource
      * @return centrality - the centrality of the device
      */
-    //NOTE: In the beginning the calculated C will present often as 0.0
+    //NOTE: In the beginning the calculated C MAY be 0, as it is based on encounter duration, and peer encounter
     public static double calculateC(ContextualManagerDataSource dataSource){
 
         int numEncounters=0;
         double avgEncDur=0;
-        double distance = 1; // we're not taking into consideration the distance in this implementation -> only in the future
+        // TODO: consider the distance between devices based on their coordinates
+        double distance = 1;
         double lambda = 1;
         double i=0;
         /* work on peer list
@@ -65,7 +66,7 @@ public class ContextualManagerCentrality {
             i=1;
             for (ContextualManagerAP peer : peerList) {
                 if (peer.getIsConnected() == 1) {
-                    // @todo distance based on Haversive formula
+                    // TODO distance based on Haversive formula
                     centrality = centrality+(peer.getNumEncounters()*peer.getAvgEncounterDuration())/distance;
                 ++i;
                 }
@@ -73,12 +74,12 @@ public class ContextualManagerCentrality {
             }
         /* simplification of lambda, just the ratio of connected peers against all peers
         * the more connected peers, the higher the centrality
+        * TODO use an eigenvalue formulation for lambda
         */
         lambda = i/peerList.size();
         }
 
         centrality = centrality * 1/lambda;
-       // centrality = centrality/(System.currentTimeMillis()- ContextualManagerCaptureService.TIMESTAMP)/60000;
         return centrality;
     }
 }

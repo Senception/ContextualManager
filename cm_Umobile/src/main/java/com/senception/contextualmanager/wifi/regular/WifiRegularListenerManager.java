@@ -6,6 +6,16 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Copyright (C) Senception Lda
+ * Update to Contextual Manager 2017-2018
+ * @author José Soares - jose.soares@senception.com
+ * @version 0.1
+ *
+ * @file holds WifiRegular, to set the Wi-Fi Listener
+ */
+
+
 public class WifiRegularListenerManager {
 
     private static final String TAG = WifiRegularListenerManager.class.getSimpleName();

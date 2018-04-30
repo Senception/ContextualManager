@@ -277,10 +277,10 @@ public class ContextualManagerCaptureService extends Service {
                 /* Saves A and C into the database */
                 ContextualManagerAP mySelf = new ContextualManagerAP();
                 mySelf.setSSID("self");
-                mySelf.setBSSID(MacSecurity.md5Hash("self"));
+                mySelf.setHashedMac(MacSecurity.md5Hash("self"));
                 mySelf.setAvailability(Availability);
                 mySelf.setCentrality(C);
-                if(!dataSource.hasPeer(mySelf.getBSSID(), ContextualManagerService.checkWeek("peers"))) {
+                if(!dataSource.hasPeer(mySelf.getHashedMac(), ContextualManagerService.checkWeek("peers"))) {
                     dataSource.registerNewPeers(mySelf, ContextualManagerService.checkWeek("peers"));
                 }
                 else {

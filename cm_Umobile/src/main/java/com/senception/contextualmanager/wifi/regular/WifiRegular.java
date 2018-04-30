@@ -4,6 +4,15 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.util.Log;
 
+/**
+ * Copyright (C) Senception Lda
+ * Update to Contextual Manager 2017-2018
+ * @author José Soares - jose.soares@senception.com
+ * @version 0.1
+ *
+ * @file holds WifiRegular, to set the Wi-Fi receiver
+ */
+
 import static android.net.wifi.WifiManager.NETWORK_STATE_CHANGED_ACTION;
 
 public class WifiRegular {

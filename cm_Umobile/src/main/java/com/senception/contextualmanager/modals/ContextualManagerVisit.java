@@ -18,7 +18,7 @@ import java.text.SimpleDateFormat;
 public class ContextualManagerVisit {
 
 	private String SSID;
-	private String BSSID;
+	private String HashedMac;
 	private Long startTime;
 	private Long endTime;
 	private int dayOfTheWeek;
@@ -41,18 +41,18 @@ public class ContextualManagerVisit {
 		SSID = sSID;
 	}
 	/**
-	 * Get bssid of the AP
-	 * @return the BSSID
+	 * Get HashedMac of the AP
+	 * @return the HashedMac
 	 */
-	public String getBSSID() {
-		return BSSID;
+	public String getHashedMac() {
+		return HashedMac;
 	}
 	/**
-	 * Set the bssid of the AP
-	 * @param bSSID the bssid to set
+	 * Set the HashedMac of the AP
+	 * @param HashedMac the HashedMac to set
 	 */
-	public void setBSSID(String bSSID) {
-		BSSID = bSSID;
+	public void setHashedMac(String HashedMac) {
+		HashedMac = HashedMac;
 	}
 	/**
 	 * Get start time of the AP
@@ -124,15 +124,15 @@ public class ContextualManagerVisit {
 		this.endTime = null;
 	}
 	/**
-	 * Update the ssid, bssid, start time and end time of the AP
+	 * Update the ssid, HashedMac, start time and end time of the AP
 	 * @param SSID the ssid to set
-	 * @param BSSID the bssid to set
+	 * @param HashedMac the HashedMac to set
 	 * @param startTime the start time to set
 	 * @param endTime the end time to set
 	 */
-	public void update(String SSID, String BSSID, Long startTime, Long endTime){
+	public void update(String SSID, String HashedMac, Long startTime, Long endTime){
 		this.SSID = SSID;
-		this.BSSID = BSSID;
+		this.HashedMac = HashedMac;
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}

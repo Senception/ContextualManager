@@ -21,10 +21,10 @@ import android.util.Log;
 import com.senception.contextualmanager.services.ContextualManagerCaptureService;
 
 /**
- * Copyright (C) 2016 Senception Lda
+ * Copyright (C) Senception Lda
  * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
  * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
+ * Update to Contextual Manager 2018
  * @author Igor dos Santos
  * @author José Soares
  * @version 0.1
@@ -76,10 +76,13 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_NUM_ENCOUNTERS = "encounters";
     public static final String COLUMN_AVG_ENCOUNTER_DURATION = "avgduration";
     public static final String COLUMN_IS_CONNECTED = "connected";
-	public static final String COLUMN_SIMILARITY = "i"; // Similarity of a node (measures the node's similarity).
+	// Similarity of a node (measures the node's similarity with a peer)
+	public static final String COLUMN_SIMILARITY = "i";
 	//2)PEER (SELF)
-	public static final String COLUMN_AVAILABILITY = "a"; // Internal Usage weight of a node (measures the availability of the node)
-	public static final String COLUMN_CENTRALITY = "c"; // Affinity network level of a node (measures node's centrality/popularity).
+	// Internal Usage weight of a node (measures the availability of the node)
+	public static final String COLUMN_AVAILABILITY = "a";
+	// Affinity network level of a node (measures node's centrality/popularity).
+	public static final String COLUMN_CENTRALITY = "c";
 
 	// VISITS
 	public static final String COLUMN_TIMEON = "timeon";
@@ -93,11 +96,6 @@ public class ContextualManagerSQLiteHelper extends SQLiteOpenHelper {
 	//APPS USAGE
 	public static final String COLUMN_APP_NAME = "appname";
 	public static final String COLUMN_APP_CATEGORY = "appcategory";
-
-	/* Measures the (eigenvector) similarity between the selected resource of node I and j.
-	   For instance, I can provide a measure of battery similarity over time between nodes.
-	   Or, it can provide a measure of similarity between category of applications.*/
-	//public static final String COLUMN_I = "i"
 
 	private static final String CREATE_MONDAY_TABLE = "create table "
 			+ TABLE_MONDAY + "("

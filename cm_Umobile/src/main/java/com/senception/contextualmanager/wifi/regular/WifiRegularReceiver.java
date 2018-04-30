@@ -1,6 +1,16 @@
 package com.senception.contextualmanager.wifi.regular;
 
 
+/**
+ * Copyright (C) Senception Lda
+ * Update to Contextual Manager 2017-2018
+ * @author José Soares - jose.soares@senception.com
+ * @version 0.1
+ *
+ * @file holds WifiRegularReceiver, to set the Wi-Fi Receiver
+ */
+
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

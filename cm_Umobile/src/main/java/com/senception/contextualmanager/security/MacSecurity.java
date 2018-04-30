@@ -1,7 +1,16 @@
 package com.senception.contextualmanager.security;
 
 /**
- * Created by Senception on 16/03/2018.
+ * Copyright (C) Senception Lda
+ * Author(s):
+ * 			  José Soares - jose.soares@senception.com
+ * Update to Contextual Manager 2017/2018
+ * @author Igor dos Santos
+ * @author José Soares
+ * @version 0.1
+ *
+ * @file Class to get the memory usage.
+ *
  */
 
 public class MacSecurity {

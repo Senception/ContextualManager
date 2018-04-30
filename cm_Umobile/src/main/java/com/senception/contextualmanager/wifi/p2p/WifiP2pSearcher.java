@@ -22,7 +22,7 @@ import com.senception.contextualmanager.services.ContextualManagerService;
 import java.util.Map;
 
 /**
- * 2017 COPELABS/ULHT
+ * Copyright Senception Lda
  * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
  * @author José Soares (Senception Lda) - jose.soares@senception.com

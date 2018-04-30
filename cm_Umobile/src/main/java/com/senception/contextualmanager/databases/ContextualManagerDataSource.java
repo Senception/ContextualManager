@@ -1,13 +1,14 @@
 /**
- * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Copyright (C) Senception Lda
+ * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
+ * Update to Contextual Manager 2018
  * @author Igor dos Santos
  * @author José Soares
  * @version 0.1
  *
- * @file Contains ContextualManagerDataSource. This class provides access to google fused location api to obtain coordinates.
+ * @file Contains ContextualManagerDataSource.
+ *
  * 
  */
 
@@ -32,10 +33,10 @@ import com.senception.contextualmanager.modals.ContextualManagerPhysicalUsage;
 
 
 /**
- * Copyright (C) 2016 Senception Lda
- * Author(s): Igor dos Santos - degomosIgor@sen-ception.com *
+ * Copyright (C) Senception Lda
+ * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
- * Update to Contextual Manager 2017
+ * Update to Contextual Manager 2018
  * @author Igor dos Santos
  * @author José Soares
  * @version 0.1
@@ -103,7 +104,7 @@ public class ContextualManagerDataSource {
 	}
 	
 	/**
-	 * Close the predefined PerSense Light database.
+	 * Close the predefined database.
 	 */
 	public void closeDB() {
 		dbHelper.close();
@@ -196,7 +197,7 @@ public class ContextualManagerDataSource {
 	private ContextualManagerAP cursorToAP(Cursor cursor) {
 		ContextualManagerAP ap = new ContextualManagerAP();
 		ap.setId(cursor.getInt(0));
-		ap.setBSSID(cursor.getString(1));
+		ap.setHashedMac(cursor.getString(1));
 		ap.setDayOfWeek(cursor.getString(2));
 		ap.setSSID(cursor.getString(3));
 		ap.setAttractiveness(cursor.getDouble(4));
@@ -212,11 +213,12 @@ public class ContextualManagerDataSource {
 	 * @param cursor Cursor pointing to a record of the Peers table.
 	 * @return the TKiddoAP object
 	 */
+
 	private ContextualManagerAP cursorPeers(Cursor cursor) {
 		ContextualManagerAP ap = new ContextualManagerAP();
 		ap.setId(cursor.getInt(0)); //id
 		ap.setSSID(cursor.getString(1)); // ssid
-		ap.setBSSID(cursor.getString(2)); // bssid
+		ap.setHashedMac(cursor.getString(2)); // HashedMAC
 		ap.setLatitude(cursor.getDouble(3)); // latitude
 		ap.setLongitude(cursor.getDouble(4)); // longitude
         ap.setAvailability(cursor.getDouble(5)); // a
@@ -230,12 +232,14 @@ public class ContextualManagerDataSource {
 		return ap;
 	}
 
+
 	/**
 	 * Function cursorResourceUsage
 	 * Converts a cursor pointing to a record in the ResourceUsage table to a Contextual Manager object.
 	 * @param cursor Cursor pointing to a record of the ResourceUsage table.
 	 * @return the Contextual Manager object
 	 */
+
 	private ContextualManagerPhysicalUsage cursorResourceUsage(Cursor cursor){
 		ContextualManagerPhysicalUsage pru = new ContextualManagerPhysicalUsage();
 		pru.setResourceType(cursor.getString(1));
@@ -250,6 +254,7 @@ public class ContextualManagerDataSource {
 	 * @param cursor Cursor pointing to a record of the AppsResourceUsage table.
 	 * @return the Contextual Manager object
 	 */
+
 	private ContextualManagerAppUsage cursorAppResourceUsage (Cursor cursor){
 		ContextualManagerAppUsage app = new ContextualManagerAppUsage();
 		app.setAppName(cursor.getString(1));
@@ -268,7 +273,7 @@ public class ContextualManagerDataSource {
 	 */
 	public long registerNewAP (ContextualManagerAP ap, String tableName) {
 		ContentValues values = new ContentValues();
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
+	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getHashedMac());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, ap.getDayOfWeek());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_ATTRACTIVENESS, ap.getAttractiveness());
@@ -288,7 +293,7 @@ public class ContextualManagerDataSource {
 	public long registerNewPeers (ContextualManagerAP ap, String tableName) {
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
+	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getHashedMac());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
@@ -354,9 +359,9 @@ public class ContextualManagerDataSource {
 	 * @return true, if successful.
 	 */
 	public boolean updateAP(ContextualManagerAP ap, String tableName) {
-		String identifier = ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getBSSID() + "'"+" COLLATE NOCASE ";
+		String identifier = ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getHashedMac() + "'"+" COLLATE NOCASE ";
 		ContentValues values = new ContentValues();
-		values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
+		values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getHashedMac());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_DAYOFTHEWEEK, ap.getDayOfWeek());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_ATTRACTIVENESS, ap.getAttractiveness());
@@ -376,11 +381,11 @@ public class ContextualManagerDataSource {
 	 * @return true, if successful.
 	 */
 	public boolean updatePeer(ContextualManagerAP ap, String tableName) {
-		String identifier = ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getBSSID() + "'"+" COLLATE NOCASE ";
+		String identifier = ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + ap.getHashedMac() + "'"+" COLLATE NOCASE ";
 
 		ContentValues values = new ContentValues();
 		values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, ap.getSSID());
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getBSSID());
+	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, ap.getHashedMac());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LATITUDE, ap.getLatitude());
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_LONGITUDE, ap.getLongitude());
 		values.put(ContextualManagerSQLiteHelper.COLUMN_AVAILABILITY, ap.getAvailability());
@@ -449,13 +454,13 @@ public class ContextualManagerDataSource {
 	/**
 	 * Function getAP
 	 * Gets an AP already registered by the application. 
-	 * @param bssid The ssid of the AP which information should be returned
+	 * @param HashedMAC The ssid of the AP which information should be returned
 	 * @param tableName name of the table on the database
 	 * @return the ContextualManagerAP object, null if not found.
 	 */
-	public ContextualManagerAP getAP(String bssid, String tableName) {
+	public ContextualManagerAP getAP(String HashedMAC, String tableName) {
 		ContextualManagerAP ap;
-		Cursor cursor = db.query(tableName, allColumns, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null, null, null, null);
+		Cursor cursor = db.query(tableName, allColumns, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + HashedMAC + "'", null, null, null, null);
 		if (cursor.moveToFirst())
 			ap = cursorToAP(cursor);
 		else
@@ -468,13 +473,13 @@ public class ContextualManagerDataSource {
 	/**
 	 * Function getPeer
 	 * Gets an Peer already registered by the application. 
-	 * @param bssid The ssid of the Peer which information should be returned
+	 * @param HashedMAC The ssid of the Peer which information should be returned
 	 * @param tableName name of the table on the database
 	 * @return the ContextualManagerAP object, null if not found.
 	 */
-	public ContextualManagerAP getPeer(String bssid, String tableName) {
+	public ContextualManagerAP getPeer(String HashedMAC, String tableName) {
 		ContextualManagerAP ap;
-		Cursor cursor = db.query(tableName, allColumnsPeers, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'"+ " COLLATE NOCASE ", null, null, null, null);
+		Cursor cursor = db.query(tableName, allColumnsPeers, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + HashedMAC + "'"+ " COLLATE NOCASE ", null, null, null, null);
 		if (cursor.moveToFirst())
 			ap = cursorPeers(cursor);
 		else
@@ -540,7 +545,7 @@ public class ContextualManagerDataSource {
 	 * Function getDayOrWeekAP
 	 * Gets the all the AP recorded by the application on the day or week table.
 	 * @param tableName name of the table on the database
-	 * @return A map with the AP objects, and the bssid as key.
+	 * @return A map with the AP objects, and the HashedMAC as key.
 	 */
 	public Map<String, ContextualManagerAP> getDayOrWeekAP(String tableName) {
 		Map<String, ContextualManagerAP> apMap = new TreeMap<String, ContextualManagerAP>();
@@ -550,7 +555,7 @@ public class ContextualManagerDataSource {
 		
 		while (!cursor.isAfterLast()) {
 			ContextualManagerAP ap = cursorToAP(cursor);
-			apMap.put(ap.getBSSID(), ap);
+			apMap.put(ap.getHashedMac(), ap);
 			cursor.moveToNext();
 		}
 
@@ -562,7 +567,7 @@ public class ContextualManagerDataSource {
 	 * Function getDayOrWeekPeers
 	 * Gets the all the Peers recorded by the application on the day or week table.
 	 * @param tableName name of the table on the database
-	 * @return A map with the AP objects, and the bssid as key.
+	 * @return A map with the AP objects, and the HashedMAC as key.
 	 */
 	public Map<String, ContextualManagerAP> getDayOrWeekPeers(String tableName) {
 		Map<String, ContextualManagerAP> apMap = new TreeMap<String, ContextualManagerAP>();
@@ -572,7 +577,7 @@ public class ContextualManagerDataSource {
 		
 		while (!cursor.isAfterLast()) {
 			ContextualManagerAP ap = cursorPeers(cursor);
-			apMap.put(ap.getBSSID(), ap);
+			apMap.put(ap.getHashedMac(), ap);
 			cursor.moveToNext();
 		}
 
@@ -584,7 +589,7 @@ public class ContextualManagerDataSource {
 	 * Function getAllAP
 	 * Gets the all the AP recorded by the application on the AP table.
 	 * @param tableName name of the table on the database
-	 * @return A map with the AP objects, and the bssid as key.
+	 * @return A map with the AP objects, and the HashedMAC as key.
 	 */
 	public Map<String, ContextualManagerAP> getAllAP(List <ScanResult> availableAP, String tableName) {
 		Map<String, ContextualManagerAP> apMap = new TreeMap<String, ContextualManagerAP>();
@@ -601,8 +606,8 @@ public class ContextualManagerDataSource {
 		
 		while (!cursor.isAfterLast()) {
 			ContextualManagerAP ap = cursorToAP(cursor);
-			if (scanUniques.contains(ap.getBSSID())) {
-				apMap.put(ap.getBSSID(), ap);
+			if (scanUniques.contains(ap.getHashedMac())) {
+				apMap.put(ap.getHashedMac(), ap);
 			}
 			cursor.moveToNext();
 		}
@@ -614,23 +619,23 @@ public class ContextualManagerDataSource {
 	/**
 	 * Function hasAP
 	 * Checks if a given AP has already been registered by the application.
-	 * @param bssid The ssid of the AP
+	 * @param HashedMAC The ssid of the AP
 	 * @param tableName name of the table on the database
 	 * @return true, if AP has already been registered by the application, false otherwise.
 	 */
-	public boolean hasAP (String bssid, String tableName) {
-        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+" COLLATE NOCASE ", null) == 0)? false : true;
+	public boolean hasAP (String HashedMAC, String tableName) {
+        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + HashedMAC + "'"+" COLLATE NOCASE ", null) == 0)? false : true;
 	}
 
 	/**
 	 * Function hasPeer
 	 * Checks if a given Peer has already been registered by the application.
-	 * @param bssid The ssid of the Peer
+	 * @param HashedMAC The ssid of the Peer
 	 * @param tableName name of the table on the database
 	 * @return true, if Peer has already been registered by the application, false otherwise.
 	 */
-	public boolean hasPeer(String bssid, String tableName) {
-        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + bssid + "'"+ " COLLATE NOCASE ", null) == 0)? false : true;
+	public boolean hasPeer(String HashedMAC, String tableName) {
+        return (DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + tableName + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + " = '" + HashedMAC + "'"+ " COLLATE NOCASE ", null) == 0)? false : true;
 	}
 
 	/**
@@ -666,12 +671,12 @@ public class ContextualManagerDataSource {
      * @return The stationary time for the given AP.
      */
 	public long getStationaryTime(ContextualManagerAP ap) {
-		String bssid = ap.getBSSID();
+		String HashedMAC = ap.getHashedMac();
 		long sationaryTime = 0;
 		long count = 0;
 		long startTime = 0;
 		long endTime = 0;
-		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_VISITS, allColumnsVisit, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null, null, null, null);
+		Cursor cursor = db.query(ContextualManagerSQLiteHelper.TABLE_VISITS, allColumnsVisit, ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + HashedMAC + "'", null, null, null, null);
 		
 		if (cursor.moveToFirst()) {
 			while (!cursor.isAfterLast()) {
@@ -703,8 +708,8 @@ public class ContextualManagerDataSource {
      * @return The number of visits.
      */
 	public long countVisits(ContextualManagerAP ap) {
-		String bssid = ap.getBSSID();
-        return DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_VISITS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + bssid + "'", null);
+		String HashedMAC = ap.getHashedMac();
+        return DatabaseUtils.longForQuery(db, "SELECT COUNT(*) FROM " + ContextualManagerSQLiteHelper.TABLE_VISITS + " WHERE " + ContextualManagerSQLiteHelper.COLUMN_BSSID + "='" + HashedMAC + "'", null);
 	}
 
 	/**
@@ -721,16 +726,16 @@ public class ContextualManagerDataSource {
      * Function registerNewVisit
      * Register a new visit into the database.
      * @param SSID SSID
-     * @param BSSID BSSID
+     * @param HashedMAC HashedMAC
      * @param startTime Time at which the connection started.
      * @param endTime Time at which the connection ended.
      * @return id of the created record, -1 if an error occurs.
      */
-	public long registerNewVisit (String SSID, String BSSID, Long startTime, Long endTime) {
+	public long registerNewVisit (String SSID, String HashedMAC, Long startTime, Long endTime) {
 		cal.setTimeInMillis(startTime);
 		ContentValues values = new ContentValues();
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, SSID);
-	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, BSSID);
+	    values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, HashedMAC);
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_TIMEON, startTime);
 	    values.put(ContextualManagerSQLiteHelper.COLUMN_TIMEOUT, endTime);
 	    
@@ -756,12 +761,12 @@ public class ContextualManagerDataSource {
      * Updates an existing visit in the database.
      * @param _id id of the record to update
      * @param SSID SSID
-     * @param BSSID BSSID
+     * @param HashedMAC HashedMAC
      * @param startTime Time at which the connection started.
      * @param endTime Time at which the connection ended.
      * @return id of the created record, -1 if an error occurs.
      */
-	public boolean updateVisit (long _id, String SSID, String BSSID, Long startTime, Long endTime) {
+	public boolean updateVisit (long _id, String SSID, String HashedMAC, Long startTime, Long endTime) {
 		String identifier = ContextualManagerSQLiteHelper.COLUMN_ID + "=" + _id;
 		
 		ContentValues values = new ContentValues();
@@ -770,7 +775,7 @@ public class ContextualManagerDataSource {
 			values.put(ContextualManagerSQLiteHelper.COLUMN_SSID, SSID);
 		
 		if (SSID != null)
-			values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, BSSID);
+			values.put(ContextualManagerSQLiteHelper.COLUMN_BSSID, HashedMAC);
 	    
 		if (startTime != null) {
 			values.put(ContextualManagerSQLiteHelper.COLUMN_TIMEON, startTime);

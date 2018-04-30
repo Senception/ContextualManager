@@ -83,7 +83,7 @@ public class ContextualManagerService extends Service{
 	ContextualManagerWifiP2P receiver;
 	private IntentFilter intentFilter;
 	private static double dispositionalTrust = 1.0;
-	private static String fusedBssid = "";
+	private static String fusedHashedMac = "";
 	private static String fusedSsid = "";
 	private static int noCoordinate = 0;
 	private AlarmManager alarmManager;
@@ -211,10 +211,14 @@ public class ContextualManagerService extends Service{
 	 */
 	public void discoveredPeers(ArrayList<ContextualManagerAP> cmPeerList){
         Log.d(TAG, "Peers found");
-        if(fusedLocation.mCurrentLocation != null){
+		/*
+		* @todo fused location would be used to store and to exchange coordinates. At this stage this is not required
+		*
+        */
+        /*if(fusedLocation.mCurrentLocation != null){
 			latitude = fusedLocation.mCurrentLocation.getLatitude();
 			longitude = fusedLocation.mCurrentLocation.getLongitude();
-
+*/
             ArrayList<ContextualManagerAP> allPeersOnDB = new ArrayList<>();
 
             //Get a list with all the peers in the data base*/
@@ -230,7 +234,7 @@ public class ContextualManagerService extends Service{
             for (int i = 0; i < allPeersOnDB.size(); i++) {
                 ContextualManagerAP peerOnDB = allPeersOnDB.get(i);
                 for (int j = 0; j < cmPeerList.size(); j++) {
-                    if(peerOnDB.getBSSID().equals(MacSecurity.md5Hash(cmPeerList.get(j).getBSSID()))){
+                    if(peerOnDB.getHashedMac().equals(MacSecurity.md5Hash(cmPeerList.get(j).getHashedMac()))){
                         connectionLost = false;
                         break;
                     }
@@ -248,12 +252,12 @@ public class ContextualManagerService extends Service{
             }
 
 			for(ContextualManagerAP item: cmPeerList){
-                String hashBSSID = MacSecurity.md5Hash(item.getBSSID());
+                String hashHashedMac = MacSecurity.md5Hash(item.getHashedMac());
 				ContextualManagerAP ap = new ContextualManagerAP();
                 //if its the 1st time wee see the peer
-				if(!dataSource.hasPeer(hashBSSID, checkWeek("peers"))){
+				if(!dataSource.hasPeer(hashHashedMac, checkWeek("peers"))){
 					ap.setSSID(item.getSSID());
-					ap.setBSSID(hashBSSID);
+					ap.setHashedMac(hashHashedMac);
 					ap.setLatitude(latitude);
 					ap.setLongitude(longitude);
                     ap.setAvailability(0.0);
@@ -280,9 +284,9 @@ public class ContextualManagerService extends Service{
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and saved into the DB");
 				}
 				else{ //the peer found was already on the database
-					ContextualManagerAP peer = dataSource.getPeer(hashBSSID, checkWeek("peers"));
+					ContextualManagerAP peer = dataSource.getPeer(hashHashedMac, checkWeek("peers"));
 					peer.setSSID(item.getSSID());
-					peer.setBSSID(hashBSSID);
+					peer.setHashedMac(hashHashedMac);
 					peer.setLatitude(latitude);
 					peer.setLongitude(longitude);
 					peer.setNumEncounters(peer.getNumEncounters()+1);
@@ -301,16 +305,19 @@ public class ContextualManagerService extends Service{
                     Log.d(TAG, "startEnc = " + peerStartEnc);
                     int duration = (peerEndEnc-peerStartEnc);
                     Log.d(TAG, "duration = " + duration);
-                    peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) ((System.currentTimeMillis() - TIMESTAMP)/ 60*1000));
+					peer.setAvgEncounterDuration(((0.7*peerAvgEncDur)+0.3*(peerEndEnc-peerStartEnc))/((System.currentTimeMillis()-TIMESTAMP)/1000));
+                   // peer.setAvgEncounterDuration((peerAvgEncDur + duration)/ (double) ((System.currentTimeMillis() - TIMESTAMP)/ 60*1000));
                     Log.d(TAG, "The avgEncounterDuration of the peer " + peer.getSSID() + " is " + peer.getAvgEncounterDuration());
 					dataSource.updatePeer(peer, checkWeek("peers"));
                     Log.d(TAG, "The peer " + ap.getSSID() + " was found and updated into the DB");
 				}
             }
-		}
+
+	/*}
 		else{
 			//Log.d(TAG, "[*] DISCOVERED PEERS --> Wait for coordinates");
 		}
+	*/
 	}
 
 	/**
@@ -335,9 +342,9 @@ public class ContextualManagerService extends Service{
 					if(latitude != 0.0 && longitude != 0.0 ){
 						//String hashSSID = md5Hash(scan.SSID);
 						ap.setSSID(scan.SSID);
-                        String hashBSSID = MacSecurity.md5Hash(scan.BSSID);
-                        //ap.setBSSID(scan.BSSID);
-                        ap.setBSSID(hashBSSID);
+                        String HashedMac = MacSecurity.md5Hash(scan.BSSID);
+                        //ap.setHashedMac(scan.HashedMac);
+                        ap.setHashedMac(HashedMac);
 						ap.setDayOfWeek(sdf.format(date));
 						if(scan.SSID == "" || scan.SSID == null || scan.SSID.isEmpty()){
 							ap.setSSID("Unknown");
@@ -356,7 +363,7 @@ public class ContextualManagerService extends Service{
 					if(latitude != 0.0 && longitude != 0.0){
 						String hashSSID = MacSecurity.md5Hash(scan.SSID);
 						ContextualManagerAP ap = dataSource.getAP(scan.BSSID, checkWeek("ap"));
-						ap.setBSSID(scan.BSSID);
+						ap.setHashedMac(scan.BSSID);
 						ap.setDayOfWeek(sdf.format(date));
 						ap.setSSID(hashSSID);
 						ap.setDateTime(dataFormat.format(System.currentTimeMillis()));
@@ -841,8 +848,8 @@ public class ContextualManagerService extends Service{
 		return null;
 	}
 
-	public static String getFusedBssid(){
-		return fusedBssid;
+	public static String getFusedHashedMac(){
+		return fusedHashedMac;
 	}
 	public static String getFusedSsid(){
 		return fusedSsid;
@@ -850,13 +857,13 @@ public class ContextualManagerService extends Service{
 	public static int getNoCoordinate(){
 		return noCoordinate;
 	}
-	public void actulizaCoordenadas(String bssid ,String ssid, double latitude, double longitude){
+	public void actulizaCoordenadas(String HashedMac ,String ssid, double latitude, double longitude){
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE");
 		Date date = new Date();
 
 		if(latitude != 0.0 && longitude != 0.0){
-			ContextualManagerAP ap = dataSource.getAP(bssid, checkWeek("ap"));
-			ap.setBSSID(bssid);
+			ContextualManagerAP ap = dataSource.getAP(HashedMac, checkWeek("ap"));
+			ap.setHashedMac(HashedMac);
 			ap.setDayOfWeek(sdf.format(date));
 			ap.setSSID(ssid);
 			ap.setAttractiveness(dispositionalTrust);
@@ -877,9 +884,9 @@ public class ContextualManagerService extends Service{
 		listenersWifiP2p.add(listener);
 	}
 
-	public void notifyOnFoundPersence(ArrayList<ContextualManagerAP> disc, ArrayList<ContextualManagerAP> reg){
+	public void notifyOnFoundGroup(ArrayList<ContextualManagerAP> disc, ArrayList<ContextualManagerAP> reg){
 		for(ContextualManagerWifiP2PChangeListener listener: listenersWifiP2p){
-			listener.onFoundPersenceGroup(disc, reg);
+			listener.onFoundGroup(disc, reg);
 		}
 	}
 
@@ -924,7 +931,7 @@ public class ContextualManagerService extends Service{
 	}
 
 	class PerSenseServiceWifiListener implements ContextualManagerWifiChangeListener {
-		public void onWifiStateDisabled(boolean valid, String bssid, String ssid, long visitId, long connectionStart, long connectionEnd){
+		public void onWifiStateDisabled(boolean valid, String HashedMac, String ssid, long visitId, long connectionStart, long connectionEnd){
 			notifyPredictedMoveChange(getString(R.string.wifiOff));
 			if(valid){
 				dataSource.updateVisit(visitId, null,null,null, connectionEnd);
@@ -936,24 +943,24 @@ public class ContextualManagerService extends Service{
 			notifyPredictedMoveChange(getString(R.string.bestAp)+" "+"(" + ssid + ")");
 
 		}
-		public void onWifiConnectionDown(boolean valid, String bssid, String ssid, long visitId, long connectionStart, long connectionEnd){
+		public void onWifiConnectionDown(boolean valid, String HashedMac, String ssid, long visitId, long connectionStart, long connectionEnd){
 			notifyPredictedMoveChange(getString(R.string.wifiDown));
 			if(valid){
 				dataSource.updateVisit(visitId, null, null, null, connectionEnd);
 				notifyDataBaseChange();
 			}
 		}
-		public long onWifiConnectionUp(String bssid, String ssid, List<ScanResult> lastScanResults){
+		public long onWifiConnectionUp(String HashedMac, String ssid, List<ScanResult> lastScanResults){
 			notifyPredictedMoveChange(getString(R.string.wifiUp) +"(" + ssid + ")");
 			SimpleDateFormat sdf = new SimpleDateFormat("EEE");
 			Date date = new Date();
 
 			if(fusedLocation.mCurrentLocation == null){
 
-				if(!dataSource.hasAP(bssid, checkWeek("ap"))){
+				if(!dataSource.hasAP(HashedMac, checkWeek("ap"))){
 
 					ContextualManagerAP ap = new ContextualManagerAP();
-					ap.setBSSID(bssid);
+					ap.setHashedMac(HashedMac);
 					ap.setDayOfWeek(sdf.format(date));
 					ap.setSSID(ssid);
 					ap.setAttractiveness(dispositionalTrust);
@@ -962,7 +969,7 @@ public class ContextualManagerService extends Service{
 					ap.setLongitude(longitude);
 					dataSource.registerNewAP(ap, checkWeek("ap"));
 
-					fusedBssid = bssid;
+					fusedHashedMac = HashedMac;
 					fusedSsid = ssid;
 					noCoordinate = 1;
 				}
@@ -973,10 +980,10 @@ public class ContextualManagerService extends Service{
 				longitude = fusedLocation.mCurrentLocation.getLongitude();
 
 
-				if(!dataSource.hasAP(bssid, checkWeek("ap"))){
+				if(!dataSource.hasAP(HashedMac, checkWeek("ap"))){
 					if(latitude != 0.0 && longitude != 0.0){
 						ContextualManagerAP ap = new ContextualManagerAP();
-						ap.setBSSID(bssid);
+						ap.setHashedMac(HashedMac);
 						ap.setDayOfWeek(sdf.format(date));
 						ap.setSSID(ssid);
 						ap.setAttractiveness(dispositionalTrust);
@@ -988,8 +995,8 @@ public class ContextualManagerService extends Service{
 				}
 				else{
 					if(latitude != 0.0 && longitude != 0.0){
-						ContextualManagerAP ap = dataSource.getAP(bssid, checkWeek("ap"));
-						ap.setBSSID(bssid);
+						ContextualManagerAP ap = dataSource.getAP(HashedMac, checkWeek("ap"));
+						ap.setHashedMac(HashedMac);
 						ap.setDayOfWeek(sdf.format(date));
 						ap.setSSID(ssid);
 						ap.setAttractiveness(dispositionalTrust);
@@ -1001,26 +1008,26 @@ public class ContextualManagerService extends Service{
 				}
 			}
 
-			computeBestAp(bssid, lastScanResults);
+			computeBestAp(HashedMac, lastScanResults);
 			notifyDataBaseChange();
 
-			return dataSource.registerNewVisit(ssid, bssid, wifiManager.wifiCurrentAPStart, wifiManager.wifiCurrentAPStart);
+			return dataSource.registerNewVisit(ssid, HashedMac, wifiManager.wifiCurrentAPStart, wifiManager.wifiCurrentAPStart);
 		}
 
-		public void onWifiAvailableNetworksChange(String bssid, List<ScanResult> results){
-			computeBestAp(bssid, results);
+		public void onWifiAvailableNetworksChange(String HashedMac, List<ScanResult> results){
+			computeBestAp(HashedMac, results);
 		}
 		@SuppressWarnings("unused")
-		private void computeBestAp(String bssid, List<ScanResult> results){
+		private void computeBestAp(String HashedMac, List<ScanResult> results){
 
 			ContextualManagerAP bestAp =dataSource.getBestAP(results, checkWeek("ap"));
 			if(bestAp != null){
-				if(bestAp.getBSSID().equals(bssid)){
+				if(bestAp.getHashedMac().equals(HashedMac)){
 					long timeToMove = dataSource.getStationaryTime(bestAp) - (System.currentTimeMillis() - wifiManager.wifiCurrentAPStart)/1000;
 					notifyPredictedMoveChange(getString(R.string.bestAp)+" "+"(" + bestAp.getSSID() + ")");
 				}
 				else{
-					long timeToMove = dataSource.getStationaryTime(dataSource.getAP(bssid, checkWeek("ap"))) - (System.currentTimeMillis() - wifiManager.wifiCurrentAPStart)/1000;
+					long timeToMove = dataSource.getStationaryTime(dataSource.getAP(HashedMac, checkWeek("ap"))) - (System.currentTimeMillis() - wifiManager.wifiCurrentAPStart)/1000;
 					if(timeToMove >= 0){
 						notifyPredictedMoveChange(getString(R.string.handover)+" " + bestAp.getSSID()+" " + getString(R.string.expected)+" " + timeToMove + "s");
 					}

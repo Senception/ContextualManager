@@ -17,14 +17,15 @@ import java.util.Map;
 
 
 /**
- * Copyright (C) 2016 Senception Lda
- * Update to Contextual Manager 2017
- * @author Igor dos Santos - degomosIgor@sen-ception.com
+ * Copyright (C) Senception Lda
+ * Update to Contextual Manager 2018
+ * @author Igor dos Santos - degomosIgor@senception.com
  * @author José Soares - jose.soares@senception.com
  * @version 0.1
  *
  * @file Contains ContextualManagerReceive. This class is used
- * to receive information from contextual managers (A,C)
+ * to receive information from contextual managers
+ * We send directly the values A (availability), C (Centrality) and I (similarity)
  */
 public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvailable {
 
@@ -33,7 +34,7 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
     private Context mContext;
 
     /**
-     * Constructs a contectualManagerReceive that will be attempting to
+     * Constructs a contextualManagerReceive that will be attempting to
      * receive the availability and centrality from other peers that are
      * also running the Contextual Manager.
      * @param context
@@ -47,13 +48,12 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
 
     @Override
     public void onTxtRecordAvailable(String fullDomainName, Map<String, String> txtRecordMap, WifiP2pDevice srcDevice) {
-        //TODO resolve error: getting txtrecord with a and c null ---> Cannot reproduce error.
-        if(txtRecordMap != null && txtRecordMap.size() != 0) {
+          if(txtRecordMap != null && txtRecordMap.size() != 0) {
             //Log.d(TAG, "txtRecord: " + txtRecordMap.toString());
-            Log.d(TAG, "received from" + srcDevice.deviceName);
+            //Log.d(TAG, "received from" + srcDevice.deviceName);
             String a = txtRecordMap.get(Identity.AVAILABILITY);
             String c = txtRecordMap.get(Identity.CENTRALITY);
-            Log.d("teste", "Received a: " + a + "\t c : " + c);
+            Log.d(TAG, "Received a: " + a + "\t c : " + c);
 
             double A = 0;
             double C = 0;
@@ -63,24 +63,25 @@ public class ContextualManagerReceive implements WifiP2pListener.TxtRecordAvaila
                 C = Double.parseDouble(c);
             }
 
-            String hashSrcDeviceBSSID = MacSecurity.md5Hash(srcDevice.deviceAddress);
+            String hashSrcDeviceHashedMac = MacSecurity.md5Hash(srcDevice.deviceAddress);
 
             //if it's the first time we see this peer we save it
-            if (!dataSource.hasPeer(hashSrcDeviceBSSID, ContextualManagerService.checkWeek("peers"))) {
+            if (!dataSource.hasPeer(hashSrcDeviceHashedMac, ContextualManagerService.checkWeek("peers"))) {
                 ContextualManagerAP peer = new ContextualManagerAP();
                 peer.setSSID(srcDevice.deviceName);
-                peer.setBSSID(hashSrcDeviceBSSID);
+                peer.setHashedMac(hashSrcDeviceHashedMac);
                 //TODO peer.setLatitude(latitude);
                 //TODO peer.setLongitude(longitude);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 peer.setNumEncounters(1);
-                peer.setStartEncounter((int)(System.currentTimeMillis()/1000)); //time in seconds System.currentTimeMillis()/1000
+                //time in seconds System.currentTimeMillis()/1000
+                peer.setStartEncounter((int)(System.currentTimeMillis()/1000));
                 dataSource.registerNewPeers(peer, ContextualManagerService.checkWeek("peers"));
             } else {
-                ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceBSSID, ContextualManagerService.checkWeek("peers"));
+                ContextualManagerAP peer = dataSource.getPeer(hashSrcDeviceHashedMac, ContextualManagerService.checkWeek("peers"));
                 peer.setSSID(srcDevice.deviceName);
-                peer.setBSSID(hashSrcDeviceBSSID);
+                peer.setHashedMac(hashSrcDeviceHashedMac);
                 peer.setAvailability(A);
                 peer.setCentrality(C);
                 //TODO peer.setLatitude(latitude);

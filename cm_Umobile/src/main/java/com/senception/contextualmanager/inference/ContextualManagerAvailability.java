@@ -8,7 +8,7 @@ import com.senception.contextualmanager.services.ContextualManagerCaptureService
 import java.util.ArrayList;
 
 /**
- * Copyright (C) 2016 Senception Lda
+ * Copyright (C) Senception Lda
  * Author(s): Igor dos Santos - degomosIgor@senception.com *
  * 			  José Soares - jose.soares@senception.com
  * Update to Contextual Manager 2017/2018
@@ -44,9 +44,7 @@ public class ContextualManagerAvailability {
         // Availability is an weighted average of all values of r
         // @todo improve the average accuracy, by using another type of weighted average
         Availability = Availability/t;
-        Log.d("teste", "r is:"+rList.toString());
-        Log.d("teste", "t is:"+t);
-        Log.d("teste", "Availability A  = " + Availability);
+        Log.d("calculateA", "Availability A  = " + Availability);
      return Availability;
     }
 
@@ -62,20 +60,21 @@ public class ContextualManagerAvailability {
 
         ArrayList<Double> res = new ArrayList<>();
         for (int i = 0; i < usagePerHour1.size(); i++) {
-            //-1 + -1 = -1
-            if(usagePerHour1.get(i) == -1 && usagePerHour2.get(i) == -1){
+           if(usagePerHour1.get(i) == -1 && usagePerHour2.get(i) == -1){
                 res.add(usagePerHour1.get(i));
             }
-            //-1+30 = 30 --> 30/currentHour
+            /* for proof-of-concept demo, we are using an array with 60 positions (60 minutes). Originally this was intended for 24 positions
+            * TODO adjust to the best value e.g., availability per minute, availability per hour, etc
+            */
             else if ( usagePerHour1.get(i) == -1 && usagePerHour2.get(i) != -1){
                 res.add(usagePerHour2.get(i) / (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000);
             }
-            //30+-1 = 30 --> 30/currentHour
+
             else if (usagePerHour2.get(i) == -1 && usagePerHour1.get(i) != -1){
                 res.add(usagePerHour1.get(i) / (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000);
             }
-            //30+30 = 60 --> 60/currentHour
-            else{ // Maybe we should use the time in hours instead of minutes
+
+            else{
                 res.add((usagePerHour1.get(i) + usagePerHour2.get(i)) / ( (System.currentTimeMillis() - ContextualManagerCaptureService.TIMESTAMP)/60*1000)); //todo optimize without dividing for the hour in the sumArrays method
             }
         }
@@ -93,15 +92,15 @@ public class ContextualManagerAvailability {
      */
     public static ArrayList<Double> calculateR(ArrayList<Double> e, ArrayList<Double>
             cpu, ArrayList<Double> mem, ArrayList<Double> storage){
-        Log.d("teste", "e = " + e.toString());
-        Log.d("teste", "cpu = " + cpu.toString());
-        Log.d("teste", "mem = " + mem.toString());
-        Log.d("teste", "s = " + storage.toString());
-        ArrayList<Double> e2 = multiplyArrays(e, e); // e square
-        ArrayList<Double> e2Cpu = multiplyArrays(e2, cpu); // e2 * cpu
-        ArrayList<Double> memStor = multiplyArrays(mem, storage); // mem * storage
-        ArrayList<Double> r = multiplyArrays(e2Cpu, memStor);
-        //todo resources between [0..100], but we need r between [0..1]
+        Log.d("calculateR", "e = " + e.toString());
+        Log.d("calculateR", "cpu = " + cpu.toString());
+        Log.d("calculateR", "mem = " + mem.toString());
+        Log.d("calculateR", "s = " + storage.toString());
+        ArrayList<Double> e2 = multiplyArrays(e, e); // battery is squared, as it has more weight than the other values
+        ArrayList<Double> e2Cpu = multiplyArrays(e2, cpu); // e2cpu concerns available CPU
+        ArrayList<Double> memStor = multiplyArrays(mem, storage); // memstor multiplies memory and storage
+        ArrayList<Double> r = multiplyArrays(e2Cpu, memStor); //final result for r
+        // set r to be between 0 and 1
         double d = Math.pow(100,5);
         for (int i = 0; i < r.size(); i++) {
             if(r.get(i) != -1){

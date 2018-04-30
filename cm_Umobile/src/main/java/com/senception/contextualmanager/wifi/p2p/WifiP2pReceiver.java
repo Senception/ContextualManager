@@ -21,7 +21,7 @@ import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION;
 import static android.net.wifi.p2p.WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION;
 
 /**
- * 2017 COPELABS/ULHT
+ * Copyright Senception Lda
  * Update to Contextual Manager 2018 Senception Lda
  * @author Miguel Tavares (COPELABS/ULHT)
  * @author José Soares (Senception Lda) - jose.soares@senception.com
